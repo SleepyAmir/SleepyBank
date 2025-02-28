@@ -15,13 +15,11 @@ import java.time.LocalDate;
 @SuperBuilder
 @ToString
 
-
-
-public class Person {
-
-    private String firstName;
-    private String lastName;
-    private String email;
-    private int phone;
-    private LocalDate birthDate;
+public class Account {
+    private String username;
+    private String password;
+    private int cardNumber;
+    private int cvv2Code;
+    private LocalDate expiryDate;
+    private double balance;
 }

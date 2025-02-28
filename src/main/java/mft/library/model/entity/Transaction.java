@@ -1,13 +1,11 @@
 package mft.library.model.entity;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDate;
-
 
 @NoArgsConstructor
 @Getter
@@ -15,13 +13,10 @@ import java.time.LocalDate;
 @SuperBuilder
 @ToString
 
+public class Transaction {
+    private int id;
+    private String type;
+    private double amount;
+    private String recipient;
 
-
-public class Person {
-
-    private String firstName;
-    private String lastName;
-    private String email;
-    private int phone;
-    private LocalDate birthDate;
 }

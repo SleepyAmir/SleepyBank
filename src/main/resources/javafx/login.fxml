@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -12,7 +13,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="280.0" prefWidth="289.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
     <children>
@@ -35,30 +35,27 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <GridPane layoutX="30.0" layoutY="71.0" prefHeight="128.0" prefWidth="253.0">
+        <GridPane layoutX="46.0" layoutY="73.0" prefHeight="91.0" prefWidth="202.0">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.5999755859375" minWidth="10.0"
-                                   prefWidth="70.79998779296875"/>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="136.79998779296875" minWidth="10.0"
-                                   prefWidth="129.20001220703125"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.5999755859375" minWidth="10.0" prefWidth="58.5999755859375" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.20001220703125" minWidth="10.0" prefWidth="143.4000244140625" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="45.600006103515625" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="45.399993896484375" vgrow="SOMETIMES" />
             </rowConstraints>
-            <Label text="Name"/>
-            <Label text="Email" GridPane.rowIndex="1"/>
-            <Label text="Password" GridPane.rowIndex="2"/>
-            <TextField fx:id="nameTxt" GridPane.columnIndex="1"/>
-            <TextField fx:id="emailTxt" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-            <TextField fx:id="passwordTxt" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Label prefHeight="17.0" prefWidth="58.0" text="Username" />
+            <Label text="Password" GridPane.rowIndex="1" />
+            <TextField fx:id="userNameTxt" GridPane.columnIndex="1" />
+            <TextField fx:id="passwordTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         </GridPane>
-        <Button fx:id="loginBtn" layoutX="102.0" layoutY="228.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="86.0" text="Login" />
+        <Button fx:id="loginBtn" layoutX="44.0" layoutY="176.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" text="Login" />
         <Text layoutX="110.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sleepy Bank" textAlignment="CENTER">
             <font>
                 <Font size="14.0" />
             </font>
         </Text>
+      <Hyperlink fx:id="registerLink" layoutX="44.0" layoutY="205.0" text="Register" />
+      <Hyperlink fx:id="forgotPasswordLink" layoutX="44.0" layoutY="224.0" text="Forgot Password" />
     </children>
 </Pane>

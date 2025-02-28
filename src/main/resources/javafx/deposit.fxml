@@ -9,7 +9,13 @@
 <?import javafx.scene.text.Text?>
 
 
+<?import java.net.URL?>
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="368.0" prefWidth="431.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+
+    <stylesheets>
+        <URL value="@/javafx/styles/deposit.css" />
+    </stylesheets>
+
    <children>
       <MenuBar prefHeight="25.0" prefWidth="431.0">
         <menus>

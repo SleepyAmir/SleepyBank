@@ -1,0 +1,105 @@
+/* Root styles */
+.root {
+    -fx-background-color: #f8f7ff; /* Lavender light background */
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 12px;
+}
+
+/* Color variables */
+* {
+    -fx-lavender-light: #e6e6fa;
+    -fx-lavender-medium: #9e91e8;
+    -fx-lavender-dark: #7c69c9;
+    -fx-text-color: #333333;
+}
+
+/* Title styling */
+.title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-lavender-dark; /* Dark lavender for title */
+    -fx-text-alignment: center;
+}
+
+/* Label styling */
+.label {
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+    -fx-fill: -fx-text-color; /* Dark gray text */
+}
+
+/* Text field styling */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: -fx-lavender-medium; /* Medium lavender border */
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+}
+
+.text-field:focused {
+    -fx-border-color: -fx-lavender-dark; /* Dark lavender on focus */
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, -fx-lavender-light, 3, 0, 0, 0); /* Soft shadow effect */
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: -fx-lavender-medium; /* Medium lavender background */
+    -fx-text-fill: white; /* White text */
+    -fx-font-weight: bold;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -fx-lavender-dark; /* Dark lavender on hover */
+}
+
+.button:pressed {
+    -fx-background-color: derive(-fx-lavender-dark, -10%); /* Slightly darker lavender when pressed */
+}
+
+/* Menu bar styling */
+.menu-bar {
+    -fx-background-color: -fx-lavender-light; /* Light lavender background */
+    -fx-border-color: -fx-lavender-medium; /* Medium lavender border */
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: -fx-text-color; /* Dark gray text */
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: -fx-lavender-medium; /* Medium lavender on hover */
+}
+
+.menu-bar .menu:hover .label {
+    -fx-text-fill: white; /* White text on hover */
+}
+
+.menu-bar .context-menu {
+    -fx-background-color: white; /* White context menu */
+    -fx-border-color: -fx-lavender-medium; /* Medium lavender border */
+}
+
+/* Hyperlink styling */
+.hyperlink {
+    -fx-text-fill: -fx-lavender-medium; /* Medium lavender text */
+    -fx-font-size: 12px;
+    -fx-underline: true; /* Underlined text */
+    -fx-cursor: hand;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: -fx-lavender-dark; /* Dark lavender on hover */
+}
+
+/* GridPane styling (optional) */
+.grid-pane {
+    -fx-padding: 10px; /* Padding around the grid */
+    -fx-hgap: 10px; /* Horizontal gap between columns */
+    -fx-vgap: 10px; /* Vertical gap between rows */
+}

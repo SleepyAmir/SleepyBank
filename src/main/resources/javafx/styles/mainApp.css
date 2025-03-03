@@ -1,0 +1,59 @@
+/* General body styling */
+body {
+    background-color: lavender; /* Set the background color to lavender */
+    color: #333; /* Text color for better contrast */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styling */
+header {
+    background-color: darkslateblue; /* A darker shade for contrast */
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
+
+/* Main content area */
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Buttons with lavender theme */
+button, .btn {
+    background-color: lavender;
+    border: none;
+    color: darkslateblue;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button:hover, .btn:hover {
+    background-color: plum; /* Slightly darker lavender on hover */
+}
+
+/* Links styling */
+a {
+    color: indigo;
+    text-decoration: none;
+}
+
+a:hover {
+    color: rebeccapurple; /* Change link color on hover */
+}
+
+/* Footer styling */
+footer {
+    background-color: darkslateblue;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

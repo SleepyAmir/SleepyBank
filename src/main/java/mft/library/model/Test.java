@@ -11,7 +11,7 @@ public class Test extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Load the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("/javafx/withdraw.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/javafx/mainApp.fxml"));
 
         // Create the scene
         Scene scene = new Scene(root);

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0" styleClass="background" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+    <children>
+        <VBox alignment="CENTER" layoutX="250.0" layoutY="50.0" prefHeight="400.0" prefWidth="400.0" styleClass="login-panel" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="50.0">
+            <children>
+                <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+<!--                        <Image url="@../images/bank_logo.png" />-->
+                    </image>
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                    <effect>
+                        <DropShadow color="#00000080" height="10.0" radius="4.5" width="10.0" />
+                    </effect>
+                </ImageView>
+                <Text fill="#2b579a" strokeType="OUTSIDE" strokeWidth="0.0" text="SecureBank Login">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="30.0" />
+                    </VBox.margin>
+                </Text>
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="input-container">
+                    <children>
+                        <Label text="Username:" textFill="#2b579a">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets right="10.0" />
+                            </HBox.margin>
+                        </Label>
+                        <TextField fx:id="usernameField" prefHeight="30.0" prefWidth="200.0" promptText="Enter username">
+                            <HBox.margin>
+                                <Insets />
+                            </HBox.margin>
+                        </TextField>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="15.0" left="20.0" right="20.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="input-container">
+                    <children>
+                        <Label text="Password:" textFill="#2b579a">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets right="10.0" />
+                            </HBox.margin>
+                        </Label>
+                        <PasswordField fx:id="passwordField" prefHeight="30.0" prefWidth="200.0" promptText="Enter password" />
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="30.0" left="20.0" right="20.0" />
+                    </VBox.margin>
+                </HBox>
+                <Button fx:id="loginButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" styleClass="login-button" text="Login">
+                    <onAction>#handleLogin</onAction>
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="15.0" />
+                    </VBox.margin>
+                    <effect>
+                        <DropShadow color="#00000059" height="5.0" radius="2.0" width="5.0" />
+                    </effect>
+                </Button>
+                <Label fx:id="messageLabel" textFill="RED">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <effect>
+                <DropShadow color="#00000066" height="20.0" radius="9.5" width="20.0" />
+            </effect>
+        </VBox>
+    </children>
+</AnchorPane>

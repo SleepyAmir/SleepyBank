@@ -1,6 +1,7 @@
 package bank.app.model.entity;
 
 
+import bank.app.model.entity.enums.TransactionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,12 +14,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 
-public class Transaction extends FinancialTransaction{
-    private int transactionId;
-    private int senderAccountId;//FK
-    private int receiverAccountId;//FK
+public class Transaction {
+    private int id;
+    private Account sourceAccount;
+    private Account destinationAccount;
     private double amount;
-    private String transactionType;
+    private TransactionType transactionType;
     private String timestamp;
 
 }

@@ -1,6 +1,8 @@
 package bank.app.model.entity;
 
 
+import bank.app.model.entity.enums.Role;
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,9 +15,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
 
-public class User{
+public class User {
     private int id;
     private String firstName;
     private String lastName;
@@ -25,6 +26,10 @@ public class User{
     private LocalDate birthDate;
     private String username;
     private String password;
-    private boolean isAdmin;
+    private Role role;
 
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 }

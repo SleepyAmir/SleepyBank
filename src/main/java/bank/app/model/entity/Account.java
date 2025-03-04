@@ -1,9 +1,13 @@
 package bank.app.model.entity;
 
+import bank.app.model.entity.enums.AccountType;
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDateTime;
 
 
 @NoArgsConstructor
@@ -11,13 +15,15 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 
-public class Account{
-    private int id;
-    private int userId; // Foreign Key
-    private String accountType;
+public abstract class Account {
+    private User user;
+    private AccountType accountType;
     private double balance;
-    //    private int accountId;
-//    private String cardNumber;
-//    private String cvv2;
-//    private String expiryDate;
+    private LocalDateTime createdAt;
+
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 }

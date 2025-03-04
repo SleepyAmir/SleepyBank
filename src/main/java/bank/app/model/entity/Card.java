@@ -1,9 +1,10 @@
 package bank.app.model.entity;
 
-public class Card extends Account{
+import java.time.LocalDate;
 
+public class Card extends Account{
+    private int id;
     private String cardNumber;
     private String cvv2;
-    private String expiryDate;
-
+    private LocalDate expiryDate;
 }

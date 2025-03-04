@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -27,6 +26,7 @@ public class User {
     private String username;
     private String password;
     private Role role;
+    private boolean active = true;
 
     @Override
     public String toString() {

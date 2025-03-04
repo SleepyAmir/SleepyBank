@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -20,6 +22,6 @@ public class Transaction {
     private Account destinationAccount;
     private double amount;
     private TransactionType transactionType;
-    private String timestamp;
-
+    private LocalDateTime transactionTime;
+    private String description;
 }

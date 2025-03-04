@@ -1,4 +1,4 @@
-package mft.library.model;
+package bank.app.model;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +11,7 @@ public class Test extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Load the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("/javafx/panell.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("panel.fxml"));
 
         // Create the scene
         Scene scene = new Scene(root);
@@ -25,7 +25,7 @@ public class Test extends Application {
 //    @Override
 //    public void start(Stage primaryStage) throws Exception {
 //        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/mainApp.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/mainApp.fxml"));
 //
 //        // Create the scene
 //        Scene scene = new Scene(root);
@@ -40,7 +40,7 @@ public class Test extends Application {
 //    @Override
 //    public void start(Stage primaryStage) throws Exception {
 //        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/register.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/register.fxml"));
 //
 //        // Create the scene
 //        Scene scene = new Scene(root);
@@ -56,7 +56,7 @@ public class Test extends Application {
 //    @Override
 //    public void start(Stage primaryStage) throws Exception {
 //        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/login.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
 //
 //        // Create the scene
 //        Scene scene = new Scene(root);

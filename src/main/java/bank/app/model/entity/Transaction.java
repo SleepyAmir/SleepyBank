@@ -1,4 +1,4 @@
-package mft.library.model.entity;
+package bank.app.model.entity;
 
 
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package mft.library.model.service;
+package bank.app.model.service;
 
 public class TransactionService {
 }

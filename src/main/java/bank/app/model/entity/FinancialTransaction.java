@@ -1,4 +1,4 @@
-package mft.library.model.entity;
+package bank.app.model.entity;
 
 
 import lombok.Getter;
@@ -11,7 +11,8 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 
-public abstract class FinancialTransaction extends BankEntity{
+public abstract class FinancialTransaction {
+    private int id;
     protected int senderAccountId;
     protected int receiverAccountId;
     protected double amount;

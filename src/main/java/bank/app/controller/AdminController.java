@@ -1,4 +1,4 @@
-package mft.library.controller;
+package bank.app.controller;
 
 public class AdminController {
 }

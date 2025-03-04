@@ -1,12 +1,9 @@
-package mft.library.model.entity;
+package bank.app.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDate;
 
 
 @NoArgsConstructor
@@ -14,8 +11,8 @@ import java.time.LocalDate;
 @Setter
 @SuperBuilder
 
-public class Account extends BankEntity{
-
+public class Account{
+    private int id;
     private int userId; // Foreign Key
     private String accountType;
     private double balance;

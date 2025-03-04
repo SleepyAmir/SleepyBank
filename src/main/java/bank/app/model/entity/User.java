@@ -1,4 +1,4 @@
-package mft.library.model.entity;
+package bank.app.model.entity;
 
 
 import lombok.Getter;
@@ -15,7 +15,8 @@ import java.time.LocalDate;
 @SuperBuilder
 @ToString
 
-public class User extends BankEntity{
+public class User{
+    private int id;
     private String firstName;
     private String lastName;
     private String email;

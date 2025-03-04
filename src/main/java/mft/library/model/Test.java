@@ -22,6 +22,51 @@ public class Test extends Application {
         primaryStage.setResizable(false); // Optional: Prevent resizing
         primaryStage.show();
     }
+//    @Override
+//    public void start(Stage primaryStage) throws Exception {
+//        // Load the FXML file
+//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/mainApp.fxml"));
+//
+//        // Create the scene
+//        Scene scene = new Scene(root);
+//
+//        // Set the stage properties
+//        primaryStage.setTitle("SecureBank - Register");
+//        primaryStage.setScene(scene);
+//        primaryStage.setResizable(false); // Optional: Prevent resizing
+//        primaryStage.show();
+//    }
+
+//    @Override
+//    public void start(Stage primaryStage) throws Exception {
+//        // Load the FXML file
+//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/register.fxml"));
+//
+//        // Create the scene
+//        Scene scene = new Scene(root);
+//
+//        // Set the stage properties
+//        primaryStage.setTitle("SecureBank - Register");
+//        primaryStage.setScene(scene);
+//        primaryStage.setResizable(false); // Optional: Prevent resizing
+//        primaryStage.show();
+//    }
+
+
+//    @Override
+//    public void start(Stage primaryStage) throws Exception {
+//        // Load the FXML file
+//        Parent root = FXMLLoader.load(getClass().getResource("/javafx/login.fxml"));
+//
+//        // Create the scene
+//        Scene scene = new Scene(root);
+//
+//        // Set the stage properties
+//        primaryStage.setTitle("SecureBank - Register");
+//        primaryStage.setScene(scene);
+//        primaryStage.setResizable(false); // Optional: Prevent resizing
+//        primaryStage.show();
+//    }
 
     public static void main(String[] args) {
         // Launch the JavaFX application

@@ -12,14 +12,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 
-public class Cheque {
+public class Cheque extends FinancialTransaction{
 
-    private int chequeId;
-    private int issuerAccountId;//FK
-    private int recipientAccountId;//FK
-    private double amount;
     private String chequeAddress;
     private String status;
-    private String issueDate;
+
+//    private int chequeId;
+//    private int issuerAccountId;//FK
+//    private int recipientAccountId;//FK
+//    private double amount;
+//    private String issueDate;
 
 }

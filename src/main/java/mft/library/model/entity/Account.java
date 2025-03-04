@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @Setter
 @SuperBuilder
 
-public class Account {
+public class Account extends BankEntity{
 
     private int userId; // Foreign Key
-    private int accountId;
     private String accountType;
     private double balance;
-    private String cardNumber;
-    private String cvv2;
-    private String expiryDate;
+    //    private int accountId;
+//    private String cardNumber;
+//    private String cvv2;
+//    private String expiryDate;
 }

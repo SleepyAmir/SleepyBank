@@ -15,8 +15,7 @@ import java.time.LocalDate;
 @SuperBuilder
 @ToString
 
-public class User {
-    private int userId;
+public class User extends BankEntity{
     private String firstName;
     private String lastName;
     private String email;

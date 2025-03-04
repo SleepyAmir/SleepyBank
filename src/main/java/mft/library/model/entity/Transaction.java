@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 
-public class Transaction {
+public class Transaction extends FinancialTransaction{
     private int transactionId;
     private int senderAccountId;//FK
     private int receiverAccountId;//FK

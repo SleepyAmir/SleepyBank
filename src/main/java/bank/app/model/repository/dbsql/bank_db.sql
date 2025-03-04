@@ -1,14 +1,28 @@
 create table accounts
 (
     id number primary key,
+    user nvarchar2(30)not null ,
     account_type  nvarchar2(15) not null,
-    balance number
+    balance number,
+    creation_date date
 );
 
-
+create table card
+(
+    id number primary key ,
+    user nvarchar2(30)not null ,
+    account_type  nvarchar2(15) not null,
+    balance number,
+    card_number number,
+    cvv2 number,
+    expiry_date date
+);
 create table cheques
 (
     id number primary key,
+    user nvarchar2(30)not null ,
+    account_type  nvarchar2(15) not null,
+    balance number,
     cheque_address nvarchar2(12),
     status nvarchar2(12)
 
@@ -18,9 +32,10 @@ create table cheques
 CREATE TABLE transactions
 (
     id number primary key,
-    sender_id number,
-    receive_id number,
+    source_acc number,
+    destination_acc number,
     amount number,
+    transaction_type nvarchar2(12) not null ,
     timestamp date
 
 );
@@ -39,9 +54,3 @@ create table users
     is_active  number(1) default 1
 );
 
-create table card
-(
-    card_number number,
-    cvv2 number,
-    expiry_date date
-);

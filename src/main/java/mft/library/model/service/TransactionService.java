@@ -1,4 +1,4 @@
 package mft.library.model.service;
 
-public class PersonService {
+public class TransactionService {
 }

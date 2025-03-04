@@ -11,7 +11,7 @@ public class Test extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Load the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("/javafx/register.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/javafx/panell.fxml"));
 
         // Create the scene
         Scene scene = new Scene(root);
@@ -23,9 +23,6 @@ public class Test extends Application {
         primaryStage.show();
     }
 
-    /**
-     * Main method to launch the JavaFX application.
-     */
     public static void main(String[] args) {
         // Launch the JavaFX application
         launch(args);

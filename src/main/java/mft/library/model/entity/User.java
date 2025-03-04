@@ -17,14 +17,14 @@ import java.time.LocalDate;
 
 public class User {
     private int userId;
-    private String username;
-    private String password;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
     private String address;
     private LocalDate birthDate;
+    private String username;
+    private String password;
     private boolean isAdmin;
 
 }

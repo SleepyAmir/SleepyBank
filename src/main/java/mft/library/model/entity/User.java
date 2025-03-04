@@ -1,5 +1,6 @@
 package mft.library.model.entity;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,20 +9,22 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
-
 @NoArgsConstructor
 @Getter
 @Setter
 @SuperBuilder
 @ToString
 
-
-
-public class Person {
-
+public class User {
+    private int userId;
+    private String username;
+    private String password;
     private String firstName;
     private String lastName;
     private String email;
-    private int phone;
+    private String phone;
+    private String address;
     private LocalDate birthDate;
+    private boolean isAdmin;
+
 }

@@ -13,13 +13,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
 
 public class Account {
-    private String username;
-    private String password;
-    private int cardNumber;
-    private int cvv2Code;
-    private LocalDate expiryDate;
+
+    private int userId; // Foreign Key
+    private int accountId;
+    private String accountType;
     private double balance;
+    private String cardNumber;
+    private String cvv2;
+    private String expiryDate;
 }

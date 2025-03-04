@@ -13,7 +13,7 @@
 
 <!-- Import URL for stylesheets -->
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="368.0" prefWidth="431.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="417.0" prefWidth="431.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
     <!-- Correctly link the CSS file -->
     <stylesheets>
         <URL value="@/javafx/styles/register.css" />
@@ -50,12 +50,14 @@
         <TextField layoutX="50.0" layoutY="190.0" prefHeight="25.0" prefWidth="159.0" styleClass="text-field" />
         <DatePicker layoutX="222.0" layoutY="190.0" prefHeight="25.0" prefWidth="152.0" styleClass="date-picker" />
         <Text layoutX="222.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Date Of Birth" />
-        <Text layoutX="50.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Account Information" />
-        <Text layoutX="51.0" layoutY="273.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Username" />
-        <TextField layoutX="50.0" layoutY="278.0" prefHeight="25.0" prefWidth="152.0" styleClass="text-field" />
-        <Line endX="227.20001220703125" layoutX="150.0" layoutY="252.0" startX="-100.0" />
-        <Text layoutX="219.0" layoutY="272.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Password" />
-        <TextField layoutX="219.0" layoutY="278.0" prefHeight="25.0" prefWidth="159.0" styleClass="text-field" />
-        <Button layoutX="126.0" layoutY="322.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="159.0" styleClass="button" text="Register" />
+        <Text layoutX="50.0" layoutY="293.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Account Information" />
+        <Text layoutX="51.0" layoutY="322.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Username" />
+        <TextField layoutX="50.0" layoutY="327.0" prefHeight="25.0" prefWidth="152.0" styleClass="text-field" />
+        <Line endX="227.20001220703125" layoutX="150.0" layoutY="301.0" startX="-100.0" />
+        <Text layoutX="219.0" layoutY="321.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Password" />
+        <TextField layoutX="219.0" layoutY="327.0" prefHeight="25.0" prefWidth="159.0" styleClass="text-field" />
+        <Button layoutX="126.0" layoutY="371.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="159.0" styleClass="button" text="Register" />
+      <TextField layoutX="51.0" layoutY="245.0" prefHeight="25.0" prefWidth="325.0" styleClass="text-field" />
+      <Text layoutX="51.0" layoutY="237.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Address " />
     </children>
 </Pane>

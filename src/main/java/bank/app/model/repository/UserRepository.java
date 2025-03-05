@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,6 +74,35 @@ public class UserRepository implements Repository<User, Integer>{
     public List<User> findAll() throws Exception {
         connection = ConnectionProvider.getConnectionProvider().getConnection();
         statement = connection.prepareStatement(
+                "SELECT * FROM PERSONS ORDER BY FAMILY, NAME"
+        );
+        ResultSet resultSet = statement.executeQuery();
+
+        List<User> userList = new ArrayList<>();
+        while(resultSet.next()) {
+            User user = User
+                    .builder()
+                    .id(resultSet.getInt("user_ID"))
+                    .firstName(resultSet.getString("FIRSTNAME"))
+                    .lastName(resultSet.getString("LASTNAME"))
+                    .email(resultSet.getString("EMAIL"))
+                    .phone(resultSet.getString("PHONE"))
+                    .address(resultSet.getString("ADDRESS"))
+                    .birthDate(resultSet.getDate("BIRTH_DATE").toLocalDate())
+                    .username(resultSet.getString("USERNAME"))
+                    .password(resultSet.getString("PASSWORD"))
+                    .role(Role.valueOf(resultSet.getString("ROLE_NAME")))
+                    .active(resultSet.getBoolean("IS_ACTIVE"))
+                    .build();
+            userList.add(user);
+        }
+        return userList;
+    }
+
+    @Override
+    public User findById(Integer id) throws Exception {
+        connection = ConnectionProvider.getConnectionProvider().getConnection();
+        statement = connection.prepareStatement(
                 "SELECT * FROM USERS WHERE USER_ID=?"
         );
         ResultSet resultSet = statement.executeQuery();
@@ -94,13 +124,8 @@ public class UserRepository implements Repository<User, Integer>{
                     .active(resultSet.getBoolean("IS_ACTIVE"))
                     .build();
         }
-        return Collections.singletonList(user);
+        return user;
 
-    }
-
-    @Override
-    public User findById(Integer id) throws Exception {
-        return null;
     }
 
     @Override

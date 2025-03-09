@@ -3,41 +3,27 @@ package bank.app.model.service;
 import bank.app.model.entity.Transaction;
 import bank.app.model.repository.TransactionRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class TransactionService implements Service<Transaction, Integer> {
+public class TransactionService {
+    private TransactionRepository transactionRepository = new TransactionRepository();
 
-    @Override
     public void save(Transaction transaction) throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {
             repo.save(transaction);
         }
     }
 
-    @Override
-    public void edit(Transaction transaction) throws Exception {
-        try (TransactionRepository repo = new TransactionRepository()) {
-            repo.edit(transaction);
-        }
-    }
-
-    @Override
-    public void remove(Integer id) throws Exception {
-        try (TransactionRepository repo = new TransactionRepository()) {
-            repo.remove(id);
-        }
-    }
-
-    @Override
     public List<Transaction> findAll() throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {
             return repo.findAll();
         }
     }
 
-    @Override
-    public Transaction findById(Integer id) throws Exception {
-        try (TransactionRepository repo = new TransactionRepository()) {
-            return repo.findById(id);
-        }
+    public List<Transaction> findByUserId(int userId) throws Exception {
+        return findAll().stream()
+                .filter(t -> t.getSourceAccount().getUser().getId() == userId ||
+                        t.getDestinationAccount().getUser().getId() == userId)
+                .collect(Collectors.toList());
     }
 }

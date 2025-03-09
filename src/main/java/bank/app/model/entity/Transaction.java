@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
 
 public class Transaction {
     private int id;

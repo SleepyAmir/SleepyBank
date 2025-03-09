@@ -4,90 +4,28 @@ import bank.app.model.entity.User;
 import bank.app.model.entity.enums.Role;
 import bank.app.model.repository.utils.ConnectionProvider;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
+import javafx.scene.control.TabPane;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginController implements bank.app.model.repository.Repository<User, Integer> {
+public class MainAppController implements bank.app.model.repository.Repository<User, Integer> {
 
-    @FXML private TextField userNameTxt;
-    @FXML private TextField passwordTxt;
-    @FXML private Button loginBtn;
-    @FXML private Hyperlink forgotPasswordLink;
+    @FXML private TabPane tabPane;
 
+    private User currentUser;
     private Connection connection;
     private PreparedStatement statement;
 
     @FXML
     private void initialize() {
-        loginBtn.setOnAction(event -> handleLogin());
-        forgotPasswordLink.setOnAction(event -> handleForgotPassword());
+        // Initialize dashboard components
     }
 
-    private void handleLogin() {
-        String username = userNameTxt.getText().trim();
-        String password = passwordTxt.getText().trim();
-
-        try {
-            if (username.equals("admin") && password.equals("admin")) {
-                loadView("/javafx/views/registration.fxml", "Bank Manager Registration");
-            } else {
-                User user = authenticate(username, password);
-                if (user != null) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/javafx/views/mainApp.fxml"));
-                    Parent root = loader.load();
-                    MainAppController controller = loader.getController();
-                    controller.setCurrentUser(user);
-
-                    Stage stage = (Stage) loginBtn.getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setTitle("Sleepy Bank Dashboard");
-                    stage.show();
-                } else {
-                    System.out.println("Invalid credentials");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error during login: " + e.getMessage());
-        }
-    }
-
-    private User authenticate(String username, String password) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement(
-                "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1"
-        );
-        statement.setString(1, username);
-        statement.setString(2, password);
-        ResultSet rs = statement.executeQuery();
-
-        if (rs.next()) {
-            return mapResultSetToUser(rs);
-        }
-        return null;
-    }
-
-    private void loadView(String fxmlPath, String title) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        Parent root = loader.load();
-        Stage stage = (Stage) loginBtn.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle(title);
-        stage.show();
-    }
-
-    private void handleForgotPassword() {
-        System.out.println("Forgot password functionality to be implemented later");
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        System.out.println("Logged in user: " + currentUser.getUsername());
     }
 
     @Override

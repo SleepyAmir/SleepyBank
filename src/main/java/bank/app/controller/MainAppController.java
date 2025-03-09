@@ -134,8 +134,11 @@ public class MainAppController implements Initializable {
             log.info("Dashboard populated for user: " + currentUser.getUsername());
         } catch (Exception e) {
             log.error("Error populating dashboard", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to load dashboard: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to load dashboard: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -161,84 +164,240 @@ public class MainAppController implements Initializable {
             log.info("Transactions viewed for user: " + currentUser.getUsername());
         } catch (Exception e) {
             log.error("Error viewing transactions", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to load transactions: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to load transactions: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
     private void useChequeForPurchase() {
         try {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Cheque used for purchase: " + chequeAddressTxt.getText(), ButtonType.OK);
-            alert.show();
-            log.info("Cheque used for purchase: " + chequeAddressTxt.getText());
+            String chequeNumber = chequeAddressTxt.getText();
+            Cheque cheque = chequeService.findByUserId(currentUser.getId()).stream()
+                    .filter(c -> c.getNumber().equals(chequeNumber))
+                    .findFirst()
+                    .orElse(null);
+            if (cheque != null && cheque.getPassDate().isAfter(LocalDateTime.now().toLocalDate())) {
+                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+                if (sourceCard.getBalance() >= cheque.getAmount()) {
+                    sourceCard.setBalance(sourceCard.getBalance() - cheque.getAmount());
+                    cardService.save(sourceCard);
+
+                    Transaction transaction = Transaction.builder()
+                            .sourceAccount(sourceCard)
+                            .destinationAccount(null) // No destination for purchase
+                            .amount(cheque.getAmount())
+                            .transactionType(TransactionType.Withdraw)
+                            .transactionTime(LocalDateTime.now())
+                            .description("Cheque purchase: " + chequeNumber)
+                            .build();
+                    transactionService.save(transaction);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Cheque " + chequeNumber + " used for purchase");
+                    alert.showAndWait();
+                    populateDashboard();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Insufficient balance in card");
+                    alert.showAndWait();
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid or expired cheque");
+                alert.showAndWait();
+            }
         } catch (Exception e) {
             log.error("Error using cheque", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to use cheque: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to use cheque: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
     private void manageCheques() {
-        try {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Managing cheques", ButtonType.OK);
-            alert.show();
-            log.info("Cheques managed");
-        } catch (Exception e) {
-            log.error("Error managing cheques", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to manage cheques: " + e.getMessage(), ButtonType.OK);
-            alert.show();
-        }
+        // Placeholder for future implementation
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText(null);
+        alert.setContentText("Managing cheques functionality to be implemented later");
+        alert.showAndWait();
     }
 
     private void transferToChecking() {
         try {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Transferred " + savingBalanceTxt.getText() + " to checking", ButtonType.OK);
-            alert.show();
-            log.info("Transferred to checking: " + savingBalanceTxt.getText());
+            double amount = Double.parseDouble(savingBalanceTxt.getText());
+            List<Card> cards = cardService.findByUserId(currentUser.getId());
+            Card savingCard = cards.stream()
+                    .filter(c -> c.getAccountType() == AccountType.Saving)
+                    .findFirst()
+                    .orElse(null);
+            Card checkingCard = cards.stream()
+                    .filter(c -> c.getAccountType() == AccountType.Card)
+                    .findFirst()
+                    .orElse(null);
+
+            if (savingCard != null && checkingCard != null && savingCard.getBalance() >= amount) {
+                savingCard.setBalance(savingCard.getBalance() - amount);
+                checkingCard.setBalance(checkingCard.getBalance() + amount);
+                cardService.save(savingCard);
+                cardService.save(checkingCard);
+
+                Transaction transaction = Transaction.builder()
+                        .sourceAccount(savingCard)
+                        .destinationAccount(checkingCard)
+                        .amount(amount)
+                        .transactionType(TransactionType.Transfer)
+                        .transactionTime(LocalDateTime.now())
+                        .description("Transfer from savings to checking")
+                        .build();
+                transactionService.save(transaction);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Transferred " + amount + " to checking");
+                alert.showAndWait();
+                populateDashboard();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Insufficient savings balance or no accounts found");
+                alert.showAndWait();
+            }
         } catch (Exception e) {
             log.error("Error transferring to checking", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to transfer: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to transfer: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
     private void confirmTransfer() {
         try {
             if (byCardCheckBox.isSelected()) {
-                Transaction transaction = Transaction.builder()
-                        .sourceAccount(cardService.findByCardNumber(transferCardNumberTxt.getText()))
-                        .destinationAccount(cardService.findAll().get(0)) // Simplified, needs real destination
-                        .amount(Double.parseDouble(transferAmountTxt.getText()))
-                        .transactionType(TransactionType.Transfer)
-                        .transactionTime(LocalDateTime.now())
-                        .description("Card transfer")
-                        .build();
-                transactionService.save(transaction);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Transfer confirmed by card", ButtonType.OK);
-                alert.show();
-                log.info("Transfer confirmed by card");
+                String cardNumber = transferCardNumberTxt.getText();
+                String cvv = transferCvvTxt.getText();
+                double amount = Double.parseDouble(transferAmountTxt.getText());
+
+                Card sourceCard = cardService.findByCardNumber(cardNumber);
+                if (sourceCard != null && sourceCard.getCvv2().equals(cvv) && sourceCard.getBalance() >= amount) {
+                    Card destinationCard = cardService.findAll().stream()
+                            .filter(c -> !c.getCardNumber().equals(cardNumber))
+                            .findFirst()
+                            .orElse(null); // Simplified: first other card
+
+                    if (destinationCard != null) {
+                        sourceCard.setBalance(sourceCard.getBalance() - amount);
+                        destinationCard.setBalance(destinationCard.getBalance() + amount);
+                        cardService.save(sourceCard);
+                        cardService.save(destinationCard);
+
+                        Transaction transaction = Transaction.builder()
+                                .sourceAccount(sourceCard)
+                                .destinationAccount(destinationCard)
+                                .amount(amount)
+                                .transactionType(TransactionType.Transfer)
+                                .transactionTime(LocalDateTime.now())
+                                .description("Card transfer to " + destinationCard.getCardNumber())
+                                .build();
+                        transactionService.save(transaction);
+
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Success");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Transfer of " + amount + " by card completed");
+                        alert.showAndWait();
+                        resetTransferForm();
+                        populateDashboard();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText("No destination card found");
+                        alert.showAndWait();
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Invalid card details or insufficient balance");
+                    alert.showAndWait();
+                }
             } else if (byCheckCheckBox.isSelected()) {
-                Cheque cheque = Cheque.builder()
-                        .user(currentUser)
-                        .accountType(AccountType.Check)
-                        .balance(0.0)
-                        .createdAt(LocalDateTime.now())
-                        .number(transferChequeTxt.getText())
-                        .passDate(LocalDateTime.now().toLocalDate().plusDays(30))
-                        .amount(Double.parseDouble(transferChequeAmountTxt.getText()))
-                        .receiver(transferChequeAddressTxt.getText())
-                        .description("Cheque transfer")
-                        .build();
-                chequeService.save(cheque);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Transfer confirmed by cheque", ButtonType.OK);
-                alert.show();
-                log.info("Transfer confirmed by cheque");
+                String chequeNumber = transferChequeTxt.getText();
+                double amount = Double.parseDouble(transferChequeAmountTxt.getText());
+                String receiver = transferChequeAddressTxt.getText();
+
+                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+                if (sourceCard.getBalance() >= amount) {
+                    Cheque cheque = Cheque.builder()
+                            .user(currentUser)
+                            .accountType(AccountType.Check)
+                            .balance(0.0)
+                            .createdAt(LocalDateTime.now())
+                            .number(chequeNumber)
+                            .passDate(LocalDateTime.now().toLocalDate().plusDays(30))
+                            .amount(amount)
+                            .receiver(receiver)
+                            .description("Cheque transfer")
+                            .build();
+                    chequeService.save(cheque);
+
+                    sourceCard.setBalance(sourceCard.getBalance() - amount);
+                    cardService.save(sourceCard);
+
+                    Transaction transaction = Transaction.builder()
+                            .sourceAccount(sourceCard)
+                            .destinationAccount(null) // No immediate destination for cheque
+                            .amount(amount)
+                            .transactionType(TransactionType.Withdraw)
+                            .transactionTime(LocalDateTime.now())
+                            .description("Cheque transfer: " + chequeNumber)
+                            .build();
+                    transactionService.save(transaction);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Transfer of " + amount + " by cheque completed");
+                    alert.showAndWait();
+                    resetTransferForm();
+                    populateDashboard();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Insufficient balance in card");
+                    alert.showAndWait();
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Select a transfer method (Card or Cheque)");
+                alert.showAndWait();
             }
-            resetTransferForm();
         } catch (Exception e) {
             log.error("Error confirming transfer", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to confirm transfer: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to confirm transfer: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -255,39 +414,69 @@ public class MainAppController implements Initializable {
 
     private void issueCheque() {
         try {
-            Cheque cheque = Cheque.builder()
-                    .user(currentUser)
-                    .accountType(AccountType.Check)
-                    .balance(0.0)
-                    .createdAt(LocalDateTime.now())
-                    .number(transferChequeTxt.getText())
-                    .passDate(LocalDateTime.now().toLocalDate().plusDays(30))
-                    .amount(Double.parseDouble(transferChequeAmountTxt.getText()))
-                    .receiver(transferChequeAddressTxt.getText())
-                    .description("Issued cheque")
-                    .build();
-            chequeService.save(cheque);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Cheque issued", ButtonType.OK);
-            alert.show();
-            log.info("Cheque issued");
-            resetTransferForm();
+            String chequeNumber = transferChequeTxt.getText();
+            double amount = Double.parseDouble(transferChequeAmountTxt.getText());
+            String receiver = transferChequeAddressTxt.getText();
+
+            Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+            if (sourceCard.getBalance() >= amount) {
+                Cheque cheque = Cheque.builder()
+                        .user(currentUser)
+                        .accountType(AccountType.Check)
+                        .balance(0.0)
+                        .createdAt(LocalDateTime.now())
+                        .number(chequeNumber)
+                        .passDate(LocalDateTime.now().toLocalDate().plusDays(30))
+                        .amount(amount)
+                        .receiver(receiver)
+                        .description("Issued cheque")
+                        .build();
+                chequeService.save(cheque);
+
+                sourceCard.setBalance(sourceCard.getBalance() - amount);
+                cardService.save(sourceCard);
+
+                Transaction transaction = Transaction.builder()
+                        .sourceAccount(sourceCard)
+                        .destinationAccount(null)
+                        .amount(amount)
+                        .transactionType(TransactionType.Withdraw)
+                        .transactionTime(LocalDateTime.now())
+                        .description("Cheque issued: " + chequeNumber)
+                        .build();
+                transactionService.save(transaction);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Cheque " + chequeNumber + " issued");
+                alert.showAndWait();
+                resetTransferForm();
+                populateDashboard();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Insufficient balance in card");
+                alert.showAndWait();
+            }
         } catch (Exception e) {
             log.error("Error issuing cheque", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to issue cheque: " + e.getMessage(), ButtonType.OK);
-            alert.show();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to issue cheque: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
     private void printTransactions() {
-        try {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Transactions printed", ButtonType.OK);
-            alert.show();
-            log.info("Transactions printed");
-        } catch (Exception e) {
-            log.error("Error printing transactions", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to print transactions: " + e.getMessage(), ButtonType.OK);
-            alert.show();
-        }
+        // Placeholder for future implementation
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText(null);
+        alert.setContentText("Transaction printing to be implemented later");
+        alert.showAndWait();
     }
 
     private void refreshTransactionTable(List<Transaction> transactions) {

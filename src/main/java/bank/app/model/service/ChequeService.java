@@ -1,7 +1,15 @@
 package bank.app.model.service;
 
 import bank.app.model.entity.Cheque;
+import bank.app.model.entity.enums.AccountType;
 import bank.app.model.repository.ChequeRepository;
+import bank.app.model.repository.UserRepository;
+import bank.app.model.repository.utils.ConnectionProvider;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +29,27 @@ public class ChequeService {
     }
 
     public List<Cheque> findByUserId(int userId) throws Exception {
-        return findAll().stream()
-                .filter(cheque -> cheque.getUser().getId() == userId)
-                .collect(Collectors.toList());
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES WHERE U_ID = ?")) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            List<Cheque> cheques = new ArrayList<>();
+            while (rs.next()) {
+                Cheque cheque = Cheque.builder()
+                        .id(rs.getInt("ID"))
+                        .accountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")))
+                        .balance(rs.getDouble("BALANCE"))
+                        .createdAt(rs.getTimestamp("CREATED_AT").toLocalDateTime())
+                        .number(rs.getString("CHEQUE_NUMBER"))
+                        .passDate(rs.getDate("PASS_DATE").toLocalDate())
+                        .amount(rs.getDouble("AMOUNT"))
+                        .receiver(rs.getString("RECEIVER"))
+                        .description(rs.getString("DESCRIPTION"))
+                        .user(new UserRepository().findById(rs.getInt("U_ID")))
+                        .build();
+                cheques.add(cheque);
+            }
+            return cheques;
+        }
     }
 }

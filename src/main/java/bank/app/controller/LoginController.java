@@ -7,13 +7,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +27,6 @@ public class LoginController implements bank.app.model.repository.Repository<Use
     @FXML private TextField passwordTxt;
     @FXML private Button loginBtn;
     @FXML private Hyperlink forgotPasswordLink;
-
-    private Connection connection;
-    private PreparedStatement statement;
 
     @FXML
     private void initialize() {
@@ -38,43 +39,51 @@ public class LoginController implements bank.app.model.repository.Repository<Use
         String password = passwordTxt.getText().trim();
 
         try {
+            // Special case for admin/admin
             if (username.equals("admin") && password.equals("admin")) {
-                loadView("/javafx/views/registration.fxml", "Bank Manager Registration");
-            } else {
-                User user = authenticate(username, password);
-                if (user != null) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/javafx/views/mainApp.fxml"));
-                    Parent root = loader.load();
-                    MainAppController controller = loader.getController();
-                    controller.setCurrentUser(user);
+                loadView("/templates/register.fxml", "Bank Manager Registration");
+                return; // Exit after admin login
+            }
 
-                    Stage stage = (Stage) loginBtn.getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setTitle("Sleepy Bank Dashboard");
-                    stage.show();
-                } else {
-                    System.out.println("Invalid credentials");
-                }
+            // Regular user authentication
+            User user = authenticate(username, password);
+            if (user != null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/mainApp.fxml"));
+                Parent root = loader.load();
+                MainAppController controller = loader.getController();
+                controller.setCurrentUser(user);
+
+                Stage stage = (Stage) loginBtn.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Sleepy Bank Dashboard");
+                stage.show();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Login Failed");
+                alert.setHeaderText(null); // No header
+                alert.setContentText("Invalid username or password");
+                alert.showAndWait();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Error during login: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Login error: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
     private User authenticate(String username, String password) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement(
-                "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1"
-        );
-        statement.setString(1, username);
-        statement.setString(2, password);
-        ResultSet rs = statement.executeQuery();
-
-        if (rs.next()) {
-            return mapResultSetToUser(rs);
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1")) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? mapResultSetToUser(rs) : null;
+            }
         }
-        return null;
     }
 
     private void loadView(String fxmlPath, String title) throws IOException {
@@ -87,90 +96,92 @@ public class LoginController implements bank.app.model.repository.Repository<Use
     }
 
     private void handleForgotPassword() {
-        System.out.println("Forgot password functionality to be implemented later");
+        // Simplified without ButtonType or TextInputDialog
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Forgot Password");
+        alert.setHeaderText(null);
+        alert.setContentText("Forgot password functionality to be implemented later");
+        alert.showAndWait();
     }
 
     @Override
     public void save(User user) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        user.setId(ConnectionProvider.getConnectionProvider().nextId("user_seq"));
-        statement = connection.prepareStatement(
-                "INSERT INTO USERS (USER_ID, FIRSTNAME, LASTNAME, EMAIL, PHONE, ADDRESS, BIRTH_DATE, USERNAME, PASSWORD, ROLE_NAME, IS_ACTIVE) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        statement.setInt(1, user.getId());
-        statement.setString(2, user.getFirstName());
-        statement.setString(3, user.getLastName());
-        statement.setString(4, user.getEmail());
-        statement.setString(5, user.getPhone());
-        statement.setString(6, user.getAddress());
-        statement.setDate(7, user.getBirthDate() != null ? Date.valueOf(user.getBirthDate()) : null);
-        statement.setString(8, user.getUsername());
-        statement.setString(9, user.getPassword());
-        statement.setString(10, user.getRole().name());
-        statement.setInt(11, user.isActive() ? 1 : 0);
-        statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO USERS (USER_ID, FIRSTNAME, LASTNAME, EMAIL, PHONE, ADDRESS, BIRTH_DATE, USERNAME, PASSWORD, ROLE_NAME, IS_ACTIVE) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            user.setId(ConnectionProvider.getConnectionProvider().nextId("user_seq"));
+            stmt.setInt(1, user.getId());
+            stmt.setString(2, user.getFirstName());
+            stmt.setString(3, user.getLastName());
+            stmt.setString(4, user.getEmail());
+            stmt.setString(5, user.getPhone());
+            stmt.setString(6, user.getAddress());
+            stmt.setDate(7, user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null);
+            stmt.setString(8, user.getUsername());
+            stmt.setString(9, user.getPassword());
+            stmt.setString(10, user.getRole().name());
+            stmt.setInt(11, user.isActive() ? 1 : 0);
+            stmt.executeUpdate();
+        }
     }
 
     @Override
     public void edit(User user) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement(
-                "UPDATE USERS SET FIRSTNAME=?, LASTNAME=?, EMAIL=?, PHONE=?, ADDRESS=?, BIRTH_DATE=?, USERNAME=?, PASSWORD=?, ROLE_NAME=?, IS_ACTIVE=? " +
-                        "WHERE USER_ID=?"
-        );
-        statement.setString(1, user.getFirstName());
-        statement.setString(2, user.getLastName());
-        statement.setString(3, user.getEmail());
-        statement.setString(4, user.getPhone());
-        statement.setString(5, user.getAddress());
-        statement.setDate(6, user.getBirthDate() != null ? Date.valueOf(user.getBirthDate()) : null);
-        statement.setString(7, user.getUsername());
-        statement.setString(8, user.getPassword());
-        statement.setString(9, user.getRole().name());
-        statement.setInt(10, user.isActive() ? 1 : 0);
-        statement.setInt(11, user.getId());
-        statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE USERS SET FIRSTNAME=?, LASTNAME=?, EMAIL=?, PHONE=?, ADDRESS=?, BIRTH_DATE=?, USERNAME=?, PASSWORD=?, ROLE_NAME=?, IS_ACTIVE=? " +
+                             "WHERE USER_ID=?")) {
+            stmt.setString(1, user.getFirstName());
+            stmt.setString(2, user.getLastName());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getPhone());
+            stmt.setString(5, user.getAddress());
+            stmt.setDate(6, user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null);
+            stmt.setString(7, user.getUsername());
+            stmt.setString(8, user.getPassword());
+            stmt.setString(9, user.getRole().name());
+            stmt.setInt(10, user.isActive() ? 1 : 0);
+            stmt.setInt(11, user.getId());
+            stmt.executeUpdate();
+        }
     }
 
     @Override
     public void remove(Integer id) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement("DELETE FROM USERS WHERE USER_ID=?");
-        statement.setInt(1, id);
-        statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM USERS WHERE USER_ID=?")) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        }
     }
 
     @Override
     public List<User> findAll() throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement("SELECT * FROM USERS ORDER BY LASTNAME, FIRSTNAME");
-        ResultSet rs = statement.executeQuery();
-        List<User> users = new ArrayList<>();
-
-        while (rs.next()) {
-            users.add(mapResultSetToUser(rs));
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM USERS ORDER BY LASTNAME, FIRSTNAME")) {
+            ResultSet rs = stmt.executeQuery();
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+            return users;
         }
-        return users;
     }
 
     @Override
     public User findById(Integer id) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement("SELECT * FROM USERS WHERE USER_ID=?");
-        statement.setInt(1, id);
-        ResultSet rs = statement.executeQuery();
-
-        if (rs.next()) {
-            return mapResultSetToUser(rs);
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM USERS WHERE USER_ID=?")) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? mapResultSetToUser(rs) : null;
         }
-        return null;
     }
 
     @Override
     public void close() throws Exception {
-        if (statement != null) statement.close();
-        if (connection != null) connection.close();
+        // No longer needed with try-with-resources
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {

@@ -4,10 +4,7 @@ import bank.app.model.entity.User;
 import bank.app.model.entity.enums.Role;
 import bank.app.model.repository.utils.ConnectionProvider;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -99,35 +96,57 @@ public class UserRepository implements Repository<User, Integer>{
         return userList;
     }
 
-    @Override
     public User findById(Integer id) throws Exception {
-        connection = ConnectionProvider.getConnectionProvider().getConnection();
-        statement = connection.prepareStatement(
-                "SELECT * FROM USERS WHERE USER_ID=?"
-        );
-        ResultSet resultSet = statement.executeQuery();
-
-        User user = null;
-        if(resultSet.next()) {
-            user = User
-                    .builder()
-                    .id(resultSet.getInt("user_ID"))
-                    .firstName(resultSet.getString("FIRSTNAME"))
-                    .lastName(resultSet.getString("LASTNAME"))
-                    .email(resultSet.getString("EMAIL"))
-                    .phone(resultSet.getString("PHONE"))
-                    .address(resultSet.getString("ADDRESS"))
-                    .birthDate(resultSet.getDate("BIRTH_DATE").toLocalDate())
-                    .username(resultSet.getString("USERNAME"))
-                    .password(resultSet.getString("PASSWORD"))
-                    .role(Role.valueOf(resultSet.getString("ROLE_NAME")))
-                    .active(resultSet.getBoolean("IS_ACTIVE"))
-                    .build();
+        String query = "SELECT * FROM USERS WHERE USER_ID=?";
+        System.out.println("Finding user by ID: " + id);
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection()) {
+            if (conn == null) {
+                throw new SQLException("Connection is null");
+            }
+            System.out.println("Connection: " + conn);
+            System.out.println("Query: " + query);
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                System.out.println("Statement: " + stmt);
+                if (id == null) {
+                    throw new IllegalArgumentException("User ID cannot be null");
+                }
+                System.out.println("Setting USER_ID=? to: " + id);
+                stmt.setInt(1, id);
+                System.out.println("Executing query...");
+                try (ResultSet rs = stmt.executeQuery()) {
+                    System.out.println("Query executed successfully");
+                    boolean hasResult = rs.next();
+                    System.out.println("Result: " + (hasResult ? "User found" : "No user found"));
+                    if (hasResult) {
+                        User user = User.builder()
+                                .id(rs.getInt("USER_ID"))
+                                .firstName(rs.getString("FIRSTNAME"))
+                                .lastName(rs.getString("LASTNAME"))
+                                .email(rs.getString("EMAIL"))
+                                .phone(rs.getString("PHONE"))
+                                .address(rs.getString("ADDRESS"))
+                                .birthDate(rs.getDate("BIRTH_DATE") != null ? rs.getDate("BIRTH_DATE").toLocalDate() : null)
+                                .username(rs.getString("USERNAME"))
+                                .password(rs.getString("PASSWORD"))
+                                .role(Role.valueOf(rs.getString("ROLE_NAME")))
+                                .active(rs.getInt("IS_ACTIVE") == 1)
+                                .build();
+                        System.out.println("User created: ID=" + user.getId() + ", Username=" + user.getUsername());
+                        return user;
+                    } else {
+                        System.out.println("Returning null: No user found");
+                        return null;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            throw e;
         }
-        return user;
-
     }
-
     @Override
     public void close() throws Exception {
         statement.close();

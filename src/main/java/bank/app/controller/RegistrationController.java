@@ -83,7 +83,7 @@ public class RegistrationController {
             alert.showAndWait();
 
             // Redirect to login screen
-            loadView("/javafx/views/login.fxml", "Sleepy Bank Login");
+            loadView("/templates/login.fxml", "Sleepy Bank Login");
 
         } catch (Exception e) {
             e.printStackTrace();

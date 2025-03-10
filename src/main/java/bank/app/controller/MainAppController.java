@@ -15,6 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.extern.log4j.Log4j;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -30,9 +31,9 @@ public class MainAppController implements Initializable {
 
     // Dashboard Tab
     @FXML private TextField accountBalanceTxt;
-    @FXML private TextField cardNumberTxt;
-    @FXML private TextField cvvTxt;
-    @FXML private TextField expiryTxt;
+    @FXML private TextField cardNumberTxt;  // First instance (in GridPane)
+    @FXML private TextField cvvTxt;         // First instance (below GridPane)
+    @FXML private TextField expiryTxt;      // First instance (below GridPane)
     @FXML private Button viewTransactionBtn;
     @FXML private Button transferFundsBtn;
     @FXML private TextField totalChequeBtn;
@@ -45,6 +46,11 @@ public class MainAppController implements Initializable {
     @FXML private TextField savingBalanceTxt;
     @FXML private TextField interestRateTxt;
     @FXML private Button savingTransferTxt;
+
+    // Second instances (below Rectangle)
+    @FXML private TextField cardNumberTxt1;
+    @FXML private TextField cvvTxt1;
+    @FXML private TextField expiryTxt1;
 
     // Fund Transfer Tab
     @FXML private CheckBox byCardCheckBox;
@@ -97,6 +103,15 @@ public class MainAppController implements Initializable {
         statusCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Completed"));
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 
+        // Make all fields non-editable
+        accountBalanceTxt.setEditable(false);
+        cardNumberTxt.setEditable(false);
+        cvvTxt.setEditable(false);
+        expiryTxt.setEditable(false);
+        cardNumberTxt1.setEditable(false);
+        cvvTxt1.setEditable(false);
+        expiryTxt1.setEditable(false);
+
         resetDashboard();
     }
 
@@ -109,13 +124,31 @@ public class MainAppController implements Initializable {
     private void populateDashboard() {
         try {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
-            if (!cards.isEmpty()) {
-                Card card = cards.get(0);
-                accountBalanceTxt.setText(String.format("%.2f", card.getBalance()));
-                cardNumberTxt.setText(card.getCardNumber());
-                cvvTxt.setText(card.getCvv2());
-                expiryTxt.setText(card.getExpiryDate().toString());
+            Card card;
+            if (cards.isEmpty()) {
+                // Create a new card for the user if none exist
+                card = Card.builder()
+                        .user(currentUser)
+                        .accountType(AccountType.Card)
+                        .balance(100.0) // Starting balance of $100
+                        .cardNumber(generateCardNumber())
+                        .cvv2(generateCvv())
+                        .expiryDate(LocalDate.now().plusYears(5)) // 5 years from now
+                        .build();
+                cardService.save(card);
+                log.info("Created new card for user: " + currentUser.getUsername());
+            } else {
+                card = cards.get(0); // Use the first card if exists
             }
+
+            // Populate both sets of dashboard fields
+            accountBalanceTxt.setText(String.format("%.2f", card.getBalance()));
+            cardNumberTxt.setText(card.getCardNumber());
+            cvvTxt.setText(card.getCvv2());
+            expiryTxt.setText(card.getExpiryDate().toString());
+            cardNumberTxt1.setText(card.getCardNumber());
+            cvvTxt1.setText(card.getCvv2());
+            expiryTxt1.setText(card.getExpiryDate().toString());
 
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             totalChequeBtn.setText(String.valueOf(cheques.size()));
@@ -142,11 +175,29 @@ public class MainAppController implements Initializable {
         }
     }
 
+    private String generateCardNumber() {
+        // Generate a 16-digit card number starting with "2003" and hyphens every 4 digits
+        StringBuilder sb = new StringBuilder("2004");
+        for (int i = 0; i < 12; i++) {
+            if (i % 4 == 0 && i > 0) sb.append("-");
+            sb.append((int) (Math.random() * 10));
+        }
+        return sb.toString(); // e.g., "2003-1234-5678-9012"
+    }
+
+    private String generateCvv() {
+        // Simple 3-digit CVV generator
+        return String.format("%04d", (int) (Math.random() * 1000));
+    }
+
     private void resetDashboard() {
         accountBalanceTxt.clear();
         cardNumberTxt.clear();
         cvvTxt.clear();
         expiryTxt.clear();
+        cardNumberTxt1.clear();
+        cvvTxt1.clear();
+        expiryTxt1.clear();
         totalChequeBtn.clear();
         chequeAddressTxt.clear();
         pendingChequeBtn.clear();
@@ -180,14 +231,14 @@ public class MainAppController implements Initializable {
                     .findFirst()
                     .orElse(null);
             if (cheque != null && cheque.getPassDate().isAfter(LocalDateTime.now().toLocalDate())) {
-                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0);
                 if (sourceCard.getBalance() >= cheque.getAmount()) {
                     sourceCard.setBalance(sourceCard.getBalance() - cheque.getAmount());
                     cardService.save(sourceCard);
 
                     Transaction transaction = Transaction.builder()
                             .sourceAccount(sourceCard)
-                            .destinationAccount(null) // No destination for purchase
+                            .destinationAccount(null)
                             .amount(cheque.getAmount())
                             .transactionType(TransactionType.Withdraw)
                             .transactionTime(LocalDateTime.now())
@@ -226,7 +277,6 @@ public class MainAppController implements Initializable {
     }
 
     private void manageCheques() {
-        // Placeholder for future implementation
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
         alert.setHeaderText(null);
@@ -298,7 +348,7 @@ public class MainAppController implements Initializable {
                     Card destinationCard = cardService.findAll().stream()
                             .filter(c -> !c.getCardNumber().equals(cardNumber))
                             .findFirst()
-                            .orElse(null); // Simplified: first other card
+                            .orElse(null);
 
                     if (destinationCard != null) {
                         sourceCard.setBalance(sourceCard.getBalance() - amount);
@@ -342,7 +392,7 @@ public class MainAppController implements Initializable {
                 double amount = Double.parseDouble(transferChequeAmountTxt.getText());
                 String receiver = transferChequeAddressTxt.getText();
 
-                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+                Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0);
                 if (sourceCard.getBalance() >= amount) {
                     Cheque cheque = Cheque.builder()
                             .user(currentUser)
@@ -362,7 +412,7 @@ public class MainAppController implements Initializable {
 
                     Transaction transaction = Transaction.builder()
                             .sourceAccount(sourceCard)
-                            .destinationAccount(null) // No immediate destination for cheque
+                            .destinationAccount(null)
                             .amount(amount)
                             .transactionType(TransactionType.Withdraw)
                             .transactionTime(LocalDateTime.now())
@@ -418,7 +468,7 @@ public class MainAppController implements Initializable {
             double amount = Double.parseDouble(transferChequeAmountTxt.getText());
             String receiver = transferChequeAddressTxt.getText();
 
-            Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0); // Assume first card
+            Card sourceCard = cardService.findByUserId(currentUser.getId()).get(0);
             if (sourceCard.getBalance() >= amount) {
                 Cheque cheque = Cheque.builder()
                         .user(currentUser)
@@ -471,7 +521,6 @@ public class MainAppController implements Initializable {
     }
 
     private void printTransactions() {
-        // Placeholder for future implementation
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
         alert.setHeaderText(null);

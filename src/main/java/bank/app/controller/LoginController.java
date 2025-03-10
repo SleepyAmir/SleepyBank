@@ -39,15 +39,15 @@ public class LoginController implements bank.app.model.repository.Repository<Use
         String password = passwordTxt.getText().trim();
 
         try {
-            // Special case for admin/admin
+            System.out.println("Login attempt: Username=" + username + ", Password=" + password);
             if (username.equals("admin") && password.equals("admin")) {
                 loadView("/templates/register.fxml", "Bank Manager Registration");
-                return; // Exit after admin login
+                return;
             }
 
-            // Regular user authentication
             User user = authenticate(username, password);
             if (user != null) {
+                System.out.println("Login successful for user: " + user.getUsername());
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/mainApp.fxml"));
                 Parent root = loader.load();
                 MainAppController controller = loader.getController();
@@ -58,13 +58,15 @@ public class LoginController implements bank.app.model.repository.Repository<Use
                 stage.setTitle("Sleepy Bank Dashboard");
                 stage.show();
             } else {
+                System.out.println("Login failed: No matching user");
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Login Failed");
-                alert.setHeaderText(null); // No header
+                alert.setHeaderText(null);
                 alert.setContentText("Invalid username or password");
                 alert.showAndWait();
             }
         } catch (Exception e) {
+            System.err.println("Login error: " + e.getMessage());
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -73,19 +75,72 @@ public class LoginController implements bank.app.model.repository.Repository<Use
             alert.showAndWait();
         }
     }
-
-    private User authenticate(String username, String password) throws Exception {
-        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1")) {
+//    private User authenticate(String username, String password) throws Exception {
+//        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(
+//                     "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1")) {
+//            stmt.setString(1, username);
+//            stmt.setString(2, password);
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                return rs.next() ? mapResultSetToUser(rs) : null;
+//            }
+//        }
+//    }
+//private User authenticate(String username, String password) throws Exception {
+//    String query = "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1";
+//    try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection()) {
+//        if (conn == null) {
+//            throw new SQLException("Database connection is null");
+//        }
+//        System.out.println("Connection established: " + conn);
+//        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+//            System.out.println("Query: " + query);
+//            System.out.println("Setting USERNAME=? to: " + username);
+//            stmt.setString(1, username);
+//            System.out.println("Setting PASSWORD=? to: " + password);
+//            stmt.setString(2, password);
+//            System.out.println("Executing query...");
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                System.out.println("Query executed, checking result...");
+//                return rs.next() ? mapResultSetToUser(rs) : null;
+//            }
+//        }
+//    } catch (SQLException e) {
+//        System.err.println("SQL Error: " + e.getMessage());
+//        e.printStackTrace();
+//        throw e;
+//    }
+//}
+private User authenticate(String username, String password) throws Exception {
+    String query = "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1";
+    System.out.println("Starting authentication for Username: " + username + ", Password: " + password);
+    try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection()) {
+        if (conn == null) {
+            throw new SQLException("Connection is null");
+        }
+        System.out.println("Connection acquired: " + conn);
+        System.out.println("Preparing statement with query: " + query);
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            System.out.println("Statement prepared: " + stmt);
+            System.out.println("Setting parameter 1 (USERNAME) to: " + username);
             stmt.setString(1, username);
+            System.out.println("Setting parameter 2 (PASSWORD) to: " + password);
             stmt.setString(2, password);
+            System.out.println("Parameters set, executing query...");
             try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? mapResultSetToUser(rs) : null;
+                boolean hasResult = rs.next();
+                System.out.println("Query executed, result: " + (hasResult ? "User found" : "No user found"));
+                return hasResult ? mapResultSetToUser(rs) : null;
             }
         }
+    } catch (SQLException e) {
+        System.err.println("SQL Error: " + e.getMessage());
+        System.err.println("SQL State: " + e.getSQLState());
+        System.err.println("Error Code: " + e.getErrorCode());
+        e.printStackTrace();
+        throw e;
     }
-
+}
     private void loadView(String fxmlPath, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();

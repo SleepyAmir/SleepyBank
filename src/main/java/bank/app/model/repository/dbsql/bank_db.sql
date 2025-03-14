@@ -22,7 +22,7 @@ create table card
     account_type nvarchar2(15) not null,
     balance      number,
     created_at   timestamp,
-    card_number  nvarchar2(16) not null unique,
+    card_number  nvarchar2(18) not null unique,
     cvv2         nvarchar2(4),
     expiry_date  date,
     u_id references users

@@ -18,6 +18,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -120,53 +121,40 @@ public class MainAppController implements Initializable {
         log.info("Logged in user: " + currentUser.getUsername());
         populateDashboard();
     }
-
     private void populateDashboard() {
         try {
+            System.out.println("Populating dashboard for user ID: " + currentUser.getId());
             List<Card> cards = cardService.findByUserId(currentUser.getId());
+            System.out.println("Found " + cards.size() + " cards");
             Card card;
             if (cards.isEmpty()) {
-                // Create a new card for the user if none exist
                 card = Card.builder()
                         .user(currentUser)
                         .accountType(AccountType.Card)
-                        .balance(100.0) // Starting balance of $100
+                        .balance(100.0)
                         .cardNumber(generateCardNumber())
                         .cvv2(generateCvv())
-                        .expiryDate(LocalDate.now().plusYears(5)) // 5 years from now
+                        .expiryDate(LocalDate.now().plusYears(5))
                         .build();
                 cardService.save(card);
                 log.info("Created new card for user: " + currentUser.getUsername());
+                System.out.println("New card created: " + card.getCardNumber());
             } else {
-                card = cards.get(0); // Use the first card if exists
+                card = cards.get(0);
+                System.out.println("Using existing card: " + card.getCardNumber());
             }
 
-            // Populate both sets of dashboard fields
-            accountBalanceTxt.setText(String.format("%.2f", card.getBalance()));
+            // Update UI fields
             cardNumberTxt.setText(card.getCardNumber());
+            accountBalanceTxt.setText(String.valueOf(card.getBalance()));
             cvvTxt.setText(card.getCvv2());
             expiryTxt.setText(card.getExpiryDate().toString());
-            cardNumberTxt1.setText(card.getCardNumber());
-            cvvTxt1.setText(card.getCvv2());
-            expiryTxt1.setText(card.getExpiryDate().toString());
+            System.out.println("Fields populated: Card Number=" + card.getCardNumber() + ", Balance=" + card.getBalance());
 
-            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            totalChequeBtn.setText(String.valueOf(cheques.size()));
-            pendingChequeBtn.setText(String.valueOf(cheques.stream().filter(c -> c.getPassDate().isAfter(LocalDateTime.now().toLocalDate())).count()));
-            cashedChequeBtn.setText(String.valueOf(cheques.stream().filter(c -> c.getPassDate().isBefore(LocalDateTime.now().toLocalDate())).count()));
-            bouncedChequeBtn.setText("0");
-            if (!cheques.isEmpty()) chequeAddressTxt.setText(cheques.get(0).getReceiver());
-
-            double savingsBalance = cards.stream()
-                    .filter(c -> c.getAccountType() == AccountType.Saving)
-                    .mapToDouble(Account::getBalance)
-                    .sum();
-            savingBalanceTxt.setText(String.format("%.2f", savingsBalance));
-            interestRateTxt.setText("2.5%");
-
-            log.info("Dashboard populated for user: " + currentUser.getUsername());
         } catch (Exception e) {
             log.error("Error populating dashboard", e);
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(null);
@@ -176,18 +164,17 @@ public class MainAppController implements Initializable {
     }
 
     private String generateCardNumber() {
-        // Generate a 16-digit card number starting with "2003" and hyphens every 4 digits
-        StringBuilder sb = new StringBuilder("2004");
-        for (int i = 0; i < 12; i++) {
-            if (i % 4 == 0 && i > 0) sb.append("-");
-            sb.append((int) (Math.random() * 10));
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            sb.append(random.nextInt(10));
         }
-        return sb.toString(); // e.g., "2003-1234-5678-9012"
+        return sb.toString();
     }
 
     private String generateCvv() {
-        // Simple 3-digit CVV generator
-        return String.format("%04d", (int) (Math.random() * 1000));
+        Random random = new Random();
+        return String.format("%03d", random.nextInt(1000));
     }
 
     private void resetDashboard() {

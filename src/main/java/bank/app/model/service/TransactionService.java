@@ -6,7 +6,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TransactionService {
-    private TransactionRepository transactionRepository = new TransactionRepository();
+    private TransactionRepository transactionRepository;
+
+    {
+        try {
+            transactionRepository = new TransactionRepository();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void save(Transaction transaction) throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {

@@ -6,7 +6,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CardService {
-    private CardRepository cardRepository = new CardRepository();
+    private CardRepository cardRepository;
+
+    {
+        try {
+            cardRepository = new CardRepository();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize CardRepository", e);
+        }
+    }
 
     public void save(Card card) throws Exception {
         try (CardRepository repo = new CardRepository()) {

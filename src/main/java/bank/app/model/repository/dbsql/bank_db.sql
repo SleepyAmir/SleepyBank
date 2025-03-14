@@ -1,60 +1,55 @@
-create table users
+CREATE TABLE USERS
 (
-    user_id    number primary key,
-    firstname  nvarchar2(15) not null,
-    lastname   nvarchar2(30) not null,
-    email      nvarchar2(30) not null,
-    phone      number(12)    not null,
-    address    nvarchar2(30) not null,
-    birth_date date,
-    username   varchar2(30) unique,
-    password   varchar2(16)  not null,
-    role_name  varchar2(10),
-    is_active  number(1) default 1
+    USER_ID    NUMBER PRIMARY KEY,
+    FIRSTNAME  NVARCHAR2(15) NOT NULL,
+    LASTNAME   NVARCHAR2(30) NOT NULL,
+    EMAIL      NVARCHAR2(30) NOT NULL,
+    PHONE      NUMBER(12)    NOT NULL,
+    ADDRESS    NVARCHAR2(30) NOT NULL,
+    BIRTH_DATE DATE,
+    USERNAME   VARCHAR2(30) UNIQUE,
+    PASSWORD   VARCHAR2(16)  NOT NULL,
+    ROLE_NAME  VARCHAR2(10),
+    IS_ACTIVE  NUMBER(1) DEFAULT 1
 );
+CREATE SEQUENCE USER_SEQ START WITH 1 INCREMENT BY 1;
 
-create sequence user_seq start with 1 increment by 1;
-
-
-create table card
+CREATE TABLE CARD
 (
-    id           number primary key,
-    account_type nvarchar2(15) not null,
-    balance      number,
-    created_at   timestamp,
-    card_number  nvarchar2(18) not null unique,
-    cvv2         nvarchar2(4),
-    expiry_date  date,
-    u_id references users
+    ID           NUMBER PRIMARY KEY,
+    ACCOUNT_TYPE NVARCHAR2(15) NOT NULL,
+    BALANCE      NUMBER,
+    CREATED_AT   TIMESTAMP,
+    CARD_NUMBER  NVARCHAR2(18) NOT NULL UNIQUE,
+    CVV2         NVARCHAR2(4),
+    EXPIRY_DATE  DATE,
+    U_ID         REFERENCES USERS
 );
-create sequence card_seq start with 1 increment by 1;
+CREATE SEQUENCE CARD_SEQ START WITH 1 INCREMENT BY 1;
 
-
-create table cheques
+CREATE TABLE CHEQUES
 (
-
-    id            number primary key,
-    account_type  nvarchar2(15) not null,
-    balance       number,
-    created_at    timestamp,
-    cheque_number nvarchar2(16) not null unique,
-    pass_date     date,
-    amount        number,
-    receiver      nvarchar2(30),
-    description   nvarchar2(100),
-    u_id references users
+    ID            NUMBER PRIMARY KEY,
+    ACCOUNT_TYPE  NVARCHAR2(15) NOT NULL,
+    BALANCE       NUMBER,
+    CREATED_AT    TIMESTAMP,
+    CHEQUE_NUMBER NVARCHAR2(16) NOT NULL UNIQUE,
+    PASS_DATE     DATE,
+    AMOUNT        NUMBER,
+    RECEIVER      NVARCHAR2(30),
+    DESCRIPTION   NVARCHAR2(100),
+    U_ID          REFERENCES USERS
 );
-create sequence cheque_seq start with 1 increment by 1;
+CREATE SEQUENCE CHEQUE_SEQ START WITH 1 INCREMENT BY 1;
 
-
-CREATE TABLE transactions
+CREATE TABLE TRANSACTIONS
 (
-    id                  number primary key,
-    source_account      number,
-    destination_account number,
-    amount              number,
-    transaction_type    nvarchar2(12) not null,
-    transaction_time    timestamp,
-    description nvarchar2(100)
+    ID                  NUMBER PRIMARY KEY,
+    SOURCE_ACCOUNT      NUMBER REFERENCES CARD(ID),
+    DESTINATION_ACCOUNT NUMBER REFERENCES CARD(ID),
+    AMOUNT              NUMBER,
+    TRANSACTION_TYPE    NVARCHAR2(12) NOT NULL,
+    TRANSACTION_TIME    TIMESTAMP,
+    DESCRIPTION         NVARCHAR2(100)
 );
-
+CREATE SEQUENCE TRANSACTION_SEQ START WITH 6 INCREMENT BY 1;

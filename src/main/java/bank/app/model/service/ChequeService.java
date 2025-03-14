@@ -1,9 +1,9 @@
 package bank.app.model.service;
 
 import bank.app.model.entity.Cheque;
+import bank.app.model.entity.User;
 import bank.app.model.entity.enums.AccountType;
 import bank.app.model.repository.ChequeRepository;
-import bank.app.model.repository.UserRepository;
 import bank.app.model.repository.utils.ConnectionProvider;
 
 import java.sql.Connection;
@@ -11,20 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChequeService {
-    private ChequeRepository chequeRepository = new ChequeRepository();
-
     public void save(Cheque cheque) throws Exception {
         try (ChequeRepository repo = new ChequeRepository()) {
             repo.save(cheque);
-        }
-    }
-
-    public List<Cheque> findAll() throws Exception {
-        try (ChequeRepository repo = new ChequeRepository()) {
-            return repo.findAll();
         }
     }
 
@@ -45,7 +36,7 @@ public class ChequeService {
                         .amount(rs.getDouble("AMOUNT"))
                         .receiver(rs.getString("RECEIVER"))
                         .description(rs.getString("DESCRIPTION"))
-                        .user(new UserRepository().findById(rs.getInt("U_ID")))
+                        .user(User.builder().id(rs.getInt("U_ID")).build())
                         .build();
                 cheques.add(cheque);
             }

@@ -32,6 +32,7 @@ create sequence card_seq start with 1 increment by 1;
 
 create table cheques
 (
+
     id            number primary key,
     account_type  nvarchar2(15) not null,
     balance       number,

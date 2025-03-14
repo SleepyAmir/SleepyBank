@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
@@ -49,11 +50,11 @@
                   <TextField fx:id="expiryTxt" editable="false" layoutX="192.0" layoutY="153.0" prefHeight="25.0" prefWidth="79.0" />
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9f86c0" height="151.0" layoutX="312.0" layoutY="53.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7b5fa2" height="57.0" layoutX="312.0" layoutY="52.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
-                  <TextField fx:id="cardNumberTxt1" editable="false" layoutX="332.0" layoutY="118.0" prefHeight="25.0" prefWidth="267.0" />
+                  <TextField fx:id="cardNumberTxt1" editable="false" layoutX="332.0" layoutY="118.0" prefHeight="25.0" prefWidth="268.0" />
                   <TextField fx:id="cvvTxt1" editable="false" layoutX="365.0" layoutY="161.0" prefHeight="25.0" prefWidth="54.0" />
-                  <TextField fx:id="expiryTxt1" editable="false" layoutX="536.0" layoutY="161.0" prefHeight="25.0" prefWidth="54.0" />
+                  <TextField fx:id="expiryTxt1" editable="false" layoutX="520.0" layoutY="161.0" prefHeight="25.0" prefWidth="80.0" />
                   <Label layoutX="332.0" layoutY="165.0" text="CVV2" />
-                  <Label layoutX="502.0" layoutY="165.0" text="Expiry" />
+                  <Label layoutX="486.0" layoutY="165.0" text="Expiry" />
                   <Label layoutX="407.0" layoutY="69.0" text="Sleepy Bank" textFill="WHITE">
                      <font>
                         <Font name="System Bold Italic" size="20.0" />
@@ -114,7 +115,6 @@
                      </font>
                   </CheckBox>
                   <Label layoutX="24.0" layoutY="133.0" text="Card number :" />
-                  <TextField fx:id="transferCardNumberTxt" layoutX="102.0" layoutY="129.0" prefHeight="25.0" prefWidth="166.0" />
                   <Label layoutX="341.0" layoutY="133.0" text="CVV2 :" />
                   <TextField fx:id="transferCvvTxt" layoutX="384.0" layoutY="129.0" prefHeight="25.0" prefWidth="66.0" />
                   <Label layoutX="342.0" layoutY="183.0" text="Amount :" />
@@ -142,6 +142,7 @@
                   <Button fx:id="cancelChequeBtn" layoutX="329.0" layoutY="454.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel " />
                   <Label layoutX="28.0" layoutY="408.0" text="Cheque Address:" />
                   <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
+                  <ComboBox fx:id="cardNumberCombo" layoutX="108.0" layoutY="129.0" prefHeight="25.0" prefWidth="178.0" />
                </children>
             </Pane>
          </content>

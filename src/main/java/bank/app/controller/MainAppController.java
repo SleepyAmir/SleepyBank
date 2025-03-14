@@ -121,6 +121,14 @@ public class MainAppController implements Initializable {
         log.info("Logged in user: " + currentUser.getUsername());
         populateDashboard();
     }
+    private String generateCardNumber() {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder("1383"); // Fixed prefix
+        for (int i = 0; i < 12; i++) { // 16 total digits - 4 prefix digits = 12 random digits
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString(); // e.g., "1383456789012345" (16 chars)
+    }
     private void populateDashboard() {
         try {
             System.out.println("Populating dashboard for user ID: " + currentUser.getId());
@@ -132,24 +140,34 @@ public class MainAppController implements Initializable {
                         .user(currentUser)
                         .accountType(AccountType.Card)
                         .balance(100.0)
-                        .cardNumber(generateCardNumber())
+                        .cardNumber(generateCardNumber()) // 16 digits
                         .cvv2(generateCvv())
                         .expiryDate(LocalDate.now().plusYears(5))
                         .build();
                 cardService.save(card);
                 log.info("Created new card for user: " + currentUser.getUsername());
                 System.out.println("New card created: " + card.getCardNumber());
+                cards = cardService.findByUserId(currentUser.getId()); // Refresh list
+                card = cards.isEmpty() ? card : cards.get(0);
             } else {
                 card = cards.get(0);
                 System.out.println("Using existing card: " + card.getCardNumber());
             }
 
-            // Update UI fields
-            cardNumberTxt.setText(card.getCardNumber());
+            // Format card number for display
+            String rawCardNumber = card.getCardNumber();
+            String formattedCardNumber = rawCardNumber.substring(0, 4) + "-" +
+                    rawCardNumber.substring(4, 8) + "-" +
+                    rawCardNumber.substring(8, 12) + "-" +
+                    rawCardNumber.substring(12, 16);
+            cardNumberTxt.setText(formattedCardNumber); // e.g., "1383-4567-8901-2345"
             accountBalanceTxt.setText(String.valueOf(card.getBalance()));
             cvvTxt.setText(card.getCvv2());
             expiryTxt.setText(card.getExpiryDate().toString());
-            System.out.println("Fields populated: Card Number=" + card.getCardNumber() + ", Balance=" + card.getBalance());
+            cardNumberTxt1.setText(formattedCardNumber);
+            cvvTxt1.setText(card.getCvv2());
+            expiryTxt1.setText(card.getExpiryDate().toString());
+            System.out.println("Fields populated: Card Number=" + formattedCardNumber + ", Balance=" + card.getBalance());
 
         } catch (Exception e) {
             log.error("Error populating dashboard", e);
@@ -163,18 +181,10 @@ public class MainAppController implements Initializable {
         }
     }
 
-    private String generateCardNumber() {
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            sb.append(random.nextInt(10));
-        }
-        return sb.toString();
-    }
 
     private String generateCvv() {
         Random random = new Random();
-        return String.format("%03d", random.nextInt(1000));
+        return String.format("%04d", random.nextInt(1000));
     }
 
     private void resetDashboard() {

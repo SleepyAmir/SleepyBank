@@ -6,6 +6,8 @@ import bank.app.model.entity.enums.TransactionType;
 import bank.app.model.service.CardService;
 import bank.app.model.service.ChequeService;
 import bank.app.model.service.TransactionService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -55,7 +57,7 @@ public class MainAppController implements Initializable {
 
     @FXML private CheckBox byCardCheckBox;
     @FXML private CheckBox byCheckCheckBox;
-    @FXML private TextField transferCardNumberTxt; // Replaced ComboBox
+    @FXML private TextField transferCardNumberTxt;
     @FXML private TextField transferCvvTxt;
     @FXML private TextField transferAmountTxt;
     @FXML private TextField receiverNumberTxt;
@@ -68,7 +70,7 @@ public class MainAppController implements Initializable {
     @FXML private Button cancelChequeBtn;
 
     @FXML private TableView<Transaction> transactionTable;
-    @FXML private TableColumn<Transaction, Integer> accountCol;
+    @FXML private TableColumn<Transaction, String> accountCol;
     @FXML private TableColumn<Transaction, TransactionType> typeCol;
     @FXML private TableColumn<Transaction, Double> amountCol;
     @FXML private TableColumn<Transaction, String> statusCol;
@@ -76,9 +78,22 @@ public class MainAppController implements Initializable {
     @FXML private Button printTableBtn;
 
     private User currentUser;
-    private CardService cardService = new CardService();
-    private ChequeService chequeService = new ChequeService();
-    private TransactionService transactionService = new TransactionService();
+    private CardService cardService;
+    private ChequeService chequeService;
+    private TransactionService transactionService;
+    private ObservableList<Transaction> transactionData;
+
+    {
+        try {
+            cardService = new CardService();
+            chequeService = new ChequeService();
+            transactionService = new TransactionService();
+            transactionData = FXCollections.observableArrayList();
+        } catch (Exception e) {
+            log.error("Failed to initialize services", e);
+            throw new RuntimeException("Failed to initialize services", e);
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,12 +102,16 @@ public class MainAppController implements Initializable {
         if (transferCardNumberTxt == null) log.error("transferCardNumberTxt is null");
         if (transferConfirmTxt == null) log.error("transferConfirmTxt is null");
 
+        // Set up button actions
         transferFundsBtn.setOnAction(event -> {
             log.info("Transfer Funds clicked");
             tabPane.getSelectionModel().select(fundTab);
             populateFundTransferTab();
         });
-        viewTransactionBtn.setOnAction(event -> tabPane.getSelectionModel().select(transactionHistoryTab));
+        viewTransactionBtn.setOnAction(event -> {
+            tabPane.getSelectionModel().select(transactionHistoryTab);
+            loadTransactionHistory();
+        });
         transferConfirmTxt.setOnAction(event -> confirmTransfer());
         transferCancelTxt.setOnAction(event -> resetTransferForm());
         chequeBtn.setOnAction(event -> useChequeForPurchase());
@@ -102,6 +121,7 @@ public class MainAppController implements Initializable {
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
         printTableBtn.setOnAction(event -> printTransactions());
 
+        // Checkbox listeners
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 byCheckCheckBox.setSelected(false);
@@ -124,12 +144,10 @@ public class MainAppController implements Initializable {
             }
         });
 
-        accountCol.setCellValueFactory(new PropertyValueFactory<>("sourceAccount"));
-        typeCol.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
-        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        statusCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Completed"));
-        descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+        // Set up table columns
+        setupTableColumns();
 
+        // Disable editable fields
         accountBalanceTxt.setEditable(false);
         cardNumberTxt.setEditable(false);
         cvvTxt.setEditable(false);
@@ -151,6 +169,38 @@ public class MainAppController implements Initializable {
         this.currentUser = user;
         log.info("Logged in user: " + (user != null ? user.getUsername() : "null"));
         populateDashboard();
+        loadTransactionHistory();
+    }
+
+    private void setupTableColumns() {
+        // Customize account column to show source card number
+        accountCol.setCellValueFactory(cellData -> {
+            Transaction transaction = cellData.getValue();
+            Account sourceAccount = transaction.getSourceAccount();
+            if (sourceAccount instanceof Card) {
+                return new javafx.beans.property.SimpleStringProperty(((Card) sourceAccount).getCardNumber());
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("N/A");
+            }
+        });
+        typeCol.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        statusCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Completed"));
+        descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        transactionTable.setItems(transactionData);
+    }
+
+    private void loadTransactionHistory() {
+        try {
+            transactionData.clear();
+            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
+            transactionData.addAll(transactions);
+            log.info("Loaded " + transactions.size() + " transactions for user " + currentUser.getUsername());
+        } catch (Exception e) {
+            log.error("Error loading transaction history", e);
+            showError("Failed to load transaction history: " + e.getMessage());
+        }
     }
 
     private void populateFundTransferTab() {
@@ -160,7 +210,6 @@ public class MainAppController implements Initializable {
             showError("No user logged in");
             return;
         }
-        // No need to populate card numbers since TextField is used now
         try {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             if (!cards.isEmpty()) {
@@ -378,6 +427,7 @@ public class MainAppController implements Initializable {
             showInfo("Transferred " + amount + " to " + receiverCardNumber);
             resetTransferForm();
             populateDashboard();
+            loadTransactionHistory();
         } catch (NumberFormatException e) {
             log.error("Invalid amount", e);
             showError("Amount must be a number");
@@ -387,11 +437,27 @@ public class MainAppController implements Initializable {
         }
     }
 
-    private void useChequeForPurchase() { showInfo("Cheque purchase not implemented"); }
-    private void manageCheques() { showInfo("Manage cheques not implemented"); }
-    private void transferToChecking() { showInfo("Transfer to checking not implemented"); }
-    private void issueCheque() { showInfo("Issue cheque not implemented"); }
-    private void printTransactions() { showInfo("Print transactions not implemented"); }
+    private void useChequeForPurchase() {
+        showInfo("Cheque purchase not implemented");
+    }
+
+    private void manageCheques() {
+        showInfo("Manage cheques not implemented");
+    }
+
+    private void transferToChecking() {
+        showInfo("Transfer to checking not implemented");
+    }
+
+    private void issueCheque() {
+        showInfo("Issue cheque not implemented");
+    }
+
+    private void printTransactions() {
+        log.info("Printing transactions...");
+        transactionData.forEach(t -> System.out.println(t.getDescription() + " - " + t.getAmount()));
+        showInfo("Transactions printed to console (placeholder)");
+    }
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

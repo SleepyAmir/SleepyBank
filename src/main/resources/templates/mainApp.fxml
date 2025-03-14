@@ -150,13 +150,13 @@
          <content>
             <Pane fx:id="transactionHistoryPane" prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TableView fx:id="transactionTable" layoutX="35.0" layoutY="91.0" prefHeight="352.0" prefWidth="575.0">
+                  <TableView fx:id="transactionTable" layoutX="15.0" layoutY="91.0" prefHeight="352.0" prefWidth="615.0">
                      <columns>
                         <TableColumn fx:id="accountCol" prefWidth="113.39999389648438" text="Account" />
-                        <TableColumn fx:id="typeCol" prefWidth="100.199951171875" text="Type" />
-                        <TableColumn fx:id="amountCol" prefWidth="75.0" text="Amount" />
-                        <TableColumn fx:id="statusCol" prefWidth="75.0" text="Status" />
-                        <TableColumn fx:id="descriptionCol" prefWidth="208.20001220703125" text="Description" />
+                        <TableColumn fx:id="typeCol" prefWidth="86.5999755859375" text="Type" />
+                        <TableColumn fx:id="amountCol" prefWidth="89.4000244140625" text="Amount" />
+                        <TableColumn fx:id="statusCol" prefWidth="67.79998779296875" text="Status" />
+                        <TableColumn fx:id="descriptionCol" prefWidth="256.20001220703125" text="Description" />
                      </columns>
                   </TableView>
                   <Label layoutX="189.0" layoutY="34.0" text="Transaction History">

@@ -6,10 +6,13 @@ import bank.app.model.entity.enums.TransactionType;
 import bank.app.model.service.CardService;
 import bank.app.model.service.ChequeService;
 import bank.app.model.service.TransactionService;
+import bank.app.model.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
@@ -18,9 +21,12 @@ import lombok.extern.log4j.Log4j;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Log4j
 public class MainAppController implements Initializable {
@@ -29,10 +35,14 @@ public class MainAppController implements Initializable {
     @FXML private Tab dashboardTab;
     @FXML private Tab fundTab;
     @FXML private Tab transactionHistoryTab;
+    @FXML private Tab userInfoTab;
+    @FXML private Tab transactionManagementTab;
 
     @FXML private Pane dashboardPane;
     @FXML private Pane fundTransferPane;
     @FXML private Pane transactionHistoryPane;
+    @FXML private Pane userInfoPane;
+    @FXML private Pane transactionManagementPane;
 
     @FXML private TextField accountBalanceTxt;
     @FXML private TextField cardNumberTxt;
@@ -63,9 +73,11 @@ public class MainAppController implements Initializable {
     @FXML private TextField receiverNumberTxt;
     @FXML private Button transferConfirmTxt;
     @FXML private Button transferCancelTxt;
-    @FXML private TextField transferChequeTxt;
+    @FXML private TextField transferChequeTxt; // Used if not using ComboBox
+    @FXML private ComboBox<String> transferChequeCombo; // Optional: Replace transferChequeTxt
     @FXML private TextField transferChequeAmountTxt;
     @FXML private TextField transferChequeAddressTxt;
+    @FXML private TextField chequeDescriptionTxt; // Added for cheque description
     @FXML private Button issueChequeBtn;
     @FXML private Button cancelChequeBtn;
 
@@ -77,17 +89,32 @@ public class MainAppController implements Initializable {
     @FXML private TableColumn<Transaction, String> descriptionCol;
     @FXML private Button printTableBtn;
 
+    @FXML private TextField firstNameInfoTxt;
+    @FXML private TextField lastNameInfoTxt;
+    @FXML private TextField emailAddressInfoTxt;
+    @FXML private TextField dateOfBirthInfoTxt;
+    @FXML private TextField phoneNumberInfoTxt;
+    @FXML private TextField addressInfoTxt;
+    @FXML private TextField userNameInfoTxt;
+    @FXML private TextField passwordInfoTxt;
+    @FXML private Button editBtn;
+
+    @FXML private StackedBarChart<String, Number> transactionsChart;
+
     private User currentUser;
     private CardService cardService;
     private ChequeService chequeService;
     private TransactionService transactionService;
+    private UserService userService;
     private ObservableList<Transaction> transactionData;
+    private boolean isEditMode = false;
 
     {
         try {
             cardService = new CardService();
             chequeService = new ChequeService();
             transactionService = new TransactionService();
+            userService = new UserService();
             transactionData = FXCollections.observableArrayList();
         } catch (Exception e) {
             log.error("Failed to initialize services", e);
@@ -102,7 +129,6 @@ public class MainAppController implements Initializable {
         if (transferCardNumberTxt == null) log.error("transferCardNumberTxt is null");
         if (transferConfirmTxt == null) log.error("transferConfirmTxt is null");
 
-        // Set up button actions
         transferFundsBtn.setOnAction(event -> {
             log.info("Transfer Funds clicked");
             tabPane.getSelectionModel().select(fundTab);
@@ -120,8 +146,8 @@ public class MainAppController implements Initializable {
         issueChequeBtn.setOnAction(event -> issueCheque());
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
         printTableBtn.setOnAction(event -> printTransactions());
+        editBtn.setOnAction(event -> toggleEditMode());
 
-        // Checkbox listeners
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 byCheckCheckBox.setSelected(false);
@@ -138,16 +164,17 @@ public class MainAppController implements Initializable {
                 byCardCheckBox.setSelected(false);
                 enableCardFields(false);
                 enableChequeFields(true);
+                if (transferChequeCombo != null) populateChequeCombo();
             } else if (!byCardCheckBox.isSelected()) {
                 enableCardFields(false);
                 enableChequeFields(false);
             }
         });
 
-        // Set up table columns
-        setupTableColumns();
+        setupTransactionTableColumns();
+        setupTransactionChart();
 
-        // Disable editable fields
+        setUserInfoEditable(false);
         accountBalanceTxt.setEditable(false);
         cardNumberTxt.setEditable(false);
         cvvTxt.setEditable(false);
@@ -170,10 +197,11 @@ public class MainAppController implements Initializable {
         log.info("Logged in user: " + (user != null ? user.getUsername() : "null"));
         populateDashboard();
         loadTransactionHistory();
+        populateUserInfo();
+        loadTransactionChart();
     }
 
-    private void setupTableColumns() {
-        // Customize account column to show source card number
+    private void setupTransactionTableColumns() {
         accountCol.setCellValueFactory(cellData -> {
             Transaction transaction = cellData.getValue();
             Account sourceAccount = transaction.getSourceAccount();
@@ -187,8 +215,53 @@ public class MainAppController implements Initializable {
         amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
         statusCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Completed"));
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-
         transactionTable.setItems(transactionData);
+    }
+
+    private void setupTransactionChart() {
+        transactionsChart.setTitle("Transaction Amounts by Date");
+    }
+
+    private void loadTransactionChart() {
+        transactionsChart.getData().clear();
+        try {
+            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
+            log.info("Loading chart with " + transactions.size() + " transactions");
+
+            transactions.forEach(t -> log.info("Transaction: Date=" + t.getTransactionTime().toLocalDate() +
+                    ", Type=" + t.getTransactionType() +
+                    ", Amount=" + t.getAmount()));
+
+            Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
+                    .collect(Collectors.groupingBy(
+                            t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
+                            Collectors.groupingBy(
+                                    Transaction::getTransactionType,
+                                    Collectors.summingDouble(Transaction::getAmount)
+                            )
+                    ));
+
+            XYChart.Series<String, Number> transferSeries = new XYChart.Series<>();
+            transferSeries.setName("Transfer");
+
+            XYChart.Series<String, Number> depositSeries = new XYChart.Series<>();
+            depositSeries.setName("Deposit");
+
+            XYChart.Series<String, Number> withdrawalSeries = new XYChart.Series<>();
+            withdrawalSeries.setName("Withdrawal");
+
+            groupedData.forEach((date, typeMap) -> {
+                transferSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Transfer, 0.0)));
+                depositSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Deposit, 0.0)));
+                withdrawalSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Withdraw, 0.0)));
+            });
+
+            transactionsChart.getData().addAll(transferSeries, depositSeries, withdrawalSeries);
+            log.info("Transaction chart loaded with " + transactions.size() + " transactions across " + groupedData.size() + " dates");
+        } catch (Exception e) {
+            log.error("Error loading transaction chart", e);
+            showError("Failed to load transaction chart: " + e.getMessage());
+        }
     }
 
     private void loadTransactionHistory() {
@@ -200,6 +273,61 @@ public class MainAppController implements Initializable {
         } catch (Exception e) {
             log.error("Error loading transaction history", e);
             showError("Failed to load transaction history: " + e.getMessage());
+        }
+    }
+
+    private void populateUserInfo() {
+        if (currentUser == null) {
+            log.error("currentUser is null in populateUserInfo");
+            return;
+        }
+        try {
+            firstNameInfoTxt.setText(currentUser.getFirstName() != null ? currentUser.getFirstName() : "");
+            lastNameInfoTxt.setText(currentUser.getLastName() != null ? currentUser.getLastName() : "");
+            emailAddressInfoTxt.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
+            dateOfBirthInfoTxt.setText(currentUser.getBirthDate() != null ? currentUser.getBirthDate().toString() : "");
+            phoneNumberInfoTxt.setText(currentUser.getPhone() != null ? currentUser.getPhone() : "");
+            addressInfoTxt.setText(currentUser.getAddress() != null ? currentUser.getAddress() : "");
+            userNameInfoTxt.setText(currentUser.getUsername() != null ? currentUser.getUsername() : "");
+            passwordInfoTxt.setText(currentUser.getPassword() != null ? currentUser.getPassword() : "");
+        } catch (Exception e) {
+            log.error("Error populating user info", e);
+            showError("Failed to load user info: " + e.getMessage());
+        }
+    }
+
+    private void toggleEditMode() {
+        isEditMode = !isEditMode;
+        setUserInfoEditable(isEditMode);
+        if (isEditMode) {
+            editBtn.setText("Save");
+        } else {
+            saveUserInfo();
+            editBtn.setText("Edit");
+        }
+    }
+
+    private void setUserInfoEditable(boolean editable) {
+        emailAddressInfoTxt.setEditable(editable);
+        phoneNumberInfoTxt.setEditable(editable);
+        addressInfoTxt.setEditable(editable);
+    }
+
+    private void saveUserInfo() {
+        if (currentUser == null) {
+            log.error("currentUser is null in saveUserInfo");
+            return;
+        }
+        try {
+            currentUser.setEmail(emailAddressInfoTxt.getText());
+            currentUser.setPhone(phoneNumberInfoTxt.getText());
+            currentUser.setAddress(addressInfoTxt.getText());
+            userService.save(currentUser);
+            log.info("User info saved for " + currentUser.getUsername());
+            showInfo("User information updated successfully");
+        } catch (Exception e) {
+            log.error("Error saving user info", e);
+            showError("Failed to save user info: " + e.getMessage());
         }
     }
 
@@ -218,9 +346,13 @@ public class MainAppController implements Initializable {
             } else {
                 log.warn("No cards to display");
             }
+
+            if (byCheckCheckBox.isSelected() && transferChequeCombo != null) {
+                populateChequeCombo();
+            }
         } catch (Exception e) {
-            log.error("Error setting default card", e);
-            showError("Failed to set default card: " + e.getMessage());
+            log.error("Error setting default card or cheques", e);
+            showError("Failed to set default card or cheques: " + e.getMessage());
         }
     }
 
@@ -232,11 +364,37 @@ public class MainAppController implements Initializable {
     }
 
     private void enableChequeFields(boolean enable) {
-        transferChequeTxt.setDisable(!enable);
+        if (transferChequeCombo != null) {
+            transferChequeCombo.setDisable(!enable);
+        } else {
+            transferChequeTxt.setDisable(!enable);
+        }
         transferChequeAmountTxt.setDisable(!enable);
         transferChequeAddressTxt.setDisable(!enable);
+        chequeDescriptionTxt.setDisable(!enable);
         issueChequeBtn.setDisable(!enable);
         cancelChequeBtn.setDisable(!enable);
+    }
+
+    private void populateChequeCombo() {
+        if (transferChequeCombo == null) return;
+        try {
+            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+            ObservableList<String> chequeNumbers = FXCollections.observableArrayList(
+                    cheques.stream()
+                            .filter(c -> "Pending".equals(c.getReceiver()))
+                            .map(Cheque::getNumber)
+                            .collect(Collectors.toList())
+            );
+            transferChequeCombo.setItems(chequeNumbers);
+            if (!chequeNumbers.isEmpty()) {
+                transferChequeCombo.getSelectionModel().selectFirst();
+            }
+            log.info("Populated cheque combo with " + chequeNumbers.size() + " options");
+        } catch (Exception e) {
+            log.error("Error populating cheque combo", e);
+            showError("Failed to load cheques: " + e.getMessage());
+        }
     }
 
     private String generateCardNumber() {
@@ -356,9 +514,14 @@ public class MainAppController implements Initializable {
         transferCvvTxt.clear();
         transferAmountTxt.clear();
         receiverNumberTxt.clear();
-        transferChequeTxt.clear();
+        if (transferChequeCombo != null) {
+            transferChequeCombo.getSelectionModel().clearSelection();
+        } else {
+            transferChequeTxt.clear();
+        }
         transferChequeAmountTxt.clear();
         transferChequeAddressTxt.clear();
+        chequeDescriptionTxt.clear();
         byCardCheckBox.setSelected(false);
         byCheckCheckBox.setSelected(false);
         enableCardFields(false);
@@ -370,7 +533,7 @@ public class MainAppController implements Initializable {
         try {
             if (!byCardCheckBox.isSelected()) {
                 log.warn("Card transfer not selected");
-                showError("Please select 'By Card'");
+                showError("Please select 'By Card' for card transfer");
                 return;
             }
 
@@ -428,6 +591,7 @@ public class MainAppController implements Initializable {
             resetTransferForm();
             populateDashboard();
             loadTransactionHistory();
+            loadTransactionChart();
         } catch (NumberFormatException e) {
             log.error("Invalid amount", e);
             showError("Amount must be a number");
@@ -437,6 +601,67 @@ public class MainAppController implements Initializable {
         }
     }
 
+    private void issueCheque() {
+        log.info("Issue Cheque clicked");
+        try {
+            if (!byCheckCheckBox.isSelected()) {
+                log.warn("Cheque transfer not selected");
+                showError("Please select 'By Cheque'");
+                return;
+            }
+
+            String chequeNumber = transferChequeCombo != null ?
+                    transferChequeCombo.getValue() : transferChequeTxt.getText();
+            String amountText = transferChequeAmountTxt.getText();
+            String receiverAddress = transferChequeAddressTxt.getText();
+            String description = chequeDescriptionTxt.getText();
+
+            if (chequeNumber == null || chequeNumber.trim().isEmpty() ||
+                    amountText.isEmpty() || receiverAddress.isEmpty()) {
+                log.warn("Missing cheque fields");
+                showError("All cheque fields must be filled");
+                return;
+            }
+
+            double amount = Double.parseDouble(amountText);
+            if (amount <= 0) {
+                log.warn("Invalid cheque amount");
+                showError("Amount must be positive");
+                return;
+            }
+
+            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+            Cheque cheque = cheques.stream()
+                    .filter(c -> c.getNumber().equals(chequeNumber) && "Pending".equals(c.getReceiver()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (cheque == null) {
+                log.error("Cheque not found or already used: " + chequeNumber);
+                showError("Cheque not found or already used");
+                return;
+            }
+
+            cheque.setAmount(amount);
+            cheque.setReceiver(receiverAddress);
+            cheque.setDescription(description.isEmpty() ? "Cheque transfer" : description);
+            cheque.setPassDate(LocalDate.now().plusMonths(1));
+            chequeService.saveOrUpdate(cheque); // Use saveOrUpdate instead of save
+
+            log.info("Cheque issued: Number=" + chequeNumber + ", Amount=" + amount +
+                    ", Receiver=" + receiverAddress);
+            showInfo("Cheque " + chequeNumber + " issued for " + amount + " to " + receiverAddress);
+
+            resetTransferForm();
+            populateDashboard();
+        } catch (NumberFormatException e) {
+            log.error("Invalid cheque amount", e);
+            showError("Amount must be a valid number");
+        } catch (Exception e) {
+            log.error("Cheque issuance failed", e);
+            showError("Failed to issue cheque: " + e.getMessage());
+        }
+    }
     private void useChequeForPurchase() {
         showInfo("Cheque purchase not implemented");
     }
@@ -447,10 +672,6 @@ public class MainAppController implements Initializable {
 
     private void transferToChecking() {
         showInfo("Transfer to checking not implemented");
-    }
-
-    private void issueCheque() {
-        showInfo("Issue cheque not implemented");
     }
 
     private void printTransactions() {

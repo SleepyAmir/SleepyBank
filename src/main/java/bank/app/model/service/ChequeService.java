@@ -13,6 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChequeService {
+    public void saveOrUpdate(Cheque cheque) throws Exception {
+        try (ChequeRepository repo = new ChequeRepository()) {
+            if (cheque.getId() == 0) { // New cheque
+                repo.save(cheque);
+            } else { // Existing cheque
+                repo.edit(cheque);
+            }
+        }
+    }
+
+    // Keep original save for compatibility
     public void save(Cheque cheque) throws Exception {
         try (ChequeRepository repo = new ChequeRepository()) {
             repo.save(cheque);
@@ -41,6 +52,30 @@ public class ChequeService {
                 cheques.add(cheque);
             }
             return cheques;
+        }
+    }
+
+    // Add method to find by cheque number (optional for validation)
+    public Cheque findByChequeNumber(String chequeNumber) throws Exception {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES WHERE CHEQUE_NUMBER = ?")) {
+            stmt.setString(1, chequeNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Cheque.builder()
+                        .id(rs.getInt("ID"))
+                        .accountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")))
+                        .balance(rs.getDouble("BALANCE"))
+                        .createdAt(rs.getTimestamp("CREATED_AT").toLocalDateTime())
+                        .number(rs.getString("CHEQUE_NUMBER"))
+                        .passDate(rs.getDate("PASS_DATE").toLocalDate())
+                        .amount(rs.getDouble("AMOUNT"))
+                        .receiver(rs.getString("RECEIVER"))
+                        .description(rs.getString("DESCRIPTION"))
+                        .user(User.builder().id(rs.getInt("U_ID")).build())
+                        .build();
+            }
+            return null;
         }
     }
 }

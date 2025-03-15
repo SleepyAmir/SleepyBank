@@ -421,7 +421,7 @@ public class MainAppController implements Initializable {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
             String formatted = formatCardNumber(card.getCardNumber());
-            accountBalanceTxt.setText(String.valueOf(card.getBalance()));
+            accountBalanceTxt.setText(String.valueOf(card.getBalance())); // Should show updated balance
             cardNumberTxt.setText(formatted);
             cvvTxt.setText(card.getCvv2());
             expiryTxt.setText(card.getExpiryDate().toString());
@@ -447,7 +447,6 @@ public class MainAppController implements Initializable {
             showError("Failed to load dashboard: " + e.getMessage());
         }
     }
-
     private Card createDefaultCard() {
         Card card = Card.builder()
                 .user(currentUser)
@@ -630,6 +629,7 @@ public class MainAppController implements Initializable {
                 return;
             }
 
+            // Find the cheque
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             Cheque cheque = cheques.stream()
                     .filter(c -> c.getNumber().equals(chequeNumber) && "Pending".equals(c.getReceiver()))
@@ -642,18 +642,32 @@ public class MainAppController implements Initializable {
                 return;
             }
 
+            // Find the card and deduct balance
+            List<Card> cards = cardService.findByUserId(currentUser.getId());
+            Card sourceCard = cards.isEmpty() ? createDefaultCard() : cards.get(0);
+            if (sourceCard.getBalance() < amount) {
+                log.warn("Insufficient balance: " + sourceCard.getBalance());
+                showError("Insufficient balance");
+                return;
+            }
+
+            // Update cheque
             cheque.setAmount(amount);
             cheque.setReceiver(receiverAddress);
             cheque.setDescription(description.isEmpty() ? "Cheque transfer" : description);
             cheque.setPassDate(LocalDate.now().plusMonths(1));
-            chequeService.saveOrUpdate(cheque); // Use saveOrUpdate instead of save
+            chequeService.saveOrUpdate(cheque);
+
+            // Deduct from card balance
+            sourceCard.setBalance(sourceCard.getBalance() - amount);
+            cardService.save(sourceCard);
 
             log.info("Cheque issued: Number=" + chequeNumber + ", Amount=" + amount +
-                    ", Receiver=" + receiverAddress);
+                    ", Receiver=" + receiverAddress + ", New Balance=" + sourceCard.getBalance());
             showInfo("Cheque " + chequeNumber + " issued for " + amount + " to " + receiverAddress);
 
             resetTransferForm();
-            populateDashboard();
+            populateDashboard(); // Ensure balance updates on UI
         } catch (NumberFormatException e) {
             log.error("Invalid cheque amount", e);
             showError("Amount must be a valid number");
@@ -661,8 +675,7 @@ public class MainAppController implements Initializable {
             log.error("Cheque issuance failed", e);
             showError("Failed to issue cheque: " + e.getMessage());
         }
-    }
-    private void useChequeForPurchase() {
+    }    private void useChequeForPurchase() {
         showInfo("Cheque purchase not implemented");
     }
 

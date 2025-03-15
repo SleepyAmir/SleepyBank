@@ -5,6 +5,7 @@
 <?import javafx.scene.chart.StackedBarChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
@@ -128,9 +129,9 @@
                   <Button fx:id="transferConfirmTxt" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
                   <Button fx:id="transferCancelTxt" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
                   <Label layoutX="28.0" layoutY="360.0" text="Cheque ID :" />
-                  <TextField fx:id="transferChequeTxt" layoutX="97.0" layoutY="356.0" prefHeight="25.0" prefWidth="189.0" />
-                  <Label layoutX="327.0" layoutY="360.0" text="Cheque Amount :" />
-                  <TextField fx:id="transferChequeAmountTxt" layoutX="428.0" layoutY="356.0" prefHeight="25.0" prefWidth="131.0" />
+                  <TextField fx:id="transferChequeTxt" layoutX="97.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
+                  <Label layoutX="226.0" layoutY="360.0" text="Cheque Amount :" />
+                  <TextField fx:id="transferChequeAmountTxt" layoutX="329.0" layoutY="356.0" prefHeight="25.0" prefWidth="76.0" />
                   <Label layoutX="236.0" layoutY="310.0" text="TRANSFER BY CHEQUE">
                      <font>
                         <Font name="System Bold" size="17.0" />
@@ -147,7 +148,9 @@
                   <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
                   <TextField fx:id="transferCardNumberTxt" layoutX="106.0" layoutY="129.0" prefHeight="25.0" prefWidth="160.0" />
                   <Label layoutX="327.0" layoutY="408.0" text="Description :" />
-                  <TextField fx:id="chequeDescriptionTxt" layoutX="395.0" layoutY="404.0" prefHeight="25.0" prefWidth="173.0" />
+                  <TextField fx:id="chequeDescriptionTxt" layoutX="395.0" layoutY="404.0" prefHeight="25.0" prefWidth="215.0" />
+                  <Label layoutX="421.0" layoutY="360.0" text="Pass Date:" />
+                  <DatePicker fx:id="chequeDate" layoutX="480.0" layoutY="356.0" prefHeight="25.0" prefWidth="132.0" />
                </children>
             </Pane>
          </content>

@@ -76,7 +76,7 @@ public class MainAppController implements Initializable {
     @FXML private TextField transferChequeTxt; // Used if not using ComboBox
     @FXML private ComboBox<String> transferChequeCombo; // Optional: Replace transferChequeTxt
     @FXML private TextField transferChequeAmountTxt;
-    @FXML private TextField transferChequeAddressTxt;
+    @FXML private TextField transferChequeAddressTxt; // Now "Receiver Card Number"
     @FXML private TextField chequeDescriptionTxt;
     @FXML private DatePicker chequeDate;
     @FXML private Button issueChequeBtn;
@@ -109,7 +109,7 @@ public class MainAppController implements Initializable {
     private UserService userService;
     private ObservableList<Transaction> transactionData;
     private boolean isEditMode = false;
-    private String userChequeAddress; // Store user's unique cheque address
+    private String userChequeAddress; // Unique cheque address per user
 
     {
         try {
@@ -143,7 +143,7 @@ public class MainAppController implements Initializable {
         transferConfirmTxt.setOnAction(event -> confirmTransfer());
         transferCancelTxt.setOnAction(event -> resetTransferForm());
         chequeBtn.setOnAction(event -> useChequeForPurchase());
-        manageChequeBtn.setOnAction(event -> processCheques());
+        manageChequeBtn.setOnAction(event -> manageCheques());
         savingTransferTxt.setOnAction(event -> transferToChecking());
         issueChequeBtn.setOnAction(event -> issueCheque());
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
@@ -189,6 +189,9 @@ public class MainAppController implements Initializable {
         pendingChequeBtn.setEditable(false);
         cashedChequeBtn.setEditable(false);
         bouncedChequeBtn.setEditable(false);
+
+        // Set prompt text for clarity
+        transferChequeAddressTxt.setPromptText("Receiver Card Number (e.g., 1383-XXXX-XXXX-XXXX)");
 
         resetDashboard();
         resetTransferForm();
@@ -385,7 +388,7 @@ public class MainAppController implements Initializable {
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             ObservableList<String> chequeNumbers = FXCollections.observableArrayList(
                     cheques.stream()
-                            .filter(c -> c.getReceiver().equals(userChequeAddress)) // Only unissued cheques
+                            .filter(c -> c.getReceiver().equals(userChequeAddress))
                             .map(Cheque::getNumber)
                             .collect(Collectors.toList())
             );
@@ -411,14 +414,23 @@ public class MainAppController implements Initializable {
 
     private String generateChequeAddress() {
         Random random = new Random();
-        StringBuilder sb = new StringBuilder("5555"); // Distinct prefix from card numbers (1383)
+        StringBuilder sb = new StringBuilder("5555");
         for (int i = 0; i < 12; i++) {
             sb.append(random.nextInt(10));
         }
         return sb.toString();
     }
 
+    private String generateCvv() {
+        Random random = new Random();
+        return String.format("%03d", random.nextInt(1000));
+    }
+
     private String formatCardNumber(String raw) {
+        if (raw == null) {
+            log.warn("Attempted to format null card number or cheque address");
+            return "N/A";
+        }
         return raw.substring(0, 4) + "-" + raw.substring(4, 8) + "-" +
                 raw.substring(8, 12) + "-" + raw.substring(12, 16);
     }
@@ -427,24 +439,49 @@ public class MainAppController implements Initializable {
         try {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
-            String formattedCard = formatCardNumber(card.getCardNumber());
+            String formatted = formatCardNumber(card.getCardNumber());
             accountBalanceTxt.setText(String.valueOf(card.getBalance()));
-            cardNumberTxt.setText(formattedCard);
+            cardNumberTxt.setText(formatted);
             cvvTxt.setText(card.getCvv2());
             expiryTxt.setText(card.getExpiryDate().toString());
-            cardNumberTxt1.setText(formattedCard);
+            cardNumberTxt1.setText(formatted);
             cvvTxt1.setText(card.getCvv2());
             expiryTxt1.setText(card.getExpiryDate().toString());
 
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             if (cheques.isEmpty()) {
+                userChequeAddress = generateChequeAddress();
+                log.info("Generated new cheque address for user " + currentUser.getUsername() + ": " + userChequeAddress);
                 createDefaultCheques();
                 cheques = chequeService.findByUserId(currentUser.getId());
+            } else {
+                List<Cheque> finalCheques = cheques;
+                userChequeAddress = cheques.stream()
+                        .filter(c -> c.getReceiver().startsWith("5555"))
+                        .map(Cheque::getReceiver)
+                        .findFirst()
+                        .orElseGet(() -> {
+                            String newAddress = generateChequeAddress();
+                            log.info("No valid cheque address found, generated: " + newAddress);
+                            finalCheques.stream()
+                                    .filter(c -> c.getReceiver().equals("Pending") && c.getAmount() == 0)
+                                    .forEach(c -> {
+                                        c.setReceiver(newAddress);
+                                        try {
+                                            chequeService.save(c);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                        log.info("Fixed cheque " + c.getNumber() + " to " + newAddress);
+                                    });
+                            return newAddress;
+                        });
             }
+
             totalChequeBtn.setText(String.valueOf(cheques.size()));
-            chequeAddressTxt.setText(formatCardNumber(userChequeAddress)); // Display cheque address
+            chequeAddressTxt.setText(formatCardNumber(userChequeAddress));
             pendingChequeBtn.setText(String.valueOf(cheques.stream()
-                    .filter(c -> c.getReceiver().equals(userChequeAddress)).count()));
+                    .filter(c -> c.getReceiver().equals("Pending")).count()));
             cashedChequeBtn.setText(String.valueOf(cheques.stream()
                     .filter(c -> c.getReceiver().equals("Cashed")).count()));
             bouncedChequeBtn.setText(String.valueOf(cheques.stream()
@@ -476,12 +513,8 @@ public class MainAppController implements Initializable {
         return card;
     }
 
-    private void createDefaultCheques() throws Exception {
+    private void createDefaultCheques() {
         Random random = new Random();
-        List<Card> cards = cardService.findByUserId(currentUser.getId());
-        Card userCard = cards.isEmpty() ? createDefaultCard() : cards.get(0);
-        userChequeAddress = generateChequeAddress(); // Unique cheque address for this user
-
         for (int i = 0; i < 12; i++) {
             String chequeNumber = String.format("%06d", random.nextInt(1000000));
             Cheque cheque = Cheque.builder()
@@ -492,7 +525,7 @@ public class MainAppController implements Initializable {
                     .number(chequeNumber)
                     .passDate(LocalDate.now().plusMonths(1))
                     .amount(0.0)
-                    .receiver(userChequeAddress) // Unique cheque address, not card number
+                    .receiver(userChequeAddress)
                     .description("Cheque #" + chequeNumber)
                     .build();
             try {
@@ -503,11 +536,6 @@ public class MainAppController implements Initializable {
                 throw new RuntimeException("Failed to save cheque: " + e.getMessage(), e);
             }
         }
-    }
-
-    private String generateCvv() {
-        Random random = new Random();
-        return String.format("%03d", random.nextInt(1000));
     }
 
     private void resetDashboard() {
@@ -572,7 +600,7 @@ public class MainAppController implements Initializable {
 
             if (cvv.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty()) {
                 log.warn("Missing fields");
-                log.info("All fields must be filled");
+                showError("All fields must be filled");
                 return;
             }
 
@@ -633,7 +661,7 @@ public class MainAppController implements Initializable {
             String chequeNumber = transferChequeCombo != null ?
                     transferChequeCombo.getValue() : transferChequeTxt.getText();
             String amountText = transferChequeAmountTxt.getText();
-            String receiverCardNumber = transferChequeAddressTxt.getText();
+            String receiverCardNumber = transferChequeAddressTxt.getText().replaceAll("-", "");
             String description = chequeDescriptionTxt.getText();
             LocalDate passDate = chequeDate.getValue();
 
@@ -650,6 +678,12 @@ public class MainAppController implements Initializable {
                 return;
             }
 
+            if (!receiverCardNumber.startsWith("1383")) {
+                log.warn("Invalid receiver card number: " + receiverCardNumber);
+                showError("Receiver must be a valid card number (starts with 1383)");
+                return;
+            }
+
             double amount = Double.parseDouble(amountText);
             if (amount <= 0) {
                 log.warn("Invalid cheque amount");
@@ -658,28 +692,29 @@ public class MainAppController implements Initializable {
             }
 
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+            log.info("Looking for cheque " + chequeNumber + " with receiver " + userChequeAddress);
+            cheques.forEach(c -> log.info("Cheque: " + c.getNumber() + ", Receiver: " + c.getReceiver()));
             Cheque cheque = cheques.stream()
-                    .filter(c -> c.getNumber().equals(chequeNumber) &&
-                            c.getReceiver().equals(userChequeAddress)) // Match cheque address
+                    .filter(c -> c.getNumber().equals(chequeNumber) && c.getReceiver().equals(userChequeAddress))
                     .findFirst()
                     .orElse(null);
 
             if (cheque == null) {
-                log.error("Cheque not found or already used: " + chequeNumber);
+                log.error("Cheque not found or already used: " + chequeNumber + " (expected receiver: " + userChequeAddress + ")");
                 showError("Cheque not found or already used");
                 return;
             }
 
             cheque.setAmount(amount);
-            cheque.setReceiver(receiverCardNumber); // Update to receiver's card number
-            cheque.setDescription(description.isEmpty() ? "Cheque transfer" : description);
+            cheque.setReceiver("Pending");
+            cheque.setDescription(description.isEmpty() ? "To " + receiverCardNumber : description + " | To " + receiverCardNumber);
             cheque.setPassDate(passDate);
-            chequeService.saveOrUpdate(cheque);
+            chequeService.save(cheque);
 
             log.info("Cheque issued: Number=" + chequeNumber + ", Amount=" + amount +
-                    ", Receiver=" + receiverCardNumber + ", Pass Date=" + passDate);
-            showInfo("Cheque " + chequeNumber + " issued for " + amount + " to " + receiverCardNumber +
-                    ", will be processed after " + passDate);
+                    ", Receiver Card=" + receiverCardNumber + ", Pass Date=" + passDate + ", Status=Pending");
+            showInfo("Cheque " + chequeNumber + " issued for " + amount + " to card " + receiverCardNumber +
+                    ", now Pending until " + passDate);
 
             resetTransferForm();
             populateDashboard();
@@ -692,36 +727,45 @@ public class MainAppController implements Initializable {
         }
     }
 
-    private void processCheques() {
-        log.info("Processing cheques");
+    private void manageCheques() {
+        log.info("Managing cheques");
         try {
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            List<Card> userCards = cardService.findByUserId(currentUser.getId());
-            Card sourceCard = userCards.isEmpty() ? createDefaultCard() : userCards.get(0);
+            List<Card> cards = cardService.findByUserId(currentUser.getId());
+            Card sourceCard = cards.isEmpty() ? createDefaultCard() : cards.get(0);
             LocalDate today = LocalDate.now();
 
             for (Cheque cheque : cheques) {
-                if (!cheque.getReceiver().equals(userChequeAddress) && // Not the cheque address (i.e., issued)
-                        !cheque.getReceiver().equals("Cashed") &&          // Not already cashed
-                        !cheque.getReceiver().equals("Bounced") &&         // Not bounced
+                if (cheque.getReceiver().equals("Pending") &&
                         (cheque.getPassDate().isBefore(today) || cheque.getPassDate().isEqual(today))) {
-                    double amount = cheque.getAmount();
-                    String receiverCardNumber = cheque.getReceiver().replaceAll("-", "");
+                    String description = cheque.getDescription();
+                    String receiverCardNumber = description.contains("| To ") ?
+                            description.split("\\| To ")[1] :
+                            (description.startsWith("To ") ? description.substring(3) : null);
 
-                    if (sourceCard.getBalance() < amount) {
-                        log.warn("Insufficient balance for cheque " + cheque.getNumber() + ": " + sourceCard.getBalance());
+                    if (receiverCardNumber == null) {
+                        log.warn("No receiver found in description for cheque " + cheque.getNumber());
                         cheque.setReceiver("Bounced");
-                        chequeService.saveOrUpdate(cheque);
-                        showError("Cheque " + cheque.getNumber() + " bounced due to insufficient funds");
+                        chequeService.save(cheque);
+                        showError("Cheque " + cheque.getNumber() + " bounced: Invalid receiver");
                         continue;
                     }
 
+                    double amount = cheque.getAmount();
                     Card receiverCard = cardService.findByCardNumber(receiverCardNumber);
                     if (receiverCard == null) {
-                        log.warn("Receiver card not found: " + receiverCardNumber);
+                        log.warn("Receiver card not found for cheque " + cheque.getNumber());
                         cheque.setReceiver("Bounced");
-                        chequeService.saveOrUpdate(cheque);
+                        chequeService.save(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Receiver card not found");
+                        continue;
+                    }
+
+                    if (sourceCard.getBalance() < amount) {
+                        log.warn("Insufficient balance for cheque " + cheque.getNumber());
+                        cheque.setReceiver("Bounced");
+                        chequeService.save(cheque);
+                        showError("Cheque " + cheque.getNumber() + " bounced: Insufficient funds");
                         continue;
                     }
 
@@ -729,9 +773,8 @@ public class MainAppController implements Initializable {
                     receiverCard.setBalance(receiverCard.getBalance() + amount);
                     cardService.save(sourceCard);
                     cardService.save(receiverCard);
-
                     cheque.setReceiver("Cashed");
-                    chequeService.saveOrUpdate(cheque);
+                    chequeService.save(cheque);
 
                     Transaction transaction = Transaction.builder()
                             .sourceAccount(sourceCard)
@@ -743,18 +786,16 @@ public class MainAppController implements Initializable {
                             .build();
                     transactionService.save(transaction);
 
-                    log.info("Cheque cashed: Number=" + cheque.getNumber() + ", Amount=" + amount +
-                            ", From=" + sourceCard.getCardNumber() + ", To=" + receiverCardNumber);
+                    log.info("Cheque " + cheque.getNumber() + " cashed for " + amount + " to " + receiverCardNumber);
                     showInfo("Cheque " + cheque.getNumber() + " cashed for " + amount + " to " + receiverCardNumber);
                 }
             }
-
             populateDashboard();
             loadTransactionHistory();
             loadTransactionChart();
         } catch (Exception e) {
-            log.error("Error processing cheques", e);
-            showError("Failed to process cheques: " + e.getMessage());
+            log.error("Error managing cheques", e);
+            showError("Failed to manage cheques: " + e.getMessage());
         }
     }
 

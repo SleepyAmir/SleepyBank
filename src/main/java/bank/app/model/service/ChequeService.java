@@ -78,4 +78,13 @@ public class ChequeService {
             return null;
         }
     }
-}
+    public void delete(Cheque cheque) throws Exception {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM CHEQUES WHERE ID = ?")) {
+            stmt.setInt(1, cheque.getId());
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new Exception("No cheque found with ID: " + cheque.getId());
+            }
+        }
+    }}

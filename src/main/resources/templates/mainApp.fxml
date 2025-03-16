@@ -72,9 +72,9 @@
                         <Font name="System Bold" size="17.0" />
                      </font>
                   </Label>
-                  <Label layoutX="34.0" layoutY="355.0" text="Total Cheque:" />
+                  <Label layoutX="34.0" layoutY="355.0" text="Total Cheques:" />
                   <TextField fx:id="totalChequeBtn" layoutX="110.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
-                  <Label layoutX="26.0" layoutY="299.0" text="Cheque Address:" />
+                  <Label layoutX="26.0" layoutY="299.0" text="Current Cheque:" />
                   <TextField fx:id="chequeAddressTxt" layoutX="119.0" layoutY="295.0" prefHeight="25.0" prefWidth="197.0" />
                   <Label layoutX="201.0" layoutY="355.0" text="Pending:" />
                   <TextField fx:id="pendingChequeBtn" layoutX="255.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
@@ -128,9 +128,9 @@
                   <Separator layoutX="4.0" layoutY="283.0" prefHeight="18.0" prefWidth="629.0" />
                   <Button fx:id="transferConfirmTxt" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
                   <Button fx:id="transferCancelTxt" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
-                  <Label layoutX="28.0" layoutY="360.0" text="Cheque ID :" />
-                  <TextField fx:id="transferChequeTxt" layoutX="97.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
-                  <Label layoutX="226.0" layoutY="360.0" text="Cheque Amount :" />
+                  <Label layoutX="23.0" layoutY="360.0" text="Cheque Number :" />
+                  <TextField fx:id="transferChequeTxt" editable="false" layoutX="117.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
+                  <Label layoutX="236.0" layoutY="360.0" text="Cheque Amount :" />
                   <TextField fx:id="transferChequeAmountTxt" layoutX="329.0" layoutY="356.0" prefHeight="25.0" prefWidth="76.0" />
                   <Label layoutX="236.0" layoutY="310.0" text="TRANSFER BY CHEQUE">
                      <font>
@@ -143,8 +143,8 @@
                      </font>
                   </Label>
                   <Button fx:id="issueChequeBtn" layoutX="169.0" layoutY="454.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Issue Cheque" />
-                  <Button fx:id="cancelChequeBtn" layoutX="329.0" layoutY="454.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel " />
-                  <Label layoutX="28.0" layoutY="408.0" text="Cheque Address:" />
+                  <Button fx:id="cancelChequeBtn" layoutX="329.0" layoutY="454.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel" />
+                  <Label layoutX="25.0" layoutY="408.0" text="Receiver Number:" />
                   <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
                   <TextField fx:id="transferCardNumberTxt" layoutX="106.0" layoutY="129.0" prefHeight="25.0" prefWidth="160.0" />
                   <Label layoutX="327.0" layoutY="408.0" text="Description :" />
@@ -205,7 +205,30 @@
                   <TextField fx:id="passwordInfoTxt" editable="false" layoutX="393.0" layoutY="130.0" />
                   <Line endX="-110.39999389648438" endY="-402.3999938964844" layoutX="413.0" layoutY="468.0" startX="-110.39996337890625" startY="10.79998779296875" />
                   <Button fx:id="editBtn" layoutX="397.0" layoutY="192.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Edit" />
-               </children></Pane>
+               </children>
+            </Pane>
+         </content>
+      </Tab>
+      <Tab fx:id="chequesTable" text="Manage Cheque">
+         <content>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TableView layoutX="25.0" layoutY="82.0" prefHeight="416.0" prefWidth="587.0">
+                    <columns>
+                      <TableColumn fx:id="chequeNumberCol" prefWidth="103.4000244140625" text="Cheque Number" />
+                      <TableColumn fx:id="amountCol" prefWidth="111.5999755859375" text="Amount" />
+                        <TableColumn fx:id="passDateCol" prefWidth="103.5999755859375" text="Pass_Date" />
+                        <TableColumn fx:id="receiverCol" prefWidth="68.4000244140625" text="Receiver" />
+                        <TableColumn fx:id="chequeDescriptionCol" prefWidth="197.0" text="Description" />
+                    </columns>
+                  </TableView>
+                  <Label layoutX="229.0" layoutY="28.0" text="Cheques Status">
+                     <font>
+                        <Font name="System Bold" size="25.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
          </content>
       </Tab>
       <Tab fx:id="transactionManagementTab" text="Transaction management">
@@ -213,12 +236,12 @@
             <Pane fx:id="transactionManagementPane" prefHeight="200.0" prefWidth="200.0">
                <children>
                   <StackedBarChart fx:id="transactionsChart" layoutX="32.0" layoutY="31.0" prefHeight="458.0" prefWidth="566.0">
-                    <xAxis>
-                      <CategoryAxis fx:id="categoryAxis" side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis fx:id="numberAxis" side="LEFT" />
-                    </yAxis>
+                     <xAxis>
+                        <CategoryAxis fx:id="categoryAxis" side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="numberAxis" side="LEFT" />
+                     </yAxis>
                   </StackedBarChart>
                </children>
             </Pane>

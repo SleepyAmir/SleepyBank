@@ -30,7 +30,7 @@ public class Test extends Application {
 //        // Create the scene
 //        Scene scene = new Scene(root);
 //
-//        // Set the stage properties
+//        // Set the stage propertiesY
 //        primaryStage.setTitle("SecureBank - Register");
 //        primaryStage.setScene(scene);
 //        primaryStage.setResizable(false); // Optional: Prevent resizing

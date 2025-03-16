@@ -73,10 +73,9 @@ public class MainAppController implements Initializable {
     @FXML private TextField receiverNumberTxt;
     @FXML private Button transferConfirmTxt;
     @FXML private Button transferCancelTxt;
-    @FXML private TextField transferChequeTxt; // Used if not using ComboBox
-    @FXML private ComboBox<String> transferChequeCombo; // Optional: Replace transferChequeTxt
+    @FXML private TextField transferChequeTxt;
     @FXML private TextField transferChequeAmountTxt;
-    @FXML private TextField transferChequeAddressTxt; // Now "Receiver Card Number"
+    @FXML private TextField transferChequeAddressTxt;
     @FXML private TextField chequeDescriptionTxt;
     @FXML private DatePicker chequeDate;
     @FXML private Button issueChequeBtn;
@@ -109,7 +108,8 @@ public class MainAppController implements Initializable {
     private UserService userService;
     private ObservableList<Transaction> transactionData;
     private boolean isEditMode = false;
-    private String userChequeAddress; // Unique cheque address per user
+    private String currentChequeNumber;
+    private static final String CHEQUE_BASE = "12345"; // Base prefix for all cheque numbers
 
     {
         try {
@@ -128,11 +128,7 @@ public class MainAppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         log.info("MainAppController initialized");
 
-        if (transferCardNumberTxt == null) log.error("transferCardNumberTxt is null");
-        if (transferConfirmTxt == null) log.error("transferConfirmTxt is null");
-
         transferFundsBtn.setOnAction(event -> {
-            log.info("Transfer Funds clicked");
             tabPane.getSelectionModel().select(fundTab);
             populateFundTransferTab();
         });
@@ -166,7 +162,7 @@ public class MainAppController implements Initializable {
                 byCardCheckBox.setSelected(false);
                 enableCardFields(false);
                 enableChequeFields(true);
-                if (transferChequeCombo != null) populateChequeCombo();
+                populateChequeField();
             } else if (!byCardCheckBox.isSelected()) {
                 enableCardFields(false);
                 enableChequeFields(false);
@@ -189,8 +185,8 @@ public class MainAppController implements Initializable {
         pendingChequeBtn.setEditable(false);
         cashedChequeBtn.setEditable(false);
         bouncedChequeBtn.setEditable(false);
+        transferChequeTxt.setEditable(false);
 
-        // Set prompt text for clarity
         transferChequeAddressTxt.setPromptText("Receiver Card Number (e.g., 1383-XXXX-XXXX-XXXX)");
 
         resetDashboard();
@@ -208,13 +204,11 @@ public class MainAppController implements Initializable {
 
     private void setupTransactionTableColumns() {
         accountCol.setCellValueFactory(cellData -> {
-            Transaction transaction = cellData.getValue();
-            Account sourceAccount = transaction.getSourceAccount();
-            if (sourceAccount instanceof Card) {
-                return new javafx.beans.property.SimpleStringProperty(((Card) sourceAccount).getCardNumber());
-            } else {
-                return new javafx.beans.property.SimpleStringProperty("N/A");
-            }
+            Transaction t = cellData.getValue();
+            String source = t.getSourceAccount() instanceof Card ?
+                    ((Card) t.getSourceAccount()).getCardNumber() :
+                    (t.getSourceAccount() instanceof Cheque ? ((Cheque) t.getSourceAccount()).getNumber() : "N/A");
+            return new javafx.beans.property.SimpleStringProperty(source);
         });
         typeCol.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
         amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
@@ -231,12 +225,6 @@ public class MainAppController implements Initializable {
         transactionsChart.getData().clear();
         try {
             List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
-            log.info("Loading chart with " + transactions.size() + " transactions");
-
-            transactions.forEach(t -> log.info("Transaction: Date=" + t.getTransactionTime().toLocalDate() +
-                    ", Type=" + t.getTransactionType() +
-                    ", Amount=" + t.getAmount()));
-
             Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
                     .collect(Collectors.groupingBy(
                             t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
@@ -249,20 +237,11 @@ public class MainAppController implements Initializable {
             XYChart.Series<String, Number> transferSeries = new XYChart.Series<>();
             transferSeries.setName("Transfer");
 
-            XYChart.Series<String, Number> depositSeries = new XYChart.Series<>();
-            depositSeries.setName("Deposit");
-
-            XYChart.Series<String, Number> withdrawalSeries = new XYChart.Series<>();
-            withdrawalSeries.setName("Withdrawal");
-
             groupedData.forEach((date, typeMap) -> {
                 transferSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Transfer, 0.0)));
-                depositSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Deposit, 0.0)));
-                withdrawalSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Withdraw, 0.0)));
             });
 
-            transactionsChart.getData().addAll(transferSeries, depositSeries, withdrawalSeries);
-            log.info("Transaction chart loaded with " + transactions.size() + " transactions across " + groupedData.size() + " dates");
+            transactionsChart.getData().add(transferSeries);
         } catch (Exception e) {
             log.error("Error loading transaction chart", e);
             showError("Failed to load transaction chart: " + e.getMessage());
@@ -282,34 +261,22 @@ public class MainAppController implements Initializable {
     }
 
     private void populateUserInfo() {
-        if (currentUser == null) {
-            log.error("currentUser is null in populateUserInfo");
-            return;
-        }
-        try {
-            firstNameInfoTxt.setText(currentUser.getFirstName() != null ? currentUser.getFirstName() : "");
-            lastNameInfoTxt.setText(currentUser.getLastName() != null ? currentUser.getLastName() : "");
-            emailAddressInfoTxt.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
-            dateOfBirthInfoTxt.setText(currentUser.getBirthDate() != null ? currentUser.getBirthDate().toString() : "");
-            phoneNumberInfoTxt.setText(currentUser.getPhone() != null ? currentUser.getPhone() : "");
-            addressInfoTxt.setText(currentUser.getAddress() != null ? currentUser.getAddress() : "");
-            userNameInfoTxt.setText(currentUser.getUsername() != null ? currentUser.getUsername() : "");
-            passwordInfoTxt.setText(currentUser.getPassword() != null ? currentUser.getPassword() : "");
-        } catch (Exception e) {
-            log.error("Error populating user info", e);
-            showError("Failed to load user info: " + e.getMessage());
-        }
+        if (currentUser == null) return;
+        firstNameInfoTxt.setText(currentUser.getFirstName() != null ? currentUser.getFirstName() : "");
+        lastNameInfoTxt.setText(currentUser.getLastName() != null ? currentUser.getLastName() : "");
+        emailAddressInfoTxt.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
+        dateOfBirthInfoTxt.setText(currentUser.getBirthDate() != null ? currentUser.getBirthDate().toString() : "");
+        phoneNumberInfoTxt.setText(currentUser.getPhone() != null ? currentUser.getPhone() : "");
+        addressInfoTxt.setText(currentUser.getAddress() != null ? currentUser.getAddress() : "");
+        userNameInfoTxt.setText(currentUser.getUsername() != null ? currentUser.getUsername() : "");
+        passwordInfoTxt.setText(currentUser.getPassword() != null ? currentUser.getPassword() : "");
     }
 
     private void toggleEditMode() {
         isEditMode = !isEditMode;
         setUserInfoEditable(isEditMode);
-        if (isEditMode) {
-            editBtn.setText("Save");
-        } else {
-            saveUserInfo();
-            editBtn.setText("Edit");
-        }
+        editBtn.setText(isEditMode ? "Save" : "Edit");
+        if (!isEditMode) saveUserInfo();
     }
 
     private void setUserInfoEditable(boolean editable) {
@@ -319,16 +286,12 @@ public class MainAppController implements Initializable {
     }
 
     private void saveUserInfo() {
-        if (currentUser == null) {
-            log.error("currentUser is null in saveUserInfo");
-            return;
-        }
+        if (currentUser == null) return;
         try {
             currentUser.setEmail(emailAddressInfoTxt.getText());
             currentUser.setPhone(phoneNumberInfoTxt.getText());
             currentUser.setAddress(addressInfoTxt.getText());
             userService.save(currentUser);
-            log.info("User info saved for " + currentUser.getUsername());
             showInfo("User information updated successfully");
         } catch (Exception e) {
             log.error("Error saving user info", e);
@@ -337,9 +300,7 @@ public class MainAppController implements Initializable {
     }
 
     private void populateFundTransferTab() {
-        log.info("Populating Fund Transfer tab");
         if (currentUser == null) {
-            log.error("currentUser is null");
             showError("No user logged in");
             return;
         }
@@ -347,17 +308,13 @@ public class MainAppController implements Initializable {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             if (!cards.isEmpty()) {
                 transferCardNumberTxt.setText(formatCardNumber(cards.get(0).getCardNumber()));
-                log.info("Default card set: " + transferCardNumberTxt.getText());
-            } else {
-                log.warn("No cards to display");
             }
-
-            if (byCheckCheckBox.isSelected() && transferChequeCombo != null) {
-                populateChequeCombo();
+            if (byCheckCheckBox.isSelected()) {
+                populateChequeField();
             }
         } catch (Exception e) {
-            log.error("Error setting default card or cheques", e);
-            showError("Failed to set default card or cheques: " + e.getMessage());
+            log.error("Error populating fund transfer tab", e);
+            showError("Failed to populate fund transfer tab: " + e.getMessage());
         }
     }
 
@@ -369,11 +326,7 @@ public class MainAppController implements Initializable {
     }
 
     private void enableChequeFields(boolean enable) {
-        if (transferChequeCombo != null) {
-            transferChequeCombo.setDisable(!enable);
-        } else {
-            transferChequeTxt.setDisable(!enable);
-        }
+        transferChequeTxt.setDisable(!enable);
         transferChequeAmountTxt.setDisable(!enable);
         transferChequeAddressTxt.setDisable(!enable);
         chequeDescriptionTxt.setDisable(!enable);
@@ -382,25 +335,8 @@ public class MainAppController implements Initializable {
         cancelChequeBtn.setDisable(!enable);
     }
 
-    private void populateChequeCombo() {
-        if (transferChequeCombo == null) return;
-        try {
-            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            ObservableList<String> chequeNumbers = FXCollections.observableArrayList(
-                    cheques.stream()
-                            .filter(c -> c.getReceiver().equals(userChequeAddress))
-                            .map(Cheque::getNumber)
-                            .collect(Collectors.toList())
-            );
-            transferChequeCombo.setItems(chequeNumbers);
-            if (!chequeNumbers.isEmpty()) {
-                transferChequeCombo.getSelectionModel().selectFirst();
-            }
-            log.info("Populated cheque combo with " + chequeNumbers.size() + " options");
-        } catch (Exception e) {
-            log.error("Error populating cheque combo", e);
-            showError("Failed to load cheques: " + e.getMessage());
-        }
+    private void populateChequeField() {
+        transferChequeTxt.setText(currentChequeNumber != null ? currentChequeNumber : "No cheque available");
     }
 
     private String generateCardNumber() {
@@ -412,74 +348,65 @@ public class MainAppController implements Initializable {
         return sb.toString();
     }
 
-    private String generateChequeAddress() {
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder("5555");
-        for (int i = 0; i < 12; i++) {
-            sb.append(random.nextInt(10));
+    private String generateChequeNumber(int sequence) {
+        if (currentUser == null) {
+            throw new IllegalStateException("No current user set for cheque generation");
         }
-        return sb.toString();
+        // Format: CHEQUE_BASE + USER_ID + sequence (2 digits)
+        return CHEQUE_BASE + currentUser.getId() + String.format("%02d", sequence);
     }
 
-    private String generateCvv() {
-        Random random = new Random();
-        return String.format("%03d", random.nextInt(1000));
+    private String generateNextChequeNumber(String lastNumber) {
+        if (lastNumber == null || !lastNumber.startsWith(CHEQUE_BASE + currentUser.getId())) {
+            return generateChequeNumber(1); // Start with sequence 1 for this user
+        }
+        // Extract the sequence part (last 2 digits) and increment
+        int lastSequence = Integer.parseInt(lastNumber.substring(lastNumber.length() - 2));
+        int nextSequence = (lastSequence % 10) + 1; // Cycle from 1 to 10
+        return generateChequeNumber(nextSequence);
     }
 
     private String formatCardNumber(String raw) {
-        if (raw == null) {
-            log.warn("Attempted to format null card number or cheque address");
-            return "N/A";
-        }
-        return raw.substring(0, 4) + "-" + raw.substring(4, 8) + "-" +
-                raw.substring(8, 12) + "-" + raw.substring(12, 16);
+        if (raw == null) return "N/A";
+        return raw.length() == 16 ?
+                raw.substring(0, 4) + "-" + raw.substring(4, 8) + "-" + raw.substring(8, 12) + "-" + raw.substring(12, 16) :
+                raw;
     }
 
     private void populateDashboard() {
         try {
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
-            String formatted = formatCardNumber(card.getCardNumber());
+            String formattedCard = formatCardNumber(card.getCardNumber());
             accountBalanceTxt.setText(String.valueOf(card.getBalance()));
-            cardNumberTxt.setText(formatted);
+            cardNumberTxt.setText(formattedCard);
             cvvTxt.setText(card.getCvv2());
             expiryTxt.setText(card.getExpiryDate().toString());
-            cardNumberTxt1.setText(formatted);
+            cardNumberTxt1.setText(formattedCard);
             cvvTxt1.setText(card.getCvv2());
             expiryTxt1.setText(card.getExpiryDate().toString());
 
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             if (cheques.isEmpty()) {
-                userChequeAddress = generateChequeAddress();
-                log.info("Generated new cheque address for user " + currentUser.getUsername() + ": " + userChequeAddress);
                 createDefaultCheques();
                 cheques = chequeService.findByUserId(currentUser.getId());
+                currentChequeNumber = generateChequeNumber(1); // Initial cheque number
             } else {
                 List<Cheque> finalCheques = cheques;
-                userChequeAddress = cheques.stream()
-                        .filter(c -> c.getReceiver().startsWith("5555"))
-                        .map(Cheque::getReceiver)
+                currentChequeNumber = cheques.stream()
+                        .filter(c -> c.getReceiver().equals("Available"))
+                        .map(Cheque::getNumber)
                         .findFirst()
-                        .orElseGet(() -> {
-                            String newAddress = generateChequeAddress();
-                            log.info("No valid cheque address found, generated: " + newAddress);
-                            finalCheques.stream()
-                                    .filter(c -> c.getReceiver().equals("Pending") && c.getAmount() == 0)
-                                    .forEach(c -> {
-                                        c.setReceiver(newAddress);
-                                        try {
-                                            chequeService.save(c);
-                                        } catch (Exception e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                        log.info("Fixed cheque " + c.getNumber() + " to " + newAddress);
-                                    });
-                            return newAddress;
-                        });
+                        .orElseGet(() -> generateNextChequeNumber(
+                                finalCheques.stream()
+                                        .map(Cheque::getNumber)
+                                        .max(String::compareTo)
+                                        .orElse(null)
+                        ));
             }
 
             totalChequeBtn.setText(String.valueOf(cheques.size()));
-            chequeAddressTxt.setText(formatCardNumber(userChequeAddress));
+            chequeAddressTxt.setText(currentChequeNumber);
             pendingChequeBtn.setText(String.valueOf(cheques.stream()
                     .filter(c -> c.getReceiver().equals("Pending")).count()));
             cashedChequeBtn.setText(String.valueOf(cheques.stream()
@@ -514,9 +441,8 @@ public class MainAppController implements Initializable {
     }
 
     private void createDefaultCheques() {
-        Random random = new Random();
-        for (int i = 0; i < 12; i++) {
-            String chequeNumber = String.format("%06d", random.nextInt(1000000));
+        for (int i = 1; i <= 10; i++) {
+            String chequeNumber = generateChequeNumber(i); // Unique per user
             Cheque cheque = Cheque.builder()
                     .user(currentUser)
                     .accountType(AccountType.Cheque)
@@ -525,15 +451,14 @@ public class MainAppController implements Initializable {
                     .number(chequeNumber)
                     .passDate(LocalDate.now().plusMonths(1))
                     .amount(0.0)
-                    .receiver(userChequeAddress)
+                    .receiver("Available")
                     .description("Cheque #" + chequeNumber)
                     .build();
             try {
                 chequeService.save(cheque);
-                log.info("Saved cheque: " + chequeNumber + " with address " + userChequeAddress);
+                log.info("Saved cheque: " + chequeNumber);
             } catch (Exception e) {
                 log.error("Error saving cheque: " + chequeNumber, e);
-                throw new RuntimeException("Failed to save cheque: " + e.getMessage(), e);
             }
         }
     }
@@ -556,16 +481,11 @@ public class MainAppController implements Initializable {
     }
 
     private void resetTransferForm() {
-        log.info("Resetting transfer form");
         transferCardNumberTxt.clear();
         transferCvvTxt.clear();
         transferAmountTxt.clear();
         receiverNumberTxt.clear();
-        if (transferChequeCombo != null) {
-            transferChequeCombo.getSelectionModel().clearSelection();
-        } else {
-            transferChequeTxt.clear();
-        }
+        transferChequeTxt.clear();
         transferChequeAmountTxt.clear();
         transferChequeAddressTxt.clear();
         chequeDescriptionTxt.clear();
@@ -577,29 +497,18 @@ public class MainAppController implements Initializable {
     }
 
     private void confirmTransfer() {
-        log.info("Confirm Transfer clicked");
         try {
             if (!byCardCheckBox.isSelected()) {
-                log.warn("Card transfer not selected");
                 showError("Please select 'By Card' for card transfer");
                 return;
             }
 
-            String sourceCardNumber = transferCardNumberTxt.getText();
-            if (sourceCardNumber == null || sourceCardNumber.trim().isEmpty()) {
-                log.error("No source card number entered");
-                showError("Please enter a source card number");
-                return;
-            }
-            sourceCardNumber = sourceCardNumber.replaceAll("-", "");
+            String sourceCardNumber = transferCardNumberTxt.getText().replaceAll("-", "");
             String cvv = transferCvvTxt.getText();
             String amountText = transferAmountTxt.getText();
             String receiverCardNumber = receiverNumberTxt.getText().replaceAll("-", "");
 
-            log.info("Source: " + sourceCardNumber + ", CVV: " + cvv + ", Amount: " + amountText + ", Receiver: " + receiverCardNumber);
-
-            if (cvv.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty()) {
-                log.warn("Missing fields");
+            if (sourceCardNumber.isEmpty() || cvv.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty()) {
                 showError("All fields must be filled");
                 return;
             }
@@ -607,14 +516,12 @@ public class MainAppController implements Initializable {
             double amount = Double.parseDouble(amountText);
             Card sourceCard = cardService.findByCardNumber(sourceCardNumber);
             if (sourceCard == null || !sourceCard.getCvv2().equals(cvv) || sourceCard.getBalance() < amount) {
-                log.warn("Invalid source card details or insufficient balance");
                 showError("Invalid card details or insufficient balance");
                 return;
             }
 
             Card destinationCard = cardService.findByCardNumber(receiverCardNumber);
             if (destinationCard == null) {
-                log.error("Receiver card not found: " + receiverCardNumber);
                 showError("Receiver card not found");
                 return;
             }
@@ -623,7 +530,6 @@ public class MainAppController implements Initializable {
             destinationCard.setBalance(destinationCard.getBalance() + amount);
             cardService.save(sourceCard);
             cardService.save(destinationCard);
-            log.info("Transfer complete - Source balance: " + sourceCard.getBalance() + ", Dest balance: " + destinationCard.getBalance());
 
             Transaction transaction = Transaction.builder()
                     .sourceAccount(sourceCard)
@@ -641,7 +547,6 @@ public class MainAppController implements Initializable {
             loadTransactionHistory();
             loadTransactionChart();
         } catch (NumberFormatException e) {
-            log.error("Invalid amount", e);
             showError("Amount must be a number");
         } catch (Exception e) {
             log.error("Transfer failed", e);
@@ -650,57 +555,46 @@ public class MainAppController implements Initializable {
     }
 
     private void issueCheque() {
-        log.info("Issue Cheque clicked");
         try {
             if (!byCheckCheckBox.isSelected()) {
-                log.warn("Cheque transfer not selected");
                 showError("Please select 'By Cheque'");
                 return;
             }
 
-            String chequeNumber = transferChequeCombo != null ?
-                    transferChequeCombo.getValue() : transferChequeTxt.getText();
+            String chequeNumber = transferChequeTxt.getText();
             String amountText = transferChequeAmountTxt.getText();
             String receiverCardNumber = transferChequeAddressTxt.getText().replaceAll("-", "");
             String description = chequeDescriptionTxt.getText();
             LocalDate passDate = chequeDate.getValue();
 
-            if (chequeNumber == null || chequeNumber.trim().isEmpty() ||
-                    amountText.isEmpty() || receiverCardNumber.isEmpty() || passDate == null) {
-                log.warn("Missing cheque fields or pass date");
+            if (chequeNumber.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty() || passDate == null) {
                 showError("All cheque fields and pass date must be filled");
                 return;
             }
 
             if (passDate.isBefore(LocalDate.now())) {
-                log.warn("Pass date is in the past");
                 showError("Pass date must be today or in the future");
                 return;
             }
 
             if (!receiverCardNumber.startsWith("1383")) {
-                log.warn("Invalid receiver card number: " + receiverCardNumber);
                 showError("Receiver must be a valid card number (starts with 1383)");
                 return;
             }
 
             double amount = Double.parseDouble(amountText);
             if (amount <= 0) {
-                log.warn("Invalid cheque amount");
                 showError("Amount must be positive");
                 return;
             }
 
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            log.info("Looking for cheque " + chequeNumber + " with receiver " + userChequeAddress);
-            cheques.forEach(c -> log.info("Cheque: " + c.getNumber() + ", Receiver: " + c.getReceiver()));
             Cheque cheque = cheques.stream()
-                    .filter(c -> c.getNumber().equals(chequeNumber) && c.getReceiver().equals(userChequeAddress))
+                    .filter(c -> c.getNumber().equals(chequeNumber) && c.getReceiver().equals("Available"))
                     .findFirst()
                     .orElse(null);
 
             if (cheque == null) {
-                log.error("Cheque not found or already used: " + chequeNumber + " (expected receiver: " + userChequeAddress + ")");
                 showError("Cheque not found or already used");
                 return;
             }
@@ -709,17 +603,13 @@ public class MainAppController implements Initializable {
             cheque.setReceiver("Pending");
             cheque.setDescription(description.isEmpty() ? "To " + receiverCardNumber : description + " | To " + receiverCardNumber);
             cheque.setPassDate(passDate);
-            chequeService.save(cheque);
+            chequeService.saveOrUpdate(cheque);
 
-            log.info("Cheque issued: Number=" + chequeNumber + ", Amount=" + amount +
-                    ", Receiver Card=" + receiverCardNumber + ", Pass Date=" + passDate + ", Status=Pending");
             showInfo("Cheque " + chequeNumber + " issued for " + amount + " to card " + receiverCardNumber +
                     ", now Pending until " + passDate);
-
             resetTransferForm();
             populateDashboard();
         } catch (NumberFormatException e) {
-            log.error("Invalid cheque amount", e);
             showError("Amount must be a valid number");
         } catch (Exception e) {
             log.error("Cheque issuance failed", e);
@@ -728,7 +618,6 @@ public class MainAppController implements Initializable {
     }
 
     private void manageCheques() {
-        log.info("Managing cheques");
         try {
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             List<Card> cards = cardService.findByUserId(currentUser.getId());
@@ -738,13 +627,12 @@ public class MainAppController implements Initializable {
             for (Cheque cheque : cheques) {
                 if (cheque.getReceiver().equals("Pending") &&
                         (cheque.getPassDate().isBefore(today) || cheque.getPassDate().isEqual(today))) {
-                    String description = cheque.getDescription();
-                    String receiverCardNumber = description.contains("| To ") ?
-                            description.split("\\| To ")[1] :
-                            (description.startsWith("To ") ? description.substring(3) : null);
+                    log.info("Processing cheque: " + cheque.getNumber() + ", ID: " + cheque.getId());
+                    String receiverCardNumber = cheque.getDescription().contains("| To ") ?
+                            cheque.getDescription().split("\\| To ")[1] :
+                            (cheque.getDescription().startsWith("To ") ? cheque.getDescription().substring(3) : null);
 
                     if (receiverCardNumber == null) {
-                        log.warn("No receiver found in description for cheque " + cheque.getNumber());
                         cheque.setReceiver("Bounced");
                         chequeService.save(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Invalid receiver");
@@ -754,7 +642,6 @@ public class MainAppController implements Initializable {
                     double amount = cheque.getAmount();
                     Card receiverCard = cardService.findByCardNumber(receiverCardNumber);
                     if (receiverCard == null) {
-                        log.warn("Receiver card not found for cheque " + cheque.getNumber());
                         cheque.setReceiver("Bounced");
                         chequeService.save(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Receiver card not found");
@@ -762,7 +649,6 @@ public class MainAppController implements Initializable {
                     }
 
                     if (sourceCard.getBalance() < amount) {
-                        log.warn("Insufficient balance for cheque " + cheque.getNumber());
                         cheque.setReceiver("Bounced");
                         chequeService.save(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Insufficient funds");
@@ -773,21 +659,40 @@ public class MainAppController implements Initializable {
                     receiverCard.setBalance(receiverCard.getBalance() + amount);
                     cardService.save(sourceCard);
                     cardService.save(receiverCard);
-                    cheque.setReceiver("Cashed");
-                    chequeService.save(cheque);
+
+                    String oldChequeNumber = cheque.getNumber();
+                    log.info("Deleting cheque: " + oldChequeNumber + ", ID: " + cheque.getId());
+                    chequeService.delete(cheque);
+                    log.info("Deleted cheque: " + oldChequeNumber);
+
+                    String nextChequeNumber = generateNextChequeNumber(oldChequeNumber);
+                    Cheque newCheque = Cheque.builder()
+                            .user(currentUser)
+                            .accountType(AccountType.Cheque)
+                            .balance(0.0)
+                            .createdAt(LocalDateTime.now())
+                            .number(nextChequeNumber)
+                            .passDate(LocalDate.now().plusMonths(1))
+                            .amount(0.0)
+                            .receiver("Available")
+                            .description("Cheque #" + nextChequeNumber)
+                            .build();
+                    log.info("Creating new cheque: " + nextChequeNumber);
+                    chequeService.save(newCheque);
+                    currentChequeNumber = nextChequeNumber;
 
                     Transaction transaction = Transaction.builder()
-                            .sourceAccount(sourceCard)
+                            .sourceAccount(cheque)
                             .destinationAccount(receiverCard)
                             .amount(amount)
                             .transactionType(TransactionType.Transfer)
                             .transactionTime(LocalDateTime.now())
-                            .description("Cheque #" + cheque.getNumber() + " cashed to " + receiverCardNumber)
+                            .description("Cheque #" + oldChequeNumber + " cashed to " + receiverCardNumber)
                             .build();
                     transactionService.save(transaction);
 
-                    log.info("Cheque " + cheque.getNumber() + " cashed for " + amount + " to " + receiverCardNumber);
-                    showInfo("Cheque " + cheque.getNumber() + " cashed for " + amount + " to " + receiverCardNumber);
+                    showInfo("Cheque " + oldChequeNumber + " cashed for " + amount + " to " + receiverCardNumber +
+                            ", replaced with " + nextChequeNumber);
                 }
             }
             populateDashboard();
@@ -808,9 +713,8 @@ public class MainAppController implements Initializable {
     }
 
     private void printTransactions() {
-        log.info("Printing transactions...");
         transactionData.forEach(t -> System.out.println(t.getDescription() + " - " + t.getAmount()));
-        showInfo("Transactions printed to console (placeholder)");
+        showInfo("Transactions printed to console");
     }
 
     private void showError(String message) {
@@ -825,5 +729,10 @@ public class MainAppController implements Initializable {
         alert.setTitle("Info");
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String generateCvv() {
+        Random random = new Random();
+        return String.format("%03d", random.nextInt(1000));
     }
 }

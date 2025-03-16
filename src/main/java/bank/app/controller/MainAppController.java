@@ -109,7 +109,7 @@ public class MainAppController implements Initializable {
     private ObservableList<Transaction> transactionData;
     private boolean isEditMode = false;
     private String currentChequeNumber;
-    private static final String CHEQUE_BASE = "12345"; // Base prefix for all cheque numbers
+    private static final String CHEQUE_BASE = "12345";
 
     {
         try {
@@ -144,7 +144,42 @@ public class MainAppController implements Initializable {
         issueChequeBtn.setOnAction(event -> issueCheque());
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
         printTableBtn.setOnAction(event -> printTransactions());
-        editBtn.setOnAction(event -> toggleEditMode());
+
+        // New edit button logic inspired by your example
+        editBtn.setOnAction(event -> {
+            if (!isEditMode) {
+                // Switch to edit mode
+                isEditMode = true;
+                setUserInfoEditable(true);
+                editBtn.setText("Save");
+                log.info("Switched to edit mode");
+            } else {
+                // Save changes and switch back to view mode
+                try {
+                    // Update currentUser with editable fields
+                    currentUser.setEmail(emailAddressInfoTxt.getText());
+                    currentUser.setAddress(addressInfoTxt.getText());
+                    currentUser.setUsername(userNameInfoTxt.getText());
+                    currentUser.setPassword(passwordInfoTxt.getText());
+
+                    // Save to database
+                    userService.edit(currentUser);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "User Info Edited", ButtonType.OK);
+                    alert.show();
+                    log.info("User Edited: " + currentUser.getUsername());
+
+                    // Reset to view mode
+                    isEditMode = false;
+                    setUserInfoEditable(false);
+                    editBtn.setText("Edit");
+                    populateUserInfo(); // Refresh UI with latest data
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                    alert.show();
+                    log.error("Error editing user info", e);
+                }
+            }
+        });
 
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
@@ -272,31 +307,17 @@ public class MainAppController implements Initializable {
         passwordInfoTxt.setText(currentUser.getPassword() != null ? currentUser.getPassword() : "");
     }
 
-    private void toggleEditMode() {
-        isEditMode = !isEditMode;
-        setUserInfoEditable(isEditMode);
-        editBtn.setText(isEditMode ? "Save" : "Edit");
-        if (!isEditMode) saveUserInfo();
-    }
-
     private void setUserInfoEditable(boolean editable) {
+        log.info("Setting user info editable: " + editable);
         emailAddressInfoTxt.setEditable(editable);
-        phoneNumberInfoTxt.setEditable(editable);
         addressInfoTxt.setEditable(editable);
-    }
+        userNameInfoTxt.setEditable(editable);
+        passwordInfoTxt.setEditable(editable);
 
-    private void saveUserInfo() {
-        if (currentUser == null) return;
-        try {
-            currentUser.setEmail(emailAddressInfoTxt.getText());
-            currentUser.setPhone(phoneNumberInfoTxt.getText());
-            currentUser.setAddress(addressInfoTxt.getText());
-            userService.save(currentUser);
-            showInfo("User information updated successfully");
-        } catch (Exception e) {
-            log.error("Error saving user info", e);
-            showError("Failed to save user info: " + e.getMessage());
-        }
+        firstNameInfoTxt.setEditable(false);
+        lastNameInfoTxt.setEditable(false);
+        dateOfBirthInfoTxt.setEditable(false);
+        phoneNumberInfoTxt.setEditable(false);
     }
 
     private void populateFundTransferTab() {
@@ -352,17 +373,15 @@ public class MainAppController implements Initializable {
         if (currentUser == null) {
             throw new IllegalStateException("No current user set for cheque generation");
         }
-        // Format: CHEQUE_BASE + USER_ID + sequence (2 digits)
         return CHEQUE_BASE + currentUser.getId() + String.format("%02d", sequence);
     }
 
     private String generateNextChequeNumber(String lastNumber) {
         if (lastNumber == null || !lastNumber.startsWith(CHEQUE_BASE + currentUser.getId())) {
-            return generateChequeNumber(1); // Start with sequence 1 for this user
+            return generateChequeNumber(1);
         }
-        // Extract the sequence part (last 2 digits) and increment
         int lastSequence = Integer.parseInt(lastNumber.substring(lastNumber.length() - 2));
-        int nextSequence = (lastSequence % 10) + 1; // Cycle from 1 to 10
+        int nextSequence = (lastSequence % 10) + 1;
         return generateChequeNumber(nextSequence);
     }
 
@@ -390,7 +409,7 @@ public class MainAppController implements Initializable {
             if (cheques.isEmpty()) {
                 createDefaultCheques();
                 cheques = chequeService.findByUserId(currentUser.getId());
-                currentChequeNumber = generateChequeNumber(1); // Initial cheque number
+                currentChequeNumber = generateChequeNumber(1);
             } else {
                 List<Cheque> finalCheques = cheques;
                 currentChequeNumber = cheques.stream()
@@ -442,7 +461,7 @@ public class MainAppController implements Initializable {
 
     private void createDefaultCheques() {
         for (int i = 1; i <= 10; i++) {
-            String chequeNumber = generateChequeNumber(i); // Unique per user
+            String chequeNumber = generateChequeNumber(i);
             Cheque cheque = Cheque.builder()
                     .user(currentUser)
                     .accountType(AccountType.Cheque)

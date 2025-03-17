@@ -145,41 +145,7 @@ public class MainAppController implements Initializable {
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
         printTableBtn.setOnAction(event -> printTransactions());
 
-        // New edit button logic inspired by your example
-        editBtn.setOnAction(event -> {
-            if (!isEditMode) {
-                // Switch to edit mode
-                isEditMode = true;
-                setUserInfoEditable(true);
-                editBtn.setText("Save");
-                log.info("Switched to edit mode");
-            } else {
-                // Save changes and switch back to view mode
-                try {
-                    // Update currentUser with editable fields
-                    currentUser.setEmail(emailAddressInfoTxt.getText());
-                    currentUser.setAddress(addressInfoTxt.getText());
-                    currentUser.setUsername(userNameInfoTxt.getText());
-                    currentUser.setPassword(passwordInfoTxt.getText());
-
-                    // Save to database
-                    userService.edit(currentUser);
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "User Info Edited", ButtonType.OK);
-                    alert.show();
-                    log.info("User Edited: " + currentUser.getUsername());
-
-                    // Reset to view mode
-                    isEditMode = false;
-                    setUserInfoEditable(false);
-                    editBtn.setText("Edit");
-                    populateUserInfo(); // Refresh UI with latest data
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
-                    alert.show();
-                    log.error("Error editing user info", e);
-                }
-            }
-        });
+        editBtn.setOnAction(event -> toggleEditMode());
 
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
@@ -235,6 +201,7 @@ public class MainAppController implements Initializable {
         loadTransactionHistory();
         populateUserInfo();
         loadTransactionChart();
+        log.info("Dashboard populated for user: " + user.getUsername());
     }
 
     private void setupTransactionTableColumns() {
@@ -256,30 +223,54 @@ public class MainAppController implements Initializable {
         transactionsChart.setTitle("Transaction Amounts by Date");
     }
 
-    private void loadTransactionChart() {
-        transactionsChart.getData().clear();
+    private void populateDashboard() {
         try {
-            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
-            Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
-                    .collect(Collectors.groupingBy(
-                            t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
-                            Collectors.groupingBy(
-                                    Transaction::getTransactionType,
-                                    Collectors.summingDouble(Transaction::getAmount)
-                            )
-                    ));
+            // Fetch cards once
+            List<Card> cards = cardService.findByUserId(currentUser.getId());
+            Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
+            String formattedCard = formatCardNumber(card.getCardNumber());
+            accountBalanceTxt.setText(String.valueOf(card.getBalance()));
+            cardNumberTxt.setText(formattedCard);
+            cvvTxt.setText(card.getCvv2());
+            expiryTxt.setText(card.getExpiryDate().toString());
+            cardNumberTxt1.setText(formattedCard);
+            cvvTxt1.setText(card.getCvv2());
+            expiryTxt1.setText(card.getExpiryDate().toString());
 
-            XYChart.Series<String, Number> transferSeries = new XYChart.Series<>();
-            transferSeries.setName("Transfer");
+            // Fetch cheques once and batch-create if empty
+            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+            if (cheques.isEmpty()) {
+                chequeService.saveBatch(currentUser, 10, CHEQUE_BASE);
+                cheques = chequeService.findByUserId(currentUser.getId());
+            }
 
-            groupedData.forEach((date, typeMap) -> {
-                transferSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Transfer, 0.0)));
-            });
+            // Compute cheque stats in one pass
+            int pendingCount = 0, cashedCount = 0, bouncedCount = 0;
+            String availableCheque = null;
+            for (Cheque cheque : cheques) {
+                switch (cheque.getReceiver()) {
+                    case "Pending": pendingCount++; break;
+                    case "Cashed": cashedCount++; break;
+                    case "Bounced": bouncedCount++; break;
+                    case "Available":
+                        if (availableCheque == null) availableCheque = cheque.getNumber();
+                        break;
+                }
+            }
+            currentChequeNumber = availableCheque != null ? availableCheque : generateNextChequeNumber(
+                    cheques.stream().map(Cheque::getNumber).max(String::compareTo).orElse(null));
 
-            transactionsChart.getData().add(transferSeries);
+            totalChequeBtn.setText(String.valueOf(cheques.size()));
+            chequeAddressTxt.setText(currentChequeNumber);
+            pendingChequeBtn.setText(String.valueOf(pendingCount));
+            cashedChequeBtn.setText(String.valueOf(cashedCount));
+            bouncedChequeBtn.setText(String.valueOf(bouncedCount));
+
+            savingBalanceTxt.setText("0.0");
+            interestRateTxt.setText("2.5%");
         } catch (Exception e) {
-            log.error("Error loading transaction chart", e);
-            showError("Failed to load transaction chart: " + e.getMessage());
+            log.error("Error populating dashboard", e);
+            showError("Failed to load dashboard: " + e.getMessage());
         }
     }
 
@@ -292,6 +283,31 @@ public class MainAppController implements Initializable {
         } catch (Exception e) {
             log.error("Error loading transaction history", e);
             showError("Failed to load transaction history: " + e.getMessage());
+        }
+    }
+
+    private void loadTransactionChart() {
+        try {
+            transactionsChart.getData().clear();
+            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
+            Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
+                    .collect(Collectors.groupingBy(
+                            t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
+                            Collectors.groupingBy(
+                                    Transaction::getTransactionType,
+                                    Collectors.summingDouble(Transaction::getAmount)
+                            )
+                    ));
+
+            XYChart.Series<String, Number> transferSeries = new XYChart.Series<>();
+            transferSeries.setName("Transfer");
+            groupedData.forEach((date, typeMap) -> {
+                transferSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Transfer, 0.0)));
+            });
+            transactionsChart.getData().add(transferSeries);
+        } catch (Exception e) {
+            log.error("Error loading transaction chart", e);
+            showError("Failed to load transaction chart: " + e.getMessage());
         }
     }
 
@@ -313,11 +329,37 @@ public class MainAppController implements Initializable {
         addressInfoTxt.setEditable(editable);
         userNameInfoTxt.setEditable(editable);
         passwordInfoTxt.setEditable(editable);
-
         firstNameInfoTxt.setEditable(false);
         lastNameInfoTxt.setEditable(false);
         dateOfBirthInfoTxt.setEditable(false);
         phoneNumberInfoTxt.setEditable(false);
+    }
+
+    private void toggleEditMode() {
+        if (!isEditMode) {
+            isEditMode = true;
+            setUserInfoEditable(true);
+            editBtn.setText("Save");
+            log.info("Switched to edit mode");
+        } else {
+            try {
+                currentUser.setEmail(emailAddressInfoTxt.getText());
+                currentUser.setAddress(addressInfoTxt.getText());
+                currentUser.setUsername(userNameInfoTxt.getText());
+                currentUser.setPassword(passwordInfoTxt.getText());
+                userService.edit(currentUser);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "User Info Edited", ButtonType.OK);
+                alert.showAndWait();
+                log.info("User Edited: " + currentUser.getUsername());
+                isEditMode = false;
+                setUserInfoEditable(false);
+                editBtn.setText("Edit");
+                populateUserInfo();
+            } catch (Exception e) {
+                log.error("Error editing user info", e);
+                showError("Error editing user: " + e.getMessage());
+            }
+        }
     }
 
     private void populateFundTransferTab() {
@@ -392,55 +434,6 @@ public class MainAppController implements Initializable {
                 raw;
     }
 
-    private void populateDashboard() {
-        try {
-            List<Card> cards = cardService.findByUserId(currentUser.getId());
-            Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
-            String formattedCard = formatCardNumber(card.getCardNumber());
-            accountBalanceTxt.setText(String.valueOf(card.getBalance()));
-            cardNumberTxt.setText(formattedCard);
-            cvvTxt.setText(card.getCvv2());
-            expiryTxt.setText(card.getExpiryDate().toString());
-            cardNumberTxt1.setText(formattedCard);
-            cvvTxt1.setText(card.getCvv2());
-            expiryTxt1.setText(card.getExpiryDate().toString());
-
-            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            if (cheques.isEmpty()) {
-                createDefaultCheques();
-                cheques = chequeService.findByUserId(currentUser.getId());
-                currentChequeNumber = generateChequeNumber(1);
-            } else {
-                List<Cheque> finalCheques = cheques;
-                currentChequeNumber = cheques.stream()
-                        .filter(c -> c.getReceiver().equals("Available"))
-                        .map(Cheque::getNumber)
-                        .findFirst()
-                        .orElseGet(() -> generateNextChequeNumber(
-                                finalCheques.stream()
-                                        .map(Cheque::getNumber)
-                                        .max(String::compareTo)
-                                        .orElse(null)
-                        ));
-            }
-
-            totalChequeBtn.setText(String.valueOf(cheques.size()));
-            chequeAddressTxt.setText(currentChequeNumber);
-            pendingChequeBtn.setText(String.valueOf(cheques.stream()
-                    .filter(c -> c.getReceiver().equals("Pending")).count()));
-            cashedChequeBtn.setText(String.valueOf(cheques.stream()
-                    .filter(c -> c.getReceiver().equals("Cashed")).count()));
-            bouncedChequeBtn.setText(String.valueOf(cheques.stream()
-                    .filter(c -> c.getReceiver().equals("Bounced")).count()));
-
-            savingBalanceTxt.setText("0.0");
-            interestRateTxt.setText("2.5%");
-        } catch (Exception e) {
-            log.error("Error populating dashboard", e);
-            showError("Failed to load dashboard: " + e.getMessage());
-        }
-    }
-
     private Card createDefaultCard() {
         Card card = Card.builder()
                 .user(currentUser)
@@ -457,29 +450,6 @@ public class MainAppController implements Initializable {
             log.error("Error creating default card", e);
         }
         return card;
-    }
-
-    private void createDefaultCheques() {
-        for (int i = 1; i <= 10; i++) {
-            String chequeNumber = generateChequeNumber(i);
-            Cheque cheque = Cheque.builder()
-                    .user(currentUser)
-                    .accountType(AccountType.Cheque)
-                    .balance(0.0)
-                    .createdAt(LocalDateTime.now())
-                    .number(chequeNumber)
-                    .passDate(LocalDate.now().plusMonths(1))
-                    .amount(0.0)
-                    .receiver("Available")
-                    .description("Cheque #" + chequeNumber)
-                    .build();
-            try {
-                chequeService.save(cheque);
-                log.info("Saved cheque: " + chequeNumber);
-            } catch (Exception e) {
-                log.error("Error saving cheque: " + chequeNumber, e);
-            }
-        }
     }
 
     private void resetDashboard() {
@@ -653,7 +623,7 @@ public class MainAppController implements Initializable {
 
                     if (receiverCardNumber == null) {
                         cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
+                        chequeService.saveOrUpdate(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Invalid receiver");
                         continue;
                     }
@@ -662,14 +632,14 @@ public class MainAppController implements Initializable {
                     Card receiverCard = cardService.findByCardNumber(receiverCardNumber);
                     if (receiverCard == null) {
                         cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
+                        chequeService.saveOrUpdate(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Receiver card not found");
                         continue;
                     }
 
                     if (sourceCard.getBalance() < amount) {
                         cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
+                        chequeService.saveOrUpdate(cheque);
                         showError("Cheque " + cheque.getNumber() + " bounced: Insufficient funds");
                         continue;
                     }

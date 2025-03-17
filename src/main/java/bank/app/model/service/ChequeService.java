@@ -9,6 +9,9 @@ import bank.app.model.repository.utils.ConnectionProvider;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,5 +100,33 @@ public class ChequeService {
                 return chequeList;
             }
         }
+
+    public void saveBatch(User user, int count, String chequeBase) throws Exception {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO CHEQUES (U_ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CHEQUE_NUMBER, PASS_DATE, AMOUNT, RECEIVER, DESCRIPTION) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            conn.setAutoCommit(false);
+            LocalDateTime now = LocalDateTime.now();
+            LocalDate passDate = LocalDate.now().plusMonths(1);
+            for (int i = 1; i <= count; i++) {
+                String chequeNumber = chequeBase + user.getId() + String.format("%02d", i);
+                stmt.setInt(1, user.getId());
+                stmt.setString(2, AccountType.Cheque.name());
+                stmt.setDouble(3, 0.0);
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(now));
+                stmt.setString(5, chequeNumber);
+                stmt.setDate(6, java.sql.Date.valueOf(passDate));
+                stmt.setDouble(7, 0.0);
+                stmt.setString(8, "Available");
+                stmt.setString(9, "Cheque #" + chequeNumber);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new Exception("Failed to batch save cheques: " + e.getMessage(), e);
+        }
+    }
 
     }

@@ -87,4 +87,15 @@ public class ChequeService {
                 throw new Exception("No cheque found with ID: " + cheque.getId());
             }
         }
-    }}
+    }
+        public List<Cheque> findAll() throws Exception {
+            try (ChequeRepository chequeRepository = new ChequeRepository()) {
+                List<Cheque> chequeList = chequeRepository.findAll();
+                if (chequeList.isEmpty()) {
+                    throw new Exception("Member not found");
+                }
+                return chequeList;
+            }
+        }
+
+    }

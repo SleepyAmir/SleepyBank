@@ -2,6 +2,7 @@ package bank.app.model.service;
 
 import bank.app.model.entity.Transaction;
 import bank.app.model.repository.TransactionRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,12 @@ public class TransactionService {
     public void save(Transaction transaction) throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {
             repo.save(transaction);
+        }
+    }
+
+    public void delete(Transaction transaction) throws Exception {
+        try (TransactionRepository repo = new TransactionRepository()) {
+            repo.remove(transaction.getId()); // Assuming TransactionRepository has a remove method
         }
     }
 

@@ -2,6 +2,7 @@ package bank.app.model.service;
 
 import bank.app.model.entity.Card;
 import bank.app.model.repository.CardRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,12 @@ public class CardService {
     public void save(Card card) throws Exception {
         try (CardRepository repo = new CardRepository()) {
             repo.save(card);
+        }
+    }
+
+    public void delete(Card card) throws Exception {
+        try (CardRepository repo = new CardRepository()) {
+            repo.remove(card.getId()); // Assuming CardRepository has a remove method
         }
     }
 

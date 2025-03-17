@@ -16,7 +16,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.web.WebView?>
 
 <!-- Import URL for stylesheets -->
 
@@ -68,7 +67,7 @@
                   </TableView>
                   <Label layoutX="270.0" layoutY="29.0" text="UserName" />
                   <Label layoutX="479.0" layoutY="29.0" text="FirstName" />
-                  <GridPane layoutX="14.0" layoutY="62.0" prefHeight="316.0" prefWidth="234.0">
+                  <GridPane layoutX="21.0" layoutY="51.0" prefHeight="316.0" prefWidth="234.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="94.4000244140625" minWidth="10.0" prefWidth="70.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.79998779296875" minWidth="10.0" prefWidth="130.0" />
@@ -89,9 +88,9 @@
                         <Label text="LastName" GridPane.rowIndex="1" />
                         <TextField fx:id="lastNameSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label text="Phone Number" GridPane.rowIndex="2" />
-                        <TextField fx:id="phoneNumberTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="phoneNumberSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Email" GridPane.rowIndex="3" />
-                        <TextField fx:id="emailTxt" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="emailSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <DatePicker fx:id="dateOfBirthSearchTxt" prefHeight="25.0" prefWidth="148.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <Label text="DateOfBirth" GridPane.rowIndex="4" />
                         <Label text="Address" GridPane.rowIndex="5" />
@@ -104,9 +103,11 @@
                   </GridPane>
                   <TextField fx:id="usernameFindTxt" layoutX="333.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
                   <TextField fx:id="firstnameFindTxt" layoutX="541.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
-                  <Button fx:id="saveBtn" layoutX="29.0" layoutY="402.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Save" />
-                  <Button fx:id="editBtn" layoutX="108.0" layoutY="402.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Edit" />
-                  <Button fx:id="removeBtn" layoutX="189.0" layoutY="402.0" mnemonicParsing="false" text="Remove" />
+                  <Button fx:id="saveBtn" layoutX="29.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Save" />
+                  <Button fx:id="editBtn" layoutX="108.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Edit" />
+                  <Button fx:id="removeBtn" layoutX="189.0" layoutY="386.0" mnemonicParsing="false" text="Remove" />
+                  <Button fx:id="reloadBtn" layoutX="21.0" layoutY="25.0" mnemonicParsing="false" text="🔄" />
+                   <Button fx:id="filterBtn" layoutX="54.0" layoutY="25.0" mnemonicParsing="false" text="Filter" />
                </children>
                 </Pane>
             </content>
@@ -141,7 +142,6 @@
                   <Label layoutX="168.0" layoutY="417.0" text="Cheque :" />
                   <TextField fx:id="chartPercentCard" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
                   <TextField fx:id="chartPercentCheque" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
-                  <WebView fx:id="webView" layoutX="333.0" layoutY="-2.0" prefHeight="468.0" prefWidth="348.0" />
                </children>
             </Pane>
          </content>

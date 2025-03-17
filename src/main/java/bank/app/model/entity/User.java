@@ -1,6 +1,5 @@
 package bank.app.model.entity;
 
-
 import bank.app.model.entity.enums.Role;
 import com.google.gson.Gson;
 import lombok.Getter;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @SuperBuilder
-
 public class User {
     private int id;
     private String firstName;
@@ -27,6 +25,12 @@ public class User {
     private String password;
     private Role role;
     private boolean active = true;
+    private LocalDate registrationDate;
+
+    // Ensure registrationDate defaults to today in the builder
+    public static UserBuilder<?, ?> builder() {
+        return new UserBuilderImpl().registrationDate(LocalDate.now());
+    }
 
     @Override
     public String toString() {

@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
+
 public class ChequeService {
     public void saveOrUpdate(Cheque cheque) throws Exception {
         try (ChequeRepository repo = new ChequeRepository()) {
@@ -102,10 +104,10 @@ public class ChequeService {
         }
 
     public void saveBatch(User user, int count, String chequeBase) throws Exception {
+        String sql = "INSERT INTO CHEQUES (ID, U_ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CHEQUE_NUMBER, PASS_DATE, AMOUNT, RECEIVER, DESCRIPTION) " +
+                "VALUES (CHEQUE_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO CHEQUES (U_ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CHEQUE_NUMBER, PASS_DATE, AMOUNT, RECEIVER, DESCRIPTION) " +
-                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             conn.setAutoCommit(false);
             LocalDateTime now = LocalDateTime.now();
             LocalDate passDate = LocalDate.now().plusMonths(1);
@@ -124,9 +126,11 @@ public class ChequeService {
             }
             stmt.executeBatch();
             conn.commit();
+           log.println ("Batch saved " + count + " cheques for user " + user.getId());
         } catch (SQLException e) {
             throw new Exception("Failed to batch save cheques: " + e.getMessage(), e);
         }
     }
 
-    }
+
+}

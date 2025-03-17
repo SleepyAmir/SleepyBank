@@ -5,71 +5,27 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j;
 
+@Log4j
 public class Test extends Application {
-
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+        log.info("Starting application, loading login.fxml...");
         Parent root = FXMLLoader.load(getClass().getResource("/templates/login.fxml"));
-
+        log.info("login.fxml loaded successfully");
 
         Scene scene = new Scene(root);
-
         primaryStage.setTitle("SecureBank - Register");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+        log.info("Login window displayed");
     }
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
-//        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/mainApp.fxml"));
-//
-//        // Create the scene
-//        Scene scene = new Scene(root);
-//
-//        // Set the stage propertiesY
-//        primaryStage.setTitle("SecureBank - Register");
-//        primaryStage.setScene(scene);
-//        primaryStage.setResizable(false); // Optional: Prevent resizing
-//        primaryStage.show();
-//    }
-
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
-//        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/register.fxml"));
-//
-//        // Create the scene
-//        Scene scene = new Scene(root);
-//
-//        // Set the stage properties
-//        primaryStage.setTitle("SecureBank - Register");
-//        primaryStage.setScene(scene);
-//        primaryStage.setResizable(false); // Optional: Prevent resizing
-//        primaryStage.show();
-//    }
-
-
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
-//        // Load the FXML file
-//        Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-//
-//        // Create the scene
-//        Scene scene = new Scene(root);
-//
-//        // Set the stage properties
-//        primaryStage.setTitle("SecureBank - Register");
-//        primaryStage.setScene(scene);
-//        primaryStage.setResizable(false); // Optional: Prevent resizing
-//        primaryStage.show();
-//    }
 
     public static void main(String[] args) {
-        // Launch the JavaFX application
+        log.info("Launching JavaFX application");
         launch(args);
     }
 }

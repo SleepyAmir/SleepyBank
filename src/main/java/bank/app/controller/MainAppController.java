@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @Log4j
 public class MainAppController implements Initializable {
 
+    // [Existing FXML fields unchanged...]
     @FXML private TabPane tabPane;
     @FXML private Tab dashboardTab;
     @FXML private Tab fundTab;
@@ -129,10 +130,12 @@ public class MainAppController implements Initializable {
         log.info("MainAppController initialized");
 
         transferFundsBtn.setOnAction(event -> {
+            log.info("Transfer funds button clicked");
             tabPane.getSelectionModel().select(fundTab);
             populateFundTransferTab();
         });
         viewTransactionBtn.setOnAction(event -> {
+            log.info("View transactions button clicked");
             tabPane.getSelectionModel().select(transactionHistoryTab);
             loadTransactionHistory();
         });
@@ -148,6 +151,7 @@ public class MainAppController implements Initializable {
         editBtn.setOnAction(event -> toggleEditMode());
 
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            log.info("ByCard checkbox changed to: " + newVal);
             if (newVal) {
                 byCheckCheckBox.setSelected(false);
                 enableCardFields(true);
@@ -159,6 +163,7 @@ public class MainAppController implements Initializable {
         });
 
         byCheckCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            log.info("ByCheck checkbox changed to: " + newVal);
             if (newVal) {
                 byCardCheckBox.setSelected(false);
                 enableCardFields(false);
@@ -192,16 +197,21 @@ public class MainAppController implements Initializable {
 
         resetDashboard();
         resetTransferForm();
+        log.info("Initialization complete");
     }
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
         log.info("Logged in user: " + (user != null ? user.getUsername() : "null"));
         populateDashboard();
+        log.info("Dashboard populated");
         loadTransactionHistory();
+        log.info("Transaction history loaded");
         populateUserInfo();
+        log.info("User info populated");
         loadTransactionChart();
-        log.info("Dashboard populated for user: " + user.getUsername());
+        log.info("Transaction chart loaded");
+        log.info("Dashboard fully populated for user: " + user.getUsername());
     }
 
     private void setupTransactionTableColumns() {
@@ -225,7 +235,6 @@ public class MainAppController implements Initializable {
 
     private void populateDashboard() {
         try {
-            // Fetch cards once
             List<Card> cards = cardService.findByUserId(currentUser.getId());
             Card card = cards.isEmpty() ? createDefaultCard() : cards.get(0);
             String formattedCard = formatCardNumber(card.getCardNumber());
@@ -237,14 +246,12 @@ public class MainAppController implements Initializable {
             cvvTxt1.setText(card.getCvv2());
             expiryTxt1.setText(card.getExpiryDate().toString());
 
-            // Fetch cheques once and batch-create if empty
             List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
             if (cheques.isEmpty()) {
                 chequeService.saveBatch(currentUser, 10, CHEQUE_BASE);
                 cheques = chequeService.findByUserId(currentUser.getId());
             }
 
-            // Compute cheque stats in one pass
             int pendingCount = 0, cashedCount = 0, bouncedCount = 0;
             String availableCheque = null;
             for (Cheque cheque : cheques) {
@@ -289,8 +296,7 @@ public class MainAppController implements Initializable {
     private void loadTransactionChart() {
         try {
             transactionsChart.getData().clear();
-            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
-            Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
+            Map<String, Map<TransactionType, Double>> groupedData = transactionData.stream()
                     .collect(Collectors.groupingBy(
                             t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
                             Collectors.groupingBy(

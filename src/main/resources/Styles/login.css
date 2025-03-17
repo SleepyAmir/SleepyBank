@@ -1,0 +1,102 @@
+/* Login form styling */
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1px;
+}
+
+/* Label styling */
+.label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Text field styling */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px;
+    -fx-prompt-text-fill: #A9A9A9;
+}
+
+.text-field:focused {
+    -fx-border-color: #5E35B1;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(94,53,177,0.3), 3, 0, 0, 0);
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #5E35B1;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.button:hover {
+    -fx-background-color: #7B51DB;
+}
+
+.button:pressed {
+    -fx-background-color: #4527A0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 1, 0, 0, 1);
+}
+
+/* Title styling */
+.text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-fill: #5E35B1;
+}
+
+/* Hyperlink styling */
+.hyperlink {
+    -fx-text-fill: #5E35B1;
+    -fx-underline: true;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #7B51DB;
+}
+
+.hyperlink:pressed {
+    -fx-text-fill: #4527A0;
+}
+
+/* Add a subtle background pattern */
+.root {
+    -fx-background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%235E35B1' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    -fx-background-repeat: repeat;
+}
+
+/* Grid pane styling */
+.grid-pane {
+    -fx-padding: 10px;
+}
+
+/* Login button specific styling */
+#loginBtn {
+    -fx-background-radius: 20px;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 14px;
+}
+
+#loginBtn:hover {
+    -fx-background-color: #7B51DB;
+}
+
+/* Specific styling for the forgot password link */
+#forgotPasswordLink {
+    -fx-font-size: 12px;
+}

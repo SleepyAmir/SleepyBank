@@ -1,0 +1,294 @@
+/* Main application styling */
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Tab styling */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #5E35B1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 3);
+}
+
+.tab {
+    -fx-background-color: #5E35B1;
+    -fx-background-radius: 5 5 0 0;
+    -fx-padding: 8px 12px;
+}
+
+.tab:selected {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #5E35B1;
+}
+
+/* Label styling */
+.label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Text field styling */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px;
+    -fx-prompt-text-fill: #A9A9A9;
+}
+
+.text-field:focused {
+    -fx-border-color: #5E35B1;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(94,53,177,0.3), 3, 0, 0, 0);
+}
+
+/* Read-only text fields */
+/*:editable: false*/
+.text-field:disabled, .text-field {
+    -fx-background-color: #F5F5F5;
+    -fx-text-fill: #333333;
+    -fx-opacity: 0.9;
+}
+
+/* Date picker styling */
+.date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.date-picker .arrow-button {
+    -fx-background-color: #5E35B1;
+    -fx-background-radius: 0 3 3 0;
+}
+
+.date-picker .arrow-button .arrow {
+    -fx-background-color: white;
+}
+
+.date-picker .cell {
+    -fx-background-color: white;
+    -fx-text-fill: #333333;
+}
+
+.date-picker .cell:hover {
+    -fx-background-color: #F3E5F5;
+}
+
+.date-picker .cell:selected {
+    -fx-background-color: #5E35B1;
+    -fx-text-fill: white;
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #5E35B1;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.button:hover {
+    -fx-background-color: #7B51DB;
+}
+
+.button:pressed {
+    -fx-background-color: #4527A0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 1, 0, 0, 1);
+}
+
+/* Special button styling */
+#reloadBtn, #filterBtn {
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #333333;
+    -fx-padding: 5px 10px;
+}
+
+#reloadBtn:hover, #filterBtn:hover {
+    -fx-background-color: #BDBDBD;
+}
+
+/* Table view styling */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #5E35B1;
+    -fx-padding: 8px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F5F5F5 transparent;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #F3E5F5;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #D1C4E9;
+    -fx-text-fill: #333333;
+}
+
+/* Separator styling */
+.separator .line {
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1px;
+}
+
+/* Line styling */
+.line {
+    -fx-stroke: #5E35B1;
+    -fx-stroke-width: 2px;
+}
+
+/* Credit card styling */
+#dashboardPane Rectangle {
+    -fx-arc-height: 15;
+    -fx-arc-width: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 3);
+}
+
+/* Check box styling */
+.check-box {
+    -fx-text-fill: #333333;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #5E35B1;
+    -fx-border-radius: 3px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #5E35B1;
+}
+
+.check-box:selected .box {
+    -fx-background-color: white;
+}
+
+/* Chart styling */
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+.chart-legend {
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: #E0E0E0;
+}
+
+.chart-plot-background {
+    -fx-background-color: #FFFFFF;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: #E0E0E0;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #E0E0E0;
+}
+
+.chart-series-line {
+    -fx-stroke-width: 2px;
+}
+
+/* StackedBarChart specific styling */
+.stacked-bar-chart .chart-bar {
+    -fx-background-insets: 0;
+    -fx-background-radius: 3px;
+}
+
+.default-color0.chart-bar { -fx-bar-fill: #5E35B1; }
+.default-color1.chart-bar { -fx-bar-fill: #9575CD; }
+.default-color2.chart-bar { -fx-bar-fill: #CE93D8; }
+.default-color3.chart-bar { -fx-bar-fill: #D1C4E9; }
+
+/* Dashboard specific styling */
+#dashboardPane {
+    -fx-background-color: white;
+}
+
+#dashboardPane .label {
+    -fx-font-weight: bold;
+}
+
+/* Transaction history specific styling */
+#transactionHistoryPane {
+    -fx-background-color: white;
+}
+
+#transactionHistoryPane .label {
+    -fx-font-weight: bold;
+}
+
+/* Fund transfer specific styling */
+#fundTransferPane {
+    -fx-background-color: white;
+}
+
+#fundTransferPane .label {
+    -fx-font-weight: bold;
+}
+
+/* User info specific styling */
+#userInfoPane {
+    -fx-background-color: white;
+}
+
+#userInfoPane .label {
+    -fx-font-weight: bold;
+}
+
+/* Transaction management specific styling */
+#transactionManagementPane {
+    -fx-background-color: white;
+}
+
+/* Font styling */
+.text {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-fill: #333333;
+}
+
+/* Hyperlink styling */
+.hyperlink {
+    -fx-text-fill: #5E35B1;
+    -fx-underline: true;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #7B51DB;
+}
+
+.hyperlink:pressed {
+    -fx-text-fill: #4527A0;
+}

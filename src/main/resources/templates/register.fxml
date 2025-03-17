@@ -19,14 +19,16 @@
 
 <!-- Import URL for stylesheets -->
 
+<?import java.net.URL?>
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="494.0" prefWidth="678.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.RegistrationController">
+    <stylesheets>
+        <URL value="@/Styles/register.css" />
+    </stylesheets>
     <tabs>
         <Tab fx:id="registerTab" text="Register">
             <content>
                 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="660.0">
-<!--                    <stylesheets>-->
-<!--                        <URL value="@/javafx/styles/register.css" />-->
-<!--                    </stylesheets>-->
+
                     <children>
                         <Text layoutX="249.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="New Account Registration" textAlignment="CENTER" />
                         <Text layoutX="166.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="First Name" />

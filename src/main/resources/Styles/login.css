@@ -100,3 +100,78 @@
 #forgotPasswordLink {
     -fx-font-size: 12px;
 }
+
+
+
+
+/*!* Styles/login.css *!*/
+/*.root {*/
+/*    -fx-background-color: #FFFFFF;*/
+/*    -fx-font-family: 'Segoe UI', Arial, sans-serif;*/
+/*}*/
+
+/*!* Grid Pane *!*/
+/*.grid-pane {*/
+/*    -fx-background-color: #FFFFFF;*/
+/*    -fx-padding: 10px;*/
+/*}*/
+
+/*!* Labels *!*/
+/*.label {*/
+/*    -fx-text-fill: #003366;*/
+/*    -fx-font-size: 14px;*/
+/*    -fx-font-weight: bold;*/
+/*}*/
+
+/*!* Text Fields *!*/
+/*.text-field {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #003366;*/
+/*    -fx-border-radius: 5px;*/
+/*    -fx-background-radius: 5px;*/
+/*    -fx-text-fill: #003366;*/
+/*    -fx-padding: 6px;*/
+/*    -fx-prompt-text-fill: #00336666; !* Semi-transparent navy *!*/
+/*    -fx-transition: -fx-border-color 0.2s ease;*/
+/*}*/
+
+/*.text-field:focused {*/
+/*    -fx-border-color: #FFD700; !* Gold accent *!*/
+/*    -fx-border-width: 2px;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(255,215,0,0.3), 5, 0, 0, 0);*/
+/*}*/
+
+/*!* Button *!*/
+/*.button {*/
+/*    -fx-background-color: #003366;*/
+/*    -fx-text-fill: #FFFFFF;*/
+/*    -fx-font-size: 14px;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-background-radius: 8px;*/
+/*    -fx-padding: 8px 18px;*/
+/*    -fx-cursor: hand;*/
+/*    -fx-transition: -fx-background-color 0.2s ease;*/
+/*}*/
+
+/*.button:hover {*/
+/*    -fx-background-color: #002244; !* Darker navy *!*/
+/*    -fx-text-fill: #FFD700; !* Gold accent on hover *!*/
+/*}*/
+
+/*!* Hyperlink *!*/
+/*.hyperlink {*/
+/*    -fx-text-fill: #003366;*/
+/*    -fx-font-size: 12px;*/
+/*}*/
+
+/*.hyperlink:hover {*/
+/*    -fx-text-fill: #FFD700; !* Gold accent *!*/
+/*    -fx-cursor: hand;*/
+/*}*/
+
+/*!* Title Text *!*/
+/*.text {*/
+/*    -fx-fill: #003366;*/
+/*    -fx-font-size: 16px;*/
+/*    -fx-font-weight: bold;*/
+/*}*/

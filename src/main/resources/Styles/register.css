@@ -1,31 +1,313 @@
-/* Main application styling */
+/*!* Main application styling *!*/
+/*.root {*/
+/*    -fx-background-color: #FFFFFF;*/
+/*    -fx-font-family: 'Segoe UI', Arial, sans-serif;*/
+/*}*/
+
+/*!* Tab styling *!*/
+/*.tab-pane {*/
+/*    -fx-padding: 5px; !* Adds a bit of breathing room *!*/
+/*}*/
+
+/*.tab-pane .tab-header-area .tab-header-background {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2); !* Softer shadow *!*/
+/*}*/
+
+/*.tab {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-background-radius: 8 8 0 0; !* Slightly larger radius for a modern look *!*/
+/*    -fx-padding: 8px 16px; !* More comfortable spacing *!*/
+/*    -fx-transition: -fx-background-color 0.2s ease-in-out; !* Smooth tab transitions *!*/
+/*}*/
+
+/*.tab:selected {*/
+/*    -fx-background-color: #FFFFFF;*/
+/*    -fx-background-radius: 8 8 0 0;*/
+/*    -fx-border-color: #5E35B1;*/
+/*    -fx-border-width: 0 0 2px 0; !* Underline effect for selected tab *!*/
+/*}*/
+
+/*.tab .tab-label {*/
+/*    -fx-text-fill: #FFFFFF;*/
+/*    -fx-font-size: 14px;*/
+/*    -fx-font-weight: bold;*/
+/*}*/
+
+/*.tab:selected .tab-label {*/
+/*    -fx-text-fill: #5E35B1;*/
+/*}*/
+
+/*!* Title text styling *!*/
+/*.title {*/
+/*    -fx-font-size: 26px; !* Slightly larger for prominence *!*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-fill: #5E35B1;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(94,53,177,0.2), 5, 0, 0, 1); !* Subtle shadow *!*/
+/*}*/
+
+/*!* Label styling *!*/
+/*.label {*/
+/*    -fx-text-fill: #333333;*/
+/*    -fx-font-size: 13px;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-alignment: center-left; !* Consistent alignment *!*/
+/*}*/
+
+/*!* Text field styling *!*/
+/*.text-field {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px; !* Slightly larger for modern feel *!*/
+/*    -fx-background-radius: 5px;*/
+/*    -fx-padding: 6px;*/
+/*    -fx-prompt-text-fill: #A9A9A9;*/
+/*    -fx-font-size: 13px;*/
+/*    -fx-transition: -fx-border-color 0.2s ease; !* Smooth focus transition *!*/
+/*}*/
+
+/*.text-field:focused {*/
+/*    -fx-border-color: #5E35B1;*/
+/*    -fx-border-width: 2px;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(94,53,177,0.2), 5, 0, 0, 0); !* Softer glow *!*/
+/*}*/
+
+/*!* Date picker styling *!*/
+/*.date-picker {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px;*/
+/*    -fx-background-radius: 5px;*/
+/*}*/
+
+/*.date-picker .arrow-button {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-background-radius: 0 5 5 0;*/
+/*}*/
+
+/*.date-picker .arrow-button .arrow {*/
+/*    -fx-background-color: white;*/
+/*}*/
+
+/*.date-picker .cell {*/
+/*    -fx-background-color: white;*/
+/*    -fx-text-fill: #333333;*/
+/*    -fx-font-size: 12px;*/
+/*}*/
+
+/*.date-picker .cell:hover {*/
+/*    -fx-background-color: #F3E5F5;*/
+/*}*/
+
+/*.date-picker .cell:selected {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-text-fill: white;*/
+/*}*/
+
+/*!* Button styling *!*/
+/*.button {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-text-fill: white;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-font-size: 13px;*/
+/*    -fx-background-radius: 8px; !* More rounded for a softer look *!*/
+/*    -fx-padding: 8px 18px;*/
+/*    -fx-cursor: hand;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 2);*/
+/*    -fx-transition: -fx-background-color 0.2s ease, -fx-scale-y 0.1s ease; !* Animation *!*/
+/*}*/
+
+/*.button:hover {*/
+/*    -fx-background-color: #7B51DB;*/
+/*    -fx-scale-y: 1.02; !* Slight lift effect *!*/
+/*}*/
+
+/*.button:pressed {*/
+/*    -fx-background-color: #4527A0;*/
+/*    -fx-scale-y: 0.98; !* Subtle press effect *!*/
+/*    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 1);*/
+/*}*/
+
+/*!* Special button styling (reload and filter) *!*/
+/*#reloadBtn, #filterBtn {*/
+/*    -fx-background-color: #E0E0E0;*/
+/*    -fx-text-fill: #333333;*/
+/*    -fx-font-size: 12px;*/
+/*    -fx-padding: 6px 12px;*/
+/*}*/
+
+/*#reloadBtn:hover, #filterBtn:hover {*/
+/*    -fx-background-color: #BDBDBD;*/
+/*}*/
+
+/*!* Table view styling *!*/
+/*.table-view {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px;*/
+/*    -fx-background-radius: 5px;*/
+/*}*/
+
+/*.table-view .column-header {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-padding: 6px;*/
+/*    -fx-background-radius: 5px 5px 0 0;*/
+/*}*/
+
+/*.table-view .column-header .label {*/
+/*    -fx-text-fill: white;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-font-size: 13px;*/
+/*}*/
+
+/*.table-view .table-row-cell {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: transparent transparent #F5F5F5 transparent;*/
+/*    -fx-font-size: 12px;*/
+/*}*/
+
+/*.table-view .table-row-cell:odd {*/
+/*    -fx-background-color: #FAF9FD; !* Softer alternate row color *!*/
+/*}*/
+
+/*.table-view .table-row-cell:hover {*/
+/*    -fx-background-color: #EDE7F6; !* Subtle hover effect *!*/
+/*}*/
+
+/*.table-view .table-row-cell:selected {*/
+/*    -fx-background-color: #D1C4E9;*/
+/*    -fx-text-fill: #333333;*/
+/*}*/
+
+/*!* Grid pane styling *!*/
+/*.grid-pane {*/
+/*    -fx-background-color: white;*/
+/*    -fx-padding: 12px;*/
+/*    -fx-background-radius: 5px;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px;*/
+/*}*/
+
+/*!* Separator styling *!*/
+/*.separator .line {*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-width: 1px;*/
+/*}*/
+
+/*!* Line styling *!*/
+/*.line {*/
+/*    -fx-stroke: #5E35B1;*/
+/*    -fx-stroke-width: 2px;*/
+/*}*/
+
+/*!* Pie chart styling *!*/
+/*.chart {*/
+/*    -fx-background-color: white;*/
+/*    -fx-background-radius: 5px;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px;*/
+/*    -fx-padding: 5px;*/
+/*}*/
+
+/*.chart-pie {*/
+/*    -fx-border-width: 1px;*/
+/*    -fx-border-color: white;*/
+/*}*/
+
+/*.chart-pie-label {*/
+/*    -fx-fill: #333333;*/
+/*    -fx-font-size: 12px;*/
+/*    -fx-font-weight: bold;*/
+/*}*/
+
+/*.chart-legend {*/
+/*    -fx-background-color: #F5F5F5;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-background-radius: 3px;*/
+/*    -fx-padding: 5px;*/
+/*}*/
+
+/*!* Default chart colors *!*/
+/*.default-color0.chart-pie { -fx-pie-color: #5E35B1; }*/
+/*.default-color1.chart-pie { -fx-pie-color: #9575CD; } !* Adjusted for variety *!*/
+/*.default-color2.chart-pie { -fx-pie-color: #7E57C2; }*/
+/*.default-color3.chart-pie { -fx-pie-color: #B39DDB; } !* Lighter shade *!*/
+
+/*!* Pane styling *!*/
+/*.pane {*/
+/*    -fx-background-color: white;*/
+/*}*/
+
+/*!* Dashboard specific styling *!*/
+/*#adminDashboardPane {*/
+/*    -fx-background-color: white;*/
+/*    -fx-background-radius: 5px;*/
+/*}*/
+
+/*#adminDashboardPane .label {*/
+/*    -fx-font-weight: bold;*/
+/*}*/
+
+/*#adminDashboardPane .text-field {*/
+/*    -fx-background-color: #F5F5F5;*/
+/*    -fx-border-color: #E0E0E0;*/
+/*    -fx-border-radius: 5px;*/
+/*    -fx-background-radius: 5px;*/
+/*}*/
+
+/*!* Register button specific styling *!*/
+/*#registerBtn {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-text-fill: white;*/
+/*    -fx-font-size: 14px;*/
+/*    -fx-background-radius: 25px; !* Slightly more rounded *!*/
+/*    -fx-padding: 10px 25px;*/
+/*    -fx-font-weight: bold;*/
+/*}*/
+
+/*#registerBtn:hover {*/
+/*    -fx-background-color: #7B51DB;*/
+/*}*/
+
+/*!* Tooltip styling *!*/
+/*.tooltip {*/
+/*    -fx-background-color: #5E35B1;*/
+/*    -fx-text-fill: white;*/
+/*    -fx-font-size: 12px;*/
+/*    -fx-background-radius: 5px;*/
+/*    -fx-padding: 6px;*/
+/*}*/
+
+
+
+/* Styles/register.css */
 .root {
     -fx-background-color: #FFFFFF;
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* Tab styling */
+/* Tab Pane Styling */
 .tab-pane {
-    -fx-padding: 5px; /* Adds a bit of breathing room */
+    -fx-padding: 5px;
 }
 
 .tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: #5E35B1;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2); /* Softer shadow */
+    -fx-background-color: #003366;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
 }
 
 .tab {
-    -fx-background-color: #5E35B1;
-    -fx-background-radius: 8 8 0 0; /* Slightly larger radius for a modern look */
-    -fx-padding: 8px 16px; /* More comfortable spacing */
-    -fx-transition: -fx-background-color 0.2s ease-in-out; /* Smooth tab transitions */
+    -fx-background-color: #003366;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 8px 16px;
+    -fx-transition: -fx-background-color 0.2s ease-in-out;
 }
 
 .tab:selected {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8 8 0 0;
-    -fx-border-color: #5E35B1;
-    -fx-border-width: 0 0 2px 0; /* Underline effect for selected tab */
+    -fx-border-color: #003366;
+    -fx-border-width: 0 0 2px 0;
 }
 
 .tab .tab-label {
@@ -35,245 +317,167 @@
 }
 
 .tab:selected .tab-label {
-    -fx-text-fill: #5E35B1;
+    -fx-text-fill: #003366;
 }
 
-/* Title text styling */
+/* Title */
 .title {
-    -fx-font-size: 26px; /* Slightly larger for prominence */
+    -fx-fill: #003366;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-fill: #5E35B1;
-    -fx-effect: dropshadow(gaussian, rgba(94,53,177,0.2), 5, 0, 0, 1); /* Subtle shadow */
+    -fx-effect: dropshadow(gaussian, rgba(0,51,102,0.2), 5, 0, 0, 1);
 }
 
-/* Label styling */
+/* Labels */
 .label {
-    -fx-text-fill: #333333;
+    -fx-text-fill: #003366;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-alignment: center-left; /* Consistent alignment */
 }
 
-/* Text field styling */
+/* Text Fields */
 .text-field {
     -fx-background-color: white;
-    -fx-border-color: #E0E0E0;
-    -fx-border-radius: 5px; /* Slightly larger for modern feel */
+    -fx-border-color: #003366;
+    -fx-border-radius: 5px;
     -fx-background-radius: 5px;
+    -fx-text-fill: #003366;
     -fx-padding: 6px;
-    -fx-prompt-text-fill: #A9A9A9;
-    -fx-font-size: 13px;
-    -fx-transition: -fx-border-color 0.2s ease; /* Smooth focus transition */
+    -fx-prompt-text-fill: #00336666;
 }
 
 .text-field:focused {
-    -fx-border-color: #5E35B1;
+    -fx-border-color: #FFD700; /* Gold accent */
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(gaussian, rgba(94,53,177,0.2), 5, 0, 0, 0); /* Softer glow */
+    -fx-effect: dropshadow(gaussian, rgba(255,215,0,0.2), 5, 0, 0, 0);
 }
 
-/* Date picker styling */
+/* Date Picker */
 .date-picker {
     -fx-background-color: white;
-    -fx-border-color: #E0E0E0;
+    -fx-border-color: #003366;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
 
 .date-picker .arrow-button {
-    -fx-background-color: #5E35B1;
+    -fx-background-color: #003366;
     -fx-background-radius: 0 5 5 0;
 }
 
 .date-picker .arrow-button .arrow {
-    -fx-background-color: white;
+    -fx-background-color: #FFFFFF;
 }
 
 .date-picker .cell {
     -fx-background-color: white;
-    -fx-text-fill: #333333;
-    -fx-font-size: 12px;
+    -fx-text-fill: #003366;
 }
 
 .date-picker .cell:hover {
-    -fx-background-color: #F3E5F5;
+    -fx-background-color: #E6F0FA; /* Light blue hover */
 }
 
 .date-picker .cell:selected {
-    -fx-background-color: #5E35B1;
-    -fx-text-fill: white;
+    -fx-background-color: #003366;
+    -fx-text-fill: #FFFFFF;
 }
 
-/* Button styling */
+/* Buttons */
 .button {
-    -fx-background-color: #5E35B1;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
+    -fx-background-color: #003366;
+    -fx-text-fill: #FFFFFF;
     -fx-font-size: 13px;
-    -fx-background-radius: 8px; /* More rounded for a softer look */
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
     -fx-padding: 8px 18px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 2);
-    -fx-transition: -fx-background-color 0.2s ease, -fx-scale-y 0.1s ease; /* Animation */
+    -fx-transition: -fx-background-color 0.2s ease;
 }
 
 .button:hover {
-    -fx-background-color: #7B51DB;
-    -fx-scale-y: 1.02; /* Slight lift effect */
+    -fx-background-color: #002244;
+    -fx-text-fill: #FFD700; /* Gold accent */
 }
 
 .button:pressed {
-    -fx-background-color: #4527A0;
-    -fx-scale-y: 0.98; /* Subtle press effect */
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 1);
+    -fx-background-color: #001933;
 }
 
-/* Special button styling (reload and filter) */
+/* Special Buttons */
 #reloadBtn, #filterBtn {
-    -fx-background-color: #E0E0E0;
-    -fx-text-fill: #333333;
-    -fx-font-size: 12px;
-    -fx-padding: 6px 12px;
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #003366;
+    -fx-border-color: #003366;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
 }
 
 #reloadBtn:hover, #filterBtn:hover {
-    -fx-background-color: #BDBDBD;
+    -fx-background-color: #E6F0FA;
+    -fx-text-fill: #FFD700;
 }
 
-/* Table view styling */
+/* Table View */
 .table-view {
     -fx-background-color: white;
-    -fx-border-color: #E0E0E0;
+    -fx-border-color: #003366;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
 
 .table-view .column-header {
-    -fx-background-color: #5E35B1;
+    -fx-background-color: #003366;
     -fx-padding: 6px;
     -fx-background-radius: 5px 5px 0 0;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: white;
+    -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
 }
 
 .table-view .table-row-cell {
     -fx-background-color: white;
-    -fx-border-color: transparent transparent #F5F5F5 transparent;
-    -fx-font-size: 12px;
+    -fx-text-fill: #003366;
 }
 
 .table-view .table-row-cell:odd {
-    -fx-background-color: #FAF9FD; /* Softer alternate row color */
+    -fx-background-color: #F5F8FA; /* Light blue tint */
 }
 
 .table-view .table-row-cell:hover {
-    -fx-background-color: #EDE7F6; /* Subtle hover effect */
+    -fx-background-color: #E6F0FA;
 }
 
-.table-view .table-row-cell:selected {
-    -fx-background-color: #D1C4E9;
-    -fx-text-fill: #333333;
-}
-
-/* Grid pane styling */
+/* Grid Pane */
 .grid-pane {
     -fx-background-color: white;
     -fx-padding: 12px;
     -fx-background-radius: 5px;
-    -fx-border-color: #E0E0E0;
+    -fx-border-color: #003366;
     -fx-border-radius: 5px;
 }
 
-/* Separator styling */
+/* Separator */
 .separator .line {
-    -fx-border-color: #E0E0E0;
-    -fx-border-width: 1px;
+    -fx-border-color: #003366;
 }
 
-/* Line styling */
-.line {
-    -fx-stroke: #5E35B1;
-    -fx-stroke-width: 2px;
-}
-
-/* Pie chart styling */
+/* Pie Chart */
 .chart {
     -fx-background-color: white;
-    -fx-background-radius: 5px;
-    -fx-border-color: #E0E0E0;
+    -fx-border-color: #003366;
     -fx-border-radius: 5px;
-    -fx-padding: 5px;
-}
-
-.chart-pie {
-    -fx-border-width: 1px;
-    -fx-border-color: white;
+    -fx-background-radius: 5px;
 }
 
 .chart-pie-label {
-    -fx-fill: #333333;
-    -fx-font-size: 12px;
+    -fx-fill: #003366;
     -fx-font-weight: bold;
 }
 
-.chart-legend {
-    -fx-background-color: #F5F5F5;
-    -fx-border-color: #E0E0E0;
-    -fx-background-radius: 3px;
-    -fx-padding: 5px;
-}
-
-/* Default chart colors */
-.default-color0.chart-pie { -fx-pie-color: #5E35B1; }
-.default-color1.chart-pie { -fx-pie-color: #9575CD; } /* Adjusted for variety */
-.default-color2.chart-pie { -fx-pie-color: #7E57C2; }
-.default-color3.chart-pie { -fx-pie-color: #B39DDB; } /* Lighter shade */
-
-/* Pane styling */
-.pane {
-    -fx-background-color: white;
-}
-
-/* Dashboard specific styling */
-#adminDashboardPane {
-    -fx-background-color: white;
-    -fx-background-radius: 5px;
-}
-
-#adminDashboardPane .label {
-    -fx-font-weight: bold;
-}
-
-#adminDashboardPane .text-field {
-    -fx-background-color: #F5F5F5;
-    -fx-border-color: #E0E0E0;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
-
-/* Register button specific styling */
-#registerBtn {
-    -fx-background-color: #5E35B1;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-background-radius: 25px; /* Slightly more rounded */
-    -fx-padding: 10px 25px;
-    -fx-font-weight: bold;
-}
-
-#registerBtn:hover {
-    -fx-background-color: #7B51DB;
-}
-
-/* Tooltip styling */
-.tooltip {
-    -fx-background-color: #5E35B1;
-    -fx-text-fill: white;
-    -fx-font-size: 12px;
-    -fx-background-radius: 5px;
-    -fx-padding: 6px;
-}
+.default-color0.chart-pie { -fx-pie-color: #003366; }
+.default-color1.chart-pie { -fx-pie-color: #FFD700; } /* Gold accent */
+.default-color2.chart-pie { -fx-pie-color: #336699; } /* Lighter blue */

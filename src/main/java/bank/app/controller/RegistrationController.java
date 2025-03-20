@@ -346,7 +346,6 @@ public class RegistrationController {
         firstnameFindTxt.clear();
     }
 
-    // Admin Dashboard Logic
     private void populateAdminDashboard() {
         System.out.println("Populating Admin Dashboard...");
         try {

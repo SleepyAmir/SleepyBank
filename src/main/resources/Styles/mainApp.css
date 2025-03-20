@@ -21,14 +21,14 @@
     -fx-tab-min-width: 100px;
 }
 
-.tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: -fx-primary;
-}
+/*.tab-pane .tab-header-area .tab-header-background {*/
+/*    -fx-background-color: -fx-primary;*/
+/*}*/
 
-.tab-pane .tab {
-    -fx-background-color: -fx-primary;
-    -fx-padding: 3 10 3 10;
-}
+/*.tab-pane .tab {*/
+/*    -fx-background-color: -fx-primary;*/
+/*    -fx-padding: 3 10 3 10;*/
+/*}*/
 
 .tab-pane .tab:selected {
     -fx-background-color: -fx-accent-gold;
@@ -45,19 +45,19 @@
     -fx-font-weight: normal;
 }
 
-/* Button styling */
-.button {
-    -fx-background-color: -fx-primary;
-    -fx-text-fill: -fx-secondary;
-    -fx-background-radius: 3px;
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
-}
+/*!* Button styling *!*/
+/*.button {*/
+/*    -fx-background-color: -fx-primary;*/
+/*    -fx-text-fill: -fx-secondary;*/
+/*    -fx-background-radius: 3px;*/
+/*    -fx-padding: 8 16 8 16;*/
+/*    -fx-cursor: hand;*/
+/*}*/
 
-.button:hover {
-    -fx-background-color: -fx-accent-gold;
-    -fx-text-fill: -fx-primary;
-}
+/*.button:hover {*/
+/*    -fx-background-color: -fx-accent-gold;*/
+/*    -fx-text-fill: -fx-primary;*/
+/*}*/
 
 .button:pressed {
     -fx-background-color: derive(-fx-accent-gold, -10%);
@@ -99,15 +99,15 @@
     -fx-background-color: -fx-primary;
 }
 
-/* Labels */
-.label {
-    -fx-text-fill: -fx-primary;
-}
+/*!* Labels *!*/
+/*.label {*/
+/*    -fx-text-fill: -fx-primary;*/
+/*}*/
 
-/* Separator styling */
-.separator {
-    -fx-background-color: -fx-mid-blue;
-}
+/*!* Separator styling *!*/
+/*.separator {*/
+/*    -fx-background-color: -fx-mid-blue;*/
+/*}*/
 
 /* Text styling */
 .text {
@@ -240,70 +240,70 @@
     -fx-font-weight: bold;
 }
 
-/* Special styling for dashboard */
-#dashboardPane Label {
-    -fx-text-fill: -fx-primary;
-}
+/*!* Special styling for dashboard *!*/
+/*#dashboardPane Label {*/
+/*    -fx-text-fill: -fx-primary;*/
+/*}*/
 
-#dashboardPane TextField:disabled {
-    -fx-opacity: 0.8;
-    -fx-background-color: -fx-light-blue;
-}
+/*#dashboardPane TextField:disabled {*/
+/*    -fx-opacity: 0.8;*/
+/*    -fx-background-color: -fx-light-blue;*/
+/*}*/
 
-/* Card style for dashboard */
-.card {
-    -fx-background-color: -fx-secondary;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.5, 0.0, 0.0);
-    -fx-background-radius: 5;
-    -fx-padding: 15;
-    -fx-border-color: -fx-mid-blue;
-    -fx-border-width: 1;
-    -fx-border-radius: 5;
-}
+/*!* Card style for dashboard *!*/
+/*.card {*/
+/*    -fx-background-color: -fx-secondary;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.5, 0.0, 0.0);*/
+/*    -fx-background-radius: 5;*/
+/*    -fx-padding: 15;*/
+/*    -fx-border-color: -fx-mid-blue;*/
+/*    -fx-border-width: 1;*/
+/*    -fx-border-radius: 5;*/
+/*}*/
 
-/* Credit card design */
-#dashboardPane .rectangle {
-    -fx-fill: linear-gradient(to right, -fx-primary, -fx-dark-blue);
-    -fx-stroke: -fx-accent-gold;
-    -fx-stroke-width: 1.5;
-}
+/*!* Credit card design *!*/
+/*#dashboardPane .rectangle {*/
+/*    -fx-fill: linear-gradient(to right, -fx-primary, -fx-dark-blue);*/
+/*    -fx-stroke: -fx-accent-gold;*/
+/*    -fx-stroke-width: 1.5;*/
+/*}*/
 
-/* Bank name on card */
-#dashboardPane Label[text="Sleepy Bank"] {
-    -fx-text-fill: -fx-accent-gold;
-    -fx-font-weight: bold;
-    -fx-font-style: italic;
-}
+/*!* Bank name on card *!*/
+/*#dashboardPane Label[text="Sleepy Bank"] {*/
+/*    -fx-text-fill: -fx-accent-gold;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-font-style: italic;*/
+/*}*/
 
-/* Form labels */
-.form-label {
-    -fx-font-weight: bold;
-    -fx-text-fill: -fx-primary;
-}
+/*!* Form labels *!*/
+/*.form-label {*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-text-fill: -fx-primary;*/
+/*}*/
 
-/* Field sets */
-.field-set {
-    -fx-border-color: -fx-mid-blue;
-    -fx-border-width: 1;
-    -fx-border-radius: 5;
-    -fx-padding: 10;
-}
+/*!* Field sets *!*/
+/*.field-set {*/
+/*    -fx-border-color: -fx-mid-blue;*/
+/*    -fx-border-width: 1;*/
+/*    -fx-border-radius: 5;*/
+/*    -fx-padding: 10;*/
+/*}*/
 
-/* Special accent buttons */
-.accent-button {
-    -fx-background-color: -fx-accent-gold;
-    -fx-text-fill: -fx-primary;
-}
+/*!* Special accent buttons *!*/
+/*.accent-button {*/
+/*    -fx-background-color: -fx-accent-gold;*/
+/*    -fx-text-fill: -fx-primary;*/
+/*}*/
 
-.accent-button:hover {
-    -fx-background-color: derive(-fx-accent-gold, -10%);
-}
+/*.accent-button:hover {*/
+/*    -fx-background-color: derive(-fx-accent-gold, -10%);*/
+/*}*/
 
-.accent-teal-button {
-    -fx-background-color: -fx-accent-teal;
-    -fx-text-fill: -fx-secondary;
-}
+/*.accent-teal-button {*/
+/*    -fx-background-color: -fx-accent-teal;*/
+/*    -fx-text-fill: -fx-secondary;*/
+/*}*/
 
-.accent-teal-button:hover {
-    -fx-background-color: derive(-fx-accent-teal, -10%);
-}
+/*.accent-teal-button:hover {*/
+/*    -fx-background-color: derive(-fx-accent-teal, -10%);*/
+/*}*/

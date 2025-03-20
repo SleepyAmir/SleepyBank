@@ -43,7 +43,7 @@ public class MainAppController implements Initializable {
     @FXML private Pane transactionHistoryPane;
     @FXML private Pane userInfoPane;
     @FXML private Pane transactionManagementPane;
-
+    @FXML private Label welcomeLabel;
     @FXML private TextField accountBalanceTxt;
     @FXML private TextField cardNumberTxt;
     @FXML private TextField cvvTxt;
@@ -127,6 +127,7 @@ public class MainAppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info("MainAppController initialized");
+
 
         transferFundsBtn.setOnAction(event -> {
             tabPane.getSelectionModel().select(fundTab);
@@ -812,8 +813,11 @@ public class MainAppController implements Initializable {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
+
         String jsonOutput = gson.toJson(transactionData);
+
         System.out.println("Transactions in JSON format:\n" + jsonOutput);
+
         showInfo("Transactions printed to console as JSON");
     }
 

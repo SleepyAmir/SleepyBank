@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.StackedBarChart?>
@@ -21,7 +22,6 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<?import java.net.URL?>
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="544.0" prefWidth="636.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.MainAppController">
        <stylesheets>
            <URL value="@/Styles/mainApp.css" />
@@ -31,7 +31,7 @@
          <content>
             <Pane fx:id="dashboardPane" prefHeight="518.0" prefWidth="636.0">
                <children>
-                  <Label layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="236.0">
+                  <Label fx:id="welcomeLabel" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="236.0">
                      <font>
                         <Font name="System Bold" size="23.0" />
                      </font>
@@ -57,7 +57,6 @@
                   <TextField fx:id="cvvTxt" editable="false" layoutX="57.0" layoutY="153.0" prefHeight="25.0" prefWidth="79.0" />
                   <TextField fx:id="expiryTxt" editable="false" layoutX="192.0" layoutY="153.0" prefHeight="25.0" prefWidth="79.0" />
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9f86c0" height="151.0" layoutX="312.0" layoutY="53.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7b5fa2" height="57.0" layoutX="312.0" layoutY="52.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
                   <TextField fx:id="cardNumberTxt1" editable="false" layoutX="332.0" layoutY="118.0" prefHeight="25.0" prefWidth="268.0" />
                   <TextField fx:id="cvvTxt1" editable="false" layoutX="365.0" layoutY="161.0" prefHeight="25.0" prefWidth="54.0" />
                   <TextField fx:id="expiryTxt1" editable="false" layoutX="520.0" layoutY="161.0" prefHeight="25.0" prefWidth="80.0" />

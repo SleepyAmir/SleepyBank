@@ -11,12 +11,11 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<?import java.net.URL?>
 <Pane fx:controller="bank.app.controller.LoginController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="280.0" prefWidth="289.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
 
-    <stylesheets>
-        <URL value="@/Styles/login.css" />
-    </stylesheets>
+    <!--    <stylesheets>-->
+    <!--        <URL value="@/javafx/styles/login.css" />-->
+    <!--    </stylesheets>-->
 
     <children>
         <GridPane layoutX="46.0" layoutY="73.0" prefHeight="91.0" prefWidth="202.0">
@@ -39,6 +38,6 @@
                 <Font size="14.0" />
             </font>
         </Text>
-      <Hyperlink fx:id="forgotPasswordLink" layoutX="44.0" layoutY="224.0" text="Forgot Password" />
+        <Hyperlink fx:id="forgotPasswordLink" layoutX="44.0" layoutY="224.0" text="Forgot Password" />
     </children>
 </Pane>

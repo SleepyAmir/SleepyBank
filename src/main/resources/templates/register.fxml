@@ -19,16 +19,14 @@
 
 <!-- Import URL for stylesheets -->
 
-<?import java.net.URL?>
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="494.0" prefWidth="678.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.RegistrationController">
-    <stylesheets>
-        <URL value="@/Styles/register.css" />
-    </stylesheets>
     <tabs>
         <Tab fx:id="registerTab" text="Register">
             <content>
                 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="660.0">
-
+                    <!--                    <stylesheets>-->
+                    <!--                        <URL value="@/javafx/styles/register.css" />-->
+                    <!--                    </stylesheets>-->
                     <children>
                         <Text layoutX="249.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="New Account Registration" textAlignment="CENTER" />
                         <Text layoutX="166.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="First Name" />
@@ -57,96 +55,96 @@
         <Tab fx:id="usersTab" text="Users">
             <content>
                 <Pane fx:id="usersPane" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <TableView fx:id="usersTable" layoutX="270.0" layoutY="56.0" prefHeight="390.0" prefWidth="394.0">
-                    <columns>
-                      <TableColumn fx:id="usernameCol" prefWidth="75.0" text="UserName" />
-                      <TableColumn fx:id="firstnameCol" prefWidth="75.0" text="FirstName" />
-                        <TableColumn fx:id="lastnameCol" prefWidth="75.0" text="LastName" />
-                        <TableColumn fx:id="dateOfBirthCol" prefWidth="75.0" text="DateOfBirth" />
-                        <TableColumn fx:id="phoneNumberCol" prefWidth="93.0" text="PhoneNumber" />
-                    </columns>
-                  </TableView>
-                  <Label layoutX="270.0" layoutY="29.0" text="UserName" />
-                  <Label layoutX="479.0" layoutY="29.0" text="FirstName" />
-                  <GridPane layoutX="21.0" layoutY="51.0" prefHeight="316.0" prefWidth="234.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="94.4000244140625" minWidth="10.0" prefWidth="70.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.79998779296875" minWidth="10.0" prefWidth="130.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="FirstName" />
-                        <TextField fx:id="firstNameSearchTxt" GridPane.columnIndex="1" />
-                        <Label text="LastName" GridPane.rowIndex="1" />
-                        <TextField fx:id="lastNameSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label text="Phone Number" GridPane.rowIndex="2" />
-                        <TextField fx:id="phoneNumberSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label text="Email" GridPane.rowIndex="3" />
-                        <TextField fx:id="emailSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <DatePicker fx:id="dateOfBirthSearchTxt" prefHeight="25.0" prefWidth="148.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                        <Label text="DateOfBirth" GridPane.rowIndex="4" />
-                        <Label text="Address" GridPane.rowIndex="5" />
-                        <TextField fx:id="addressSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label text="UserName" GridPane.rowIndex="6" />
-                        <TextField fx:id="userNameSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <TextField fx:id="passwordSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <Label text="Password" GridPane.rowIndex="7" />
-                     </children>
-                  </GridPane>
-                  <TextField fx:id="usernameFindTxt" layoutX="333.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
-                  <TextField fx:id="firstnameFindTxt" layoutX="541.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
-                  <Button fx:id="saveBtn" layoutX="29.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Save" />
-                  <Button fx:id="editBtn" layoutX="108.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Edit" />
-                  <Button fx:id="removeBtn" layoutX="189.0" layoutY="386.0" mnemonicParsing="false" text="Remove" />
-                  <Button fx:id="reloadBtn" layoutX="21.0" layoutY="25.0" mnemonicParsing="false" text="🔄" />
-                   <Button fx:id="filterBtn" layoutX="54.0" layoutY="25.0" mnemonicParsing="false" text="Filter" />
-               </children>
+                    <children>
+                        <TableView fx:id="usersTable" layoutX="270.0" layoutY="56.0" prefHeight="390.0" prefWidth="394.0">
+                            <columns>
+                                <TableColumn fx:id="usernameCol" prefWidth="75.0" text="UserName" />
+                                <TableColumn fx:id="firstnameCol" prefWidth="75.0" text="FirstName" />
+                                <TableColumn fx:id="lastnameCol" prefWidth="75.0" text="LastName" />
+                                <TableColumn fx:id="dateOfBirthCol" prefWidth="75.0" text="DateOfBirth" />
+                                <TableColumn fx:id="phoneNumberCol" prefWidth="93.0" text="PhoneNumber" />
+                            </columns>
+                        </TableView>
+                        <Label layoutX="270.0" layoutY="29.0" text="UserName" />
+                        <Label layoutX="479.0" layoutY="29.0" text="FirstName" />
+                        <GridPane layoutX="21.0" layoutY="51.0" prefHeight="316.0" prefWidth="234.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="94.4000244140625" minWidth="10.0" prefWidth="70.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.79998779296875" minWidth="10.0" prefWidth="130.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label text="FirstName" />
+                                <TextField fx:id="firstNameSearchTxt" GridPane.columnIndex="1" />
+                                <Label text="LastName" GridPane.rowIndex="1" />
+                                <TextField fx:id="lastNameSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Label text="Phone Number" GridPane.rowIndex="2" />
+                                <TextField fx:id="phoneNumberSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Label text="Email" GridPane.rowIndex="3" />
+                                <TextField fx:id="emailSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <DatePicker fx:id="dateOfBirthSearchTxt" prefHeight="25.0" prefWidth="148.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                <Label text="DateOfBirth" GridPane.rowIndex="4" />
+                                <Label text="Address" GridPane.rowIndex="5" />
+                                <TextField fx:id="addressSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                <Label text="UserName" GridPane.rowIndex="6" />
+                                <TextField fx:id="userNameSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                <TextField fx:id="passwordSearchTxt" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                <Label text="Password" GridPane.rowIndex="7" />
+                            </children>
+                        </GridPane>
+                        <TextField fx:id="usernameFindTxt" layoutX="333.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
+                        <TextField fx:id="firstnameFindTxt" layoutX="541.0" layoutY="25.0" prefHeight="25.0" prefWidth="115.0" />
+                        <Button fx:id="saveBtn" layoutX="29.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Save" />
+                        <Button fx:id="editBtn" layoutX="108.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Edit" />
+                        <Button fx:id="removeBtn" layoutX="189.0" layoutY="386.0" mnemonicParsing="false" text="Remove" />
+                        <Button fx:id="reloadBtn" layoutX="21.0" layoutY="25.0" mnemonicParsing="false" text="🔄" />
+                        <Button fx:id="filterBtn" layoutX="54.0" layoutY="25.0" mnemonicParsing="false" text="Filter" />
+                    </children>
                 </Pane>
             </content>
         </Tab>
-      <Tab fx:id="adminDashboardTab" text="Admin Dashboard">
-         <content>
-            <Pane fx:id="adminDashboardPane" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <GridPane layoutX="47.0" layoutY="30.0" prefHeight="90.0" prefWidth="237.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="105.0" minWidth="10.0" prefWidth="104.5999755859375" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="129.0" minWidth="10.0" prefWidth="119.4000244140625" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="37.600006103515625" minHeight="10.0" prefHeight="36.399993896484375" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="25.199981689453125" minHeight="10.0" prefHeight="23.600006103515625" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Total Users" GridPane.rowIndex="1" />
-                        <Label text="Total Balance:" />
-                        <TextField fx:id="totalBalanceTxt" GridPane.columnIndex="1" />
-                        <TextField fx:id="totalUsersTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label text="New Users Today:" GridPane.rowIndex="2" />
-                        <TextField fx:id="newUsersTodayTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     </children>
-                  </GridPane>
-                  <Separator layoutX="332.0" orientation="VERTICAL" prefHeight="468.0" prefWidth="6.0" />
-                  <Separator layoutX="-1.0" layoutY="141.0" prefHeight="5.0" prefWidth="334.0" />
-                  <PieChart fx:id="pieCHart" layoutX="19.0" layoutY="163.0" prefHeight="244.0" prefWidth="293.0" />
-                  <Label layoutX="59.0" layoutY="417.0" text="Card : " />
-                  <Label layoutX="168.0" layoutY="417.0" text="Cheque :" />
-                  <TextField fx:id="chartPercentCard" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
-                  <TextField fx:id="chartPercentCheque" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
-               </children>
-            </Pane>
-         </content>
-      </Tab>
+        <Tab fx:id="adminDashboardTab" text="Admin Dashboard">
+            <content>
+                <Pane fx:id="adminDashboardPane" prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <GridPane layoutX="47.0" layoutY="30.0" prefHeight="90.0" prefWidth="237.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="105.0" minWidth="10.0" prefWidth="104.5999755859375" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="129.0" minWidth="10.0" prefWidth="119.4000244140625" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="37.600006103515625" minHeight="10.0" prefHeight="36.399993896484375" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="25.199981689453125" minHeight="10.0" prefHeight="23.600006103515625" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label text="Total Users" GridPane.rowIndex="1" />
+                                <Label text="Total Balance:" />
+                                <TextField fx:id="totalBalanceTxt" GridPane.columnIndex="1" />
+                                <TextField fx:id="totalUsersTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Label text="New Users Today:" GridPane.rowIndex="2" />
+                                <TextField fx:id="newUsersTodayTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            </children>
+                        </GridPane>
+                        <Separator layoutX="332.0" orientation="VERTICAL" prefHeight="468.0" prefWidth="6.0" />
+                        <Separator layoutX="-1.0" layoutY="141.0" prefHeight="5.0" prefWidth="334.0" />
+                        <PieChart fx:id="pieCHart" layoutX="19.0" layoutY="163.0" prefHeight="244.0" prefWidth="293.0" />
+                        <Label layoutX="59.0" layoutY="417.0" text="Card : " />
+                        <Label layoutX="168.0" layoutY="417.0" text="Cheque :" />
+                        <TextField fx:id="chartPercentCard" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
+                        <TextField fx:id="chartPercentCheque" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
+                    </children>
+                </Pane>
+            </content>
+        </Tab>
     </tabs>
 </TabPane>

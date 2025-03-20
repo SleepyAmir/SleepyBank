@@ -75,42 +75,7 @@ public class LoginController implements bank.app.model.repository.Repository<Use
             alert.showAndWait();
         }
     }
-    //    private User authenticate(String username, String password) throws Exception {
-//        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(
-//                     "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1")) {
-//            stmt.setString(1, username);
-//            stmt.setString(2, password);
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                return rs.next() ? mapResultSetToUser(rs) : null;
-//            }
-//        }
-//    }
-//private User authenticate(String username, String password) throws Exception {
-//    String query = "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1";
-//    try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection()) {
-//        if (conn == null) {
-//            throw new SQLException("Database connection is null");
-//        }
-//        System.out.println("Connection established: " + conn);
-//        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-//            System.out.println("Query: " + query);
-//            System.out.println("Setting USERNAME=? to: " + username);
-//            stmt.setString(1, username);
-//            System.out.println("Setting PASSWORD=? to: " + password);
-//            stmt.setString(2, password);
-//            System.out.println("Executing query...");
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                System.out.println("Query executed, checking result...");
-//                return rs.next() ? mapResultSetToUser(rs) : null;
-//            }
-//        }
-//    } catch (SQLException e) {
-//        System.err.println("SQL Error: " + e.getMessage());
-//        e.printStackTrace();
-//        throw e;
-//    }
-//}
+
     private User authenticate(String username, String password) throws Exception {
         String query = "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1";
         System.out.println("Starting authentication for Username: " + username + ", Password: " + password);
@@ -151,7 +116,6 @@ public class LoginController implements bank.app.model.repository.Repository<Use
     }
 
     private void handleForgotPassword() {
-        // Simplified without ButtonType or TextInputDialog
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Forgot Password");
         alert.setHeaderText(null);
@@ -236,7 +200,7 @@ public class LoginController implements bank.app.model.repository.Repository<Use
 
     @Override
     public void close() throws Exception {
-        // No longer needed with try-with-resources
+
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {

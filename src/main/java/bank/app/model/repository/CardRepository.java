@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardRepository implements Repository<Card, Integer> {
+public class CardRepository implements Repository<Card, Integer>, AutoCloseable {
     private Connection connection;
 
     public CardRepository() throws Exception {
         this.connection = ConnectionProvider.getConnectionProvider().getConnection();
     }
-
     @Override
     public void save(Card card) throws Exception {
         Card existingCard = findByCardNumber(card.getCardNumber());

@@ -21,7 +21,11 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
+<?import java.net.URL?>
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="544.0" prefWidth="636.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.MainAppController">
+       <stylesheets>
+           <URL value="@/Styles/mainApp.css" />
+       </stylesheets>
    <tabs>
       <Tab fx:id="dashboardTab" text="Dashboard">
          <content>
@@ -159,7 +163,7 @@
          <content>
             <Pane fx:id="transactionHistoryPane" prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TableView fx:id="transactionTable" layoutX="15.0" layoutY="91.0" prefHeight="352.0" prefWidth="615.0">
+                  <TableView fx:id="transactionTable" layoutX="15.0" layoutY="67.0" prefHeight="403.0" prefWidth="615.0">
                      <columns>
                         <TableColumn fx:id="accountCol" prefWidth="113.39999389648438" text="Account" />
                         <TableColumn fx:id="typeCol" prefWidth="86.5999755859375" text="Type" />
@@ -168,12 +172,12 @@
                         <TableColumn fx:id="descriptionCol" prefWidth="256.20001220703125" text="Description" />
                      </columns>
                   </TableView>
-                  <Label layoutX="189.0" layoutY="34.0" text="Transaction History">
+                  <Label layoutX="189.0" layoutY="20.0" text="Transaction History">
                      <font>
                         <Font name="System Bold" size="29.0" />
                      </font>
                   </Label>
-                  <Button fx:id="printTableBtn" layoutX="217.0" layoutY="462.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" text="Print" />
+                  <Button fx:id="printTableBtn" layoutX="217.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" text="Print" />
                </children>
             </Pane>
          </content>
@@ -208,28 +212,7 @@
                </children>
             </Pane>
          </content>
-      </Tab>      <Tab fx:id="chequesTable" text="Manage Cheque">
-      <content>
-         <Pane prefHeight="200.0" prefWidth="200.0">
-            <children>
-               <TableView layoutX="25.0" layoutY="82.0" prefHeight="416.0" prefWidth="587.0">
-                  <columns>
-                     <TableColumn fx:id="chequeNumberCol" prefWidth="103.4000244140625" text="Cheque Number" />
-                     <TableColumn fx:id="chequeAmountCol" prefWidth="111.5999755859375" text="Amount" />
-                     <TableColumn fx:id="passDateCol" prefWidth="103.5999755859375" text="Pass_Date" />
-                     <TableColumn fx:id="receiverCol" prefWidth="68.4000244140625" text="Receiver" />
-                     <TableColumn fx:id="chequeDescriptionCol" prefWidth="197.0" text="Description" />
-                  </columns>
-               </TableView>
-               <Label layoutX="229.0" layoutY="28.0" text="Cheques Status">
-                  <font>
-                     <Font name="System Bold" size="25.0" />
-                  </font>
-               </Label>
-            </children>
-         </Pane>
-      </content>
-   </Tab>
+      </Tab>
       <Tab fx:id="transactionManagementTab" text="Transaction management">
          <content>
             <Pane fx:id="transactionManagementPane" prefHeight="200.0" prefWidth="200.0">

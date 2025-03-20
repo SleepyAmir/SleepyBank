@@ -7,8 +7,11 @@ import bank.app.model.service.CardService;
 import bank.app.model.service.ChequeService;
 import bank.app.model.service.TransactionService;
 import bank.app.model.service.UserService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.StackedBarChart;
@@ -22,10 +25,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j
@@ -145,7 +145,6 @@ public class MainAppController implements Initializable {
         cancelChequeBtn.setOnAction(event -> resetTransferForm());
         printTableBtn.setOnAction(event -> printTransactions());
 
-        // New edit button logic inspired by your example
         editBtn.setOnAction(event -> {
             if (!isEditMode) {
                 // Switch to edit mode
@@ -154,9 +153,7 @@ public class MainAppController implements Initializable {
                 editBtn.setText("Save");
                 log.info("Switched to edit mode");
             } else {
-                // Save changes and switch back to view mode
                 try {
-                    // Update currentUser with editable fields
                     currentUser.setEmail(emailAddressInfoTxt.getText());
                     currentUser.setAddress(addressInfoTxt.getText());
                     currentUser.setUsername(userNameInfoTxt.getText());
@@ -168,11 +165,10 @@ public class MainAppController implements Initializable {
                     alert.show();
                     log.info("User Edited: " + currentUser.getUsername());
 
-                    // Reset to view mode
                     isEditMode = false;
                     setUserInfoEditable(false);
                     editBtn.setText("Edit");
-                    populateUserInfo(); // Refresh UI with latest data
+                    populateUserInfo();
                 } catch (Exception e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
                     alert.show();
@@ -240,15 +236,35 @@ public class MainAppController implements Initializable {
     private void setupTransactionTableColumns() {
         accountCol.setCellValueFactory(cellData -> {
             Transaction t = cellData.getValue();
-            String source = t.getSourceAccount() instanceof Card ?
-                    ((Card) t.getSourceAccount()).getCardNumber() :
-                    (t.getSourceAccount() instanceof Cheque ? ((Cheque) t.getSourceAccount()).getNumber() : "N/A");
+            String source;
+            if (t.getSourceAccount() instanceof Card) {
+                source = ((Card) t.getSourceAccount()).getCardNumber();
+            } else if (t.getSourceAccount() instanceof Cheque) {
+                source = ((Cheque) t.getSourceAccount()).getNumber();
+            } else {
+                source = "N/A";
+            }
             return new javafx.beans.property.SimpleStringProperty(source);
         });
+
         typeCol.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
         amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        statusCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Completed"));
+
+        statusCol.setCellValueFactory(cellData -> {
+            Transaction t = cellData.getValue();
+            String status;
+            if (t.getSourceAccount() instanceof Cheque) {
+                Cheque cheque = (Cheque) t.getSourceAccount();
+                status = cheque.getReceiver(); // "Pending", "Cashed", "Bounced", etc.
+            } else {
+                status = "Completed";
+            }
+            return new javafx.beans.property.SimpleStringProperty(status);
+        });
+
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+
         transactionTable.setItems(transactionData);
     }
 
@@ -257,42 +273,69 @@ public class MainAppController implements Initializable {
     }
 
     private void loadTransactionChart() {
-        transactionsChart.getData().clear();
-        try {
-            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
-            Map<String, Map<TransactionType, Double>> groupedData = transactions.stream()
-                    .collect(Collectors.groupingBy(
-                            t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
-                            Collectors.groupingBy(
-                                    Transaction::getTransactionType,
-                                    Collectors.summingDouble(Transaction::getAmount)
-                            )
-                    ));
+        Task<List<XYChart.Series<String, Number>>> fetchChartDataTask = new Task<List<XYChart.Series<String, Number>>>() {
+            @Override
+            protected List<XYChart.Series<String, Number>> call() throws Exception {
+                // Fetch and process data in the background
+                List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
+                Map<String, Map<String, Double>> groupedData = transactions.stream()
+                        .collect(Collectors.groupingBy(
+                                t -> t.getTransactionTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM-dd")),
+                                Collectors.groupingBy(
+                                        t -> t.getSourceAccount() instanceof Card ? "Card Transfer" : "Cheque Transfer",
+                                        Collectors.summingDouble(Transaction::getAmount)
+                                )
+                        ));
 
-            XYChart.Series<String, Number> transferSeries = new XYChart.Series<>();
-            transferSeries.setName("Transfer");
+                XYChart.Series<String, Number> cardSeries = new XYChart.Series<>();
+                cardSeries.setName("Card Transfers");
+                XYChart.Series<String, Number> chequeSeries = new XYChart.Series<>();
+                chequeSeries.setName("Cheque Transfers");
 
-            groupedData.forEach((date, typeMap) -> {
-                transferSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault(TransactionType.Transfer, 0.0)));
-            });
+                groupedData.forEach((date, typeMap) -> {
+                    cardSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault("Card Transfer", 0.0)));
+                    chequeSeries.getData().add(new XYChart.Data<>(date, typeMap.getOrDefault("Cheque Transfer", 0.0)));
+                });
 
-            transactionsChart.getData().add(transferSeries);
-        } catch (Exception e) {
-            log.error("Error loading transaction chart", e);
-            showError("Failed to load transaction chart: " + e.getMessage());
-        }
+                // Use Arrays.asList() instead of List.of() for Java 8 compatibility
+                return Arrays.asList(cardSeries, chequeSeries);
+            }
+        };
+
+        fetchChartDataTask.setOnSucceeded(event -> {
+            // Update chart on the UI thread
+            transactionsChart.getData().clear();
+            transactionsChart.getData().addAll(fetchChartDataTask.getValue());
+        });
+
+        fetchChartDataTask.setOnFailed(event -> {
+            log.error("Error loading transaction chart", fetchChartDataTask.getException());
+            showError("Failed to load transaction chart: " + fetchChartDataTask.getException().getMessage());
+        });
+
+        new Thread(fetchChartDataTask).start();
     }
 
+
     private void loadTransactionHistory() {
-        try {
-            transactionData.clear();
-            List<Transaction> transactions = transactionService.findByUserId(currentUser.getId());
-            transactionData.addAll(transactions);
-            log.info("Loaded " + transactions.size() + " transactions for user " + currentUser.getUsername());
-        } catch (Exception e) {
-            log.error("Error loading transaction history", e);
-            showError("Failed to load transaction history: " + e.getMessage());
-        }
+        Task<List<Transaction>> fetchTransactionsTask = new Task<List<Transaction>>() {
+            @Override
+            protected List<Transaction> call() throws Exception {
+                return transactionService.findByUserId(currentUser.getId());
+            }
+        };
+
+        fetchTransactionsTask.setOnSucceeded(event -> {
+            transactionData.setAll(fetchTransactionsTask.getValue());
+            log.info("Loaded " + transactionData.size() + " transactions for user " + currentUser.getUsername());
+        });
+
+        fetchTransactionsTask.setOnFailed(event -> {
+            log.error("Error loading transaction history", fetchTransactionsTask.getException());
+            showError("Failed to load transaction history: " + fetchTransactionsTask.getException().getMessage());
+        });
+
+        new Thread(fetchTransactionsTask).start();
     }
 
     private void populateUserInfo() {
@@ -516,211 +559,244 @@ public class MainAppController implements Initializable {
     }
 
     private void confirmTransfer() {
-        try {
-            if (!byCardCheckBox.isSelected()) {
-                showError("Please select 'By Card' for card transfer");
-                return;
+        if (!byCardCheckBox.isSelected()) {
+            showError("Please select 'By Card' for card transfer");
+            return;
+        }
+
+        String sourceCardNumber = transferCardNumberTxt.getText().replaceAll("-", "");
+        String cvv = transferCvvTxt.getText();
+        String amountText = transferAmountTxt.getText();
+        String receiverCardNumber = receiverNumberTxt.getText().replaceAll("-", "");
+
+        if (sourceCardNumber.isEmpty() || cvv.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty()) {
+            showError("All fields must be filled");
+            return;
+        }
+
+        transferConfirmTxt.setDisable(true);
+
+        Task<Void> transferTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                log.info("Starting transfer task");
+
+                double amount = Double.parseDouble(amountText);
+
+                Card sourceCard = cardService.findByCardNumber(sourceCardNumber);
+                if (sourceCard == null || !sourceCard.getCvv2().equals(cvv) || sourceCard.getBalance() < amount) {
+                    throw new Exception("Invalid card details or insufficient balance");
+                }
+
+                Card destinationCard = cardService.findByCardNumber(receiverCardNumber);
+                if (destinationCard == null) {
+                    throw new Exception("Receiver card not found");
+                }
+
+                sourceCard.setBalance(sourceCard.getBalance() - amount);
+                destinationCard.setBalance(destinationCard.getBalance() + amount);
+
+                cardService.save(sourceCard);
+                cardService.save(destinationCard);
+
+                Transaction transaction = Transaction.builder()
+                        .sourceAccount(sourceCard)
+                        .destinationAccount(destinationCard)
+                        .amount(amount)
+                        .transactionType(TransactionType.Transfer)
+                        .transactionTime(LocalDateTime.now())
+                        .description("Transfer from " + sourceCardNumber + " to " + receiverCardNumber)
+                        .build();
+                transactionService.save(transaction);
+
+                log.info("Transfer task completed successfully");
+                return null;
             }
+        };
 
-            String sourceCardNumber = transferCardNumberTxt.getText().replaceAll("-", "");
-            String cvv = transferCvvTxt.getText();
-            String amountText = transferAmountTxt.getText();
-            String receiverCardNumber = receiverNumberTxt.getText().replaceAll("-", "");
-
-            if (sourceCardNumber.isEmpty() || cvv.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty()) {
-                showError("All fields must be filled");
-                return;
-            }
-
-            double amount = Double.parseDouble(amountText);
-            Card sourceCard = cardService.findByCardNumber(sourceCardNumber);
-            if (sourceCard == null || !sourceCard.getCvv2().equals(cvv) || sourceCard.getBalance() < amount) {
-                showError("Invalid card details or insufficient balance");
-                return;
-            }
-
-            Card destinationCard = cardService.findByCardNumber(receiverCardNumber);
-            if (destinationCard == null) {
-                showError("Receiver card not found");
-                return;
-            }
-
-            sourceCard.setBalance(sourceCard.getBalance() - amount);
-            destinationCard.setBalance(destinationCard.getBalance() + amount);
-            cardService.save(sourceCard);
-            cardService.save(destinationCard);
-
-            Transaction transaction = Transaction.builder()
-                    .sourceAccount(sourceCard)
-                    .destinationAccount(destinationCard)
-                    .amount(amount)
-                    .transactionType(TransactionType.Transfer)
-                    .transactionTime(LocalDateTime.now())
-                    .description("Transfer from " + sourceCardNumber + " to " + receiverCardNumber)
-                    .build();
-            transactionService.save(transaction);
-
-            showInfo("Transferred " + amount + " to " + receiverCardNumber);
+        transferTask.setOnSucceeded(event -> {
+            log.info("Transfer task succeeded");
+            transferConfirmTxt.setDisable(false);
+            showInfo("Transferred " + amountText + " to " + receiverCardNumber);
             resetTransferForm();
             populateDashboard();
             loadTransactionHistory();
             loadTransactionChart();
-        } catch (NumberFormatException e) {
-            showError("Amount must be a number");
-        } catch (Exception e) {
-            log.error("Transfer failed", e);
-            showError("Transfer failed: " + e.getMessage());
-        }
+        });
+
+        transferTask.setOnFailed(event -> {
+            log.error("Transfer task failed", transferTask.getException());
+            transferConfirmTxt.setDisable(false);
+            showError("Transfer failed: " + transferTask.getException().getMessage());
+        });
+
+        new Thread(transferTask).start();
     }
 
     private void issueCheque() {
-        try {
-            if (!byCheckCheckBox.isSelected()) {
-                showError("Please select 'By Cheque'");
-                return;
+        if (!byCheckCheckBox.isSelected()) {
+            showError("Please select 'By Cheque'");
+            return;
+        }
+
+        String chequeNumber = transferChequeTxt.getText();
+        String amountText = transferChequeAmountTxt.getText();
+        String receiverCardNumber = transferChequeAddressTxt.getText().replaceAll("-", "");
+        String description = chequeDescriptionTxt.getText();
+        LocalDate passDate = chequeDate.getValue();
+
+        if (chequeNumber.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty() || passDate == null) {
+            showError("All cheque fields and pass date must be filled");
+            return;
+        }
+
+        if (passDate.isBefore(LocalDate.now())) {
+            showError("Pass date must be today or in the future");
+            return;
+        }
+
+        if (!receiverCardNumber.startsWith("1383")) {
+            showError("Receiver must be a valid card number (starts with 1383)");
+            return;
+        }
+
+        issueChequeBtn.setDisable(true);
+        Task<Void> issueChequeTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                log.info("Starting cheque issuance in background thread");
+
+                double amount = Double.parseDouble(amountText);
+                if (amount <= 0) {
+                    throw new Exception("Amount must be positive");
+                }
+
+                List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+                Cheque cheque = cheques.stream()
+                        .filter(c -> c.getNumber().equals(chequeNumber) && c.getReceiver().equals("Available"))
+                        .findFirst()
+                        .orElse(null);
+
+                if (cheque == null) {
+                    throw new Exception("Cheque not found or already used");
+                }
+
+                cheque.setAmount(amount);
+                cheque.setReceiver("Pending");
+                cheque.setDescription(description.isEmpty() ? "To " + receiverCardNumber : description + " | To " + receiverCardNumber);
+                cheque.setPassDate(passDate);
+
+                chequeService.saveOrUpdate(cheque);
+
+                log.info("Cheque issuance completed successfully");
+                return null;
             }
+        };
 
-            String chequeNumber = transferChequeTxt.getText();
-            String amountText = transferChequeAmountTxt.getText();
-            String receiverCardNumber = transferChequeAddressTxt.getText().replaceAll("-", "");
-            String description = chequeDescriptionTxt.getText();
-            LocalDate passDate = chequeDate.getValue();
-
-            if (chequeNumber.isEmpty() || amountText.isEmpty() || receiverCardNumber.isEmpty() || passDate == null) {
-                showError("All cheque fields and pass date must be filled");
-                return;
-            }
-
-            if (passDate.isBefore(LocalDate.now())) {
-                showError("Pass date must be today or in the future");
-                return;
-            }
-
-            if (!receiverCardNumber.startsWith("1383")) {
-                showError("Receiver must be a valid card number (starts with 1383)");
-                return;
-            }
-
-            double amount = Double.parseDouble(amountText);
-            if (amount <= 0) {
-                showError("Amount must be positive");
-                return;
-            }
-
-            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            Cheque cheque = cheques.stream()
-                    .filter(c -> c.getNumber().equals(chequeNumber) && c.getReceiver().equals("Available"))
-                    .findFirst()
-                    .orElse(null);
-
-            if (cheque == null) {
-                showError("Cheque not found or already used");
-                return;
-            }
-
-            cheque.setAmount(amount);
-            cheque.setReceiver("Pending");
-            cheque.setDescription(description.isEmpty() ? "To " + receiverCardNumber : description + " | To " + receiverCardNumber);
-            cheque.setPassDate(passDate);
-            chequeService.saveOrUpdate(cheque);
-
-            showInfo("Cheque " + chequeNumber + " issued for " + amount + " to card " + receiverCardNumber +
+        issueChequeTask.setOnSucceeded(event -> {
+            log.info("Cheque issuance succeeded");
+            issueChequeBtn.setDisable(false); // Re-enable the button
+            showInfo("Cheque " + chequeNumber + " issued for " + amountText + " to card " + receiverCardNumber +
                     ", now Pending until " + passDate);
             resetTransferForm();
             populateDashboard();
-        } catch (NumberFormatException e) {
-            showError("Amount must be a valid number");
-        } catch (Exception e) {
-            log.error("Cheque issuance failed", e);
-            showError("Failed to issue cheque: " + e.getMessage());
-        }
+        });
+
+        issueChequeTask.setOnFailed(event -> {
+            log.error("Cheque issuance failed", issueChequeTask.getException());
+            issueChequeBtn.setDisable(false); // Re-enable the button
+            showError("Failed to issue cheque: " + issueChequeTask.getException().getMessage());
+        });
+
+        new Thread(issueChequeTask).start();
     }
 
     private void manageCheques() {
-        try {
-            List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
-            List<Card> cards = cardService.findByUserId(currentUser.getId());
-            Card sourceCard = cards.isEmpty() ? createDefaultCard() : cards.get(0);
-            LocalDate today = LocalDate.now();
+        Task<Void> manageChequesTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                List<Cheque> cheques = chequeService.findByUserId(currentUser.getId());
+                List<Card> cards = cardService.findByUserId(currentUser.getId());
+                Card sourceCard = cards.isEmpty() ? createDefaultCard() : cards.get(0);
+                LocalDate today = LocalDate.now();
 
-            for (Cheque cheque : cheques) {
-                if (cheque.getReceiver().equals("Pending") &&
-                        (cheque.getPassDate().isBefore(today) || cheque.getPassDate().isEqual(today))) {
-                    log.info("Processing cheque: " + cheque.getNumber() + ", ID: " + cheque.getId());
-                    String receiverCardNumber = cheque.getDescription().contains("| To ") ?
-                            cheque.getDescription().split("\\| To ")[1] :
-                            (cheque.getDescription().startsWith("To ") ? cheque.getDescription().substring(3) : null);
+                for (Cheque cheque : cheques) {
+                    if (cheque.getReceiver().equals("Pending") &&
+                            (cheque.getPassDate().isBefore(today) || cheque.getPassDate().isEqual(today))) {
+                        String receiverCardNumber = cheque.getDescription().contains("| To ") ?
+                                cheque.getDescription().split("\\| To ")[1] :
+                                (cheque.getDescription().startsWith("To ") ? cheque.getDescription().substring(3) : null);
 
-                    if (receiverCardNumber == null) {
-                        cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
-                        showError("Cheque " + cheque.getNumber() + " bounced: Invalid receiver");
-                        continue;
+                        if (receiverCardNumber == null) {
+                            cheque.setReceiver("Bounced");
+                            chequeService.save(cheque);
+                            continue;
+                        }
+
+                        double amount = cheque.getAmount();
+                        Card receiverCard = cardService.findByCardNumber(receiverCardNumber);
+                        if (receiverCard == null) {
+                            cheque.setReceiver("Bounced");
+                            chequeService.save(cheque);
+                            continue;
+                        }
+
+                        if (sourceCard.getBalance() < amount) {
+                            cheque.setReceiver("Bounced");
+                            chequeService.save(cheque);
+                            continue;
+                        }
+
+                        sourceCard.setBalance(sourceCard.getBalance() - amount);
+                        receiverCard.setBalance(receiverCard.getBalance() + amount);
+                        cardService.save(sourceCard);
+                        cardService.save(receiverCard);
+
+                        String oldChequeNumber = cheque.getNumber();
+                        chequeService.delete(cheque);
+
+                        String nextChequeNumber = generateNextChequeNumber(oldChequeNumber);
+                        Cheque newCheque = Cheque.builder()
+                                .user(currentUser)
+                                .accountType(AccountType.Cheque)
+                                .balance(0.0)
+                                .createdAt(LocalDateTime.now())
+                                .number(nextChequeNumber)
+                                .passDate(LocalDate.now().plusMonths(1))
+                                .amount(0.0)
+                                .receiver("Available")
+                                .description("Cheque #" + nextChequeNumber)
+                                .build();
+                        chequeService.save(newCheque);
+
+                        Transaction transaction = Transaction.builder()
+                                .sourceAccount(cheque)
+                                .destinationAccount(receiverCard)
+                                .amount(amount)
+                                .transactionType(TransactionType.Transfer)
+                                .transactionTime(LocalDateTime.now())
+                                .description("Cheque #" + oldChequeNumber + " cashed to " + receiverCardNumber)
+                                .build();
+                        transactionService.save(transaction);
                     }
-
-                    double amount = cheque.getAmount();
-                    Card receiverCard = cardService.findByCardNumber(receiverCardNumber);
-                    if (receiverCard == null) {
-                        cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
-                        showError("Cheque " + cheque.getNumber() + " bounced: Receiver card not found");
-                        continue;
-                    }
-
-                    if (sourceCard.getBalance() < amount) {
-                        cheque.setReceiver("Bounced");
-                        chequeService.save(cheque);
-                        showError("Cheque " + cheque.getNumber() + " bounced: Insufficient funds");
-                        continue;
-                    }
-
-                    sourceCard.setBalance(sourceCard.getBalance() - amount);
-                    receiverCard.setBalance(receiverCard.getBalance() + amount);
-                    cardService.save(sourceCard);
-                    cardService.save(receiverCard);
-
-                    String oldChequeNumber = cheque.getNumber();
-                    log.info("Deleting cheque: " + oldChequeNumber + ", ID: " + cheque.getId());
-                    chequeService.delete(cheque);
-                    log.info("Deleted cheque: " + oldChequeNumber);
-
-                    String nextChequeNumber = generateNextChequeNumber(oldChequeNumber);
-                    Cheque newCheque = Cheque.builder()
-                            .user(currentUser)
-                            .accountType(AccountType.Cheque)
-                            .balance(0.0)
-                            .createdAt(LocalDateTime.now())
-                            .number(nextChequeNumber)
-                            .passDate(LocalDate.now().plusMonths(1))
-                            .amount(0.0)
-                            .receiver("Available")
-                            .description("Cheque #" + nextChequeNumber)
-                            .build();
-                    log.info("Creating new cheque: " + nextChequeNumber);
-                    chequeService.save(newCheque);
-                    currentChequeNumber = nextChequeNumber;
-
-                    Transaction transaction = Transaction.builder()
-                            .sourceAccount(cheque)
-                            .destinationAccount(receiverCard)
-                            .amount(amount)
-                            .transactionType(TransactionType.Transfer)
-                            .transactionTime(LocalDateTime.now())
-                            .description("Cheque #" + oldChequeNumber + " cashed to " + receiverCardNumber)
-                            .build();
-                    transactionService.save(transaction);
-
-                    showInfo("Cheque " + oldChequeNumber + " cashed for " + amount + " to " + receiverCardNumber +
-                            ", replaced with " + nextChequeNumber);
                 }
+                return null;
             }
+        };
+
+        manageChequesTask.setOnSucceeded(event -> {
             populateDashboard();
             loadTransactionHistory();
             loadTransactionChart();
-        } catch (Exception e) {
-            log.error("Error managing cheques", e);
-            showError("Failed to manage cheques: " + e.getMessage());
-        }
+            showInfo("Cheques managed successfully");
+        });
+
+        manageChequesTask.setOnFailed(event -> {
+            log.error("Error managing cheques", manageChequesTask.getException());
+            showError("Failed to manage cheques: " + manageChequesTask.getException().getMessage());
+        });
+
+        new Thread(manageChequesTask).start();
     }
 
     private void useChequeForPurchase() {
@@ -732,8 +808,13 @@ public class MainAppController implements Initializable {
     }
 
     private void printTransactions() {
-        transactionData.forEach(t -> System.out.println(t.getDescription() + " - " + t.getAmount()));
-        showInfo("Transactions printed to console");
+
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        String jsonOutput = gson.toJson(transactionData);
+        System.out.println("Transactions in JSON format:\n" + jsonOutput);
+        showInfo("Transactions printed to console as JSON");
     }
 
     private void showError(String message) {

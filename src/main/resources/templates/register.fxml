@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <!-- Import URL for stylesheets -->
@@ -34,7 +35,10 @@
                 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="680.0">
 
                     <children>
-                        <Text layoutX="113.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="New Account Registration" textAlignment="CENTER" />
+                        <Text layoutX="73.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="New Account Registration" textAlignment="CENTER">
+                     <font>
+                        <Font name="Arial Rounded MT Bold" size="21.0" />
+                     </font></Text>
                         <Text layoutX="44.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="First Name" />
                         <Text layoutX="229.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Last Name" />
                         <TextField fx:id="firstNameTxt" layoutX="44.0" layoutY="89.0" prefHeight="25.0" prefWidth="138.0" styleClass="text-field" />
@@ -51,10 +55,10 @@
                         <Line endX="227.20001220703125" layoutX="144.0" layoutY="304.0" startX="-100.0" />
                         <Text layoutX="213.0" layoutY="324.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Password" />
                         <TextField fx:id="passwordTxt" layoutX="213.0" layoutY="330.0" prefHeight="25.0" prefWidth="159.0" styleClass="text-field" />
-                        <Button fx:id="registerBtn" layoutX="120.0" layoutY="374.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="159.0" styleClass="button" text="Register" />
+                        <Button fx:id="registerBtn" layoutX="120.0" layoutY="378.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="159.0" styleClass="button" text="Register" />
                         <TextField fx:id="addressTxt" layoutX="45.0" layoutY="248.0" prefHeight="25.0" prefWidth="325.0" styleClass="text-field" />
                         <Text layoutX="45.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="label" text="Address " />
-                  <ImageView fitHeight="335.0" fitWidth="283.0" layoutX="383.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="307.0" fitWidth="307.0" layoutX="367.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/manager.png" />
                      </image>
@@ -153,9 +157,14 @@
                         <Label layoutX="168.0" layoutY="417.0" text="Cheque :" />
                         <TextField fx:id="chartPercentCard" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
                         <TextField fx:id="chartPercentCheque" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
-                  <ImageView fitHeight="257.0" fitWidth="293.0" layoutX="381.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="257.0" fitWidth="293.0" layoutX="382.0" layoutY="-23.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/bank.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="272.0" fitWidth="275.0" layoutX="374.0" layoutY="196.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/dashboard.png" />
                      </image>
                   </ImageView>
                     </children>

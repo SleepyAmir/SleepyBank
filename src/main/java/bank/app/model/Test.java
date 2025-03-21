@@ -15,7 +15,6 @@ public class Test extends Application {
         log.info("Starting application, loading login.fxml...");
         Parent root = FXMLLoader.load(getClass().getResource("/templates/login.fxml"));
         log.info("login.fxml loaded successfully");
-
         Scene scene = new Scene(root);
         primaryStage.setTitle("SleepyBank - Register");
         primaryStage.setScene(scene);

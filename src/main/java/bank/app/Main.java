@@ -5,26 +5,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j;
 
+@Log4j
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Load the login FXML file from src/main/resources/templates
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
-        Parent root = loader.load();
-
-        // Set up the scene
-        Scene scene = new Scene(root, 289, 280); // Size from your login.fxml
+        log.info("Starting application, loading login.fxml...");
+        Parent root = FXMLLoader.load(getClass().getResource("/templates/login.fxml"));
+        log.info("login.fxml loaded successfully");
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("SleepyBank - Register");
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Sleepy Bank Login");
         primaryStage.setResizable(false);
-
-        // Show the stage
         primaryStage.show();
+        log.info("Login window displayed");
     }
 
     public static void main(String[] args) {
+        log.info("Launching JavaFX application");
         launch(args);
     }
 }

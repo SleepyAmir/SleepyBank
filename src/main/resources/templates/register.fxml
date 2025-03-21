@@ -144,10 +144,10 @@
                             <children>
                                 <Label text="Total Users" GridPane.rowIndex="1" />
                                 <Label text="Total Balance:" />
-                                <TextField fx:id="totalBalanceTxt" GridPane.columnIndex="1" />
-                                <TextField fx:id="totalUsersTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <TextField fx:id="totalBalanceTxt" editable="false" GridPane.columnIndex="1" />
+                                <TextField fx:id="totalUsersTxt" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                 <Label text="New Users Today:" GridPane.rowIndex="2" />
-                                <TextField fx:id="newUsersTodayTxt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField fx:id="newUsersTodayTxt" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                             </children>
                         </GridPane>
                         <Separator layoutX="332.0" orientation="VERTICAL" prefHeight="468.0" prefWidth="6.0" />
@@ -155,8 +155,8 @@
                         <PieChart fx:id="pieCHart" layoutX="19.0" layoutY="163.0" prefHeight="244.0" prefWidth="293.0" />
                         <Label layoutX="59.0" layoutY="417.0" text="Card : " />
                         <Label layoutX="168.0" layoutY="417.0" text="Cheque :" />
-                        <TextField fx:id="chartPercentCard" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
-                        <TextField fx:id="chartPercentCheque" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
+                        <TextField fx:id="chartPercentCard" editable="false" layoutX="97.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
+                        <TextField fx:id="chartPercentCheque" editable="false" layoutX="219.0" layoutY="413.0" prefHeight="25.0" prefWidth="43.0" />
                   <ImageView fitHeight="257.0" fitWidth="293.0" layoutX="382.0" layoutY="-23.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/bank.png" />

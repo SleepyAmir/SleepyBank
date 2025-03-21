@@ -17,7 +17,7 @@ public class Test extends Application {
         log.info("login.fxml loaded successfully");
 
         Scene scene = new Scene(root);
-        primaryStage.setTitle("SecureBank - Register");
+        primaryStage.setTitle("SleepyBank - Register");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

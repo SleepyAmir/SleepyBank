@@ -156,10 +156,10 @@
                   <Label layoutX="21.0" layoutY="450.0" text="Description :" />
                   <TextField fx:id="chequeDescriptionTxt" layoutX="89.0" layoutY="446.0" prefHeight="25.0" prefWidth="393.0" />
                   <Label layoutX="292.0" layoutY="408.0" text="Pass Date:" />
-                  <DatePicker fx:id="chequeDate" layoutX="352.0" layoutY="404.0" prefHeight="25.0" prefWidth="132.0" />
+                  <DatePicker fx:id="chequeDate" layoutX="350.0" layoutY="404.0" prefHeight="25.0" prefWidth="132.0" />
                   <ImageView fx:id="byCardPng" fitHeight="150.0" fitWidth="200.0" layoutX="460.0" layoutY="85.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../images/credit%20card.png" />
+                        <Image url="@../images/creditcard.png" />
                      </image>
                   </ImageView>
                   <ImageView fx:id="byChequePng" fitHeight="180.0" fitWidth="206.0" layoutX="445.0" layoutY="291.0" pickOnBounds="true" preserveRatio="true">
@@ -223,7 +223,7 @@
                   <Button fx:id="editBtn" layoutX="397.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Edit" />
                   <ImageView fitHeight="256.0" fitWidth="295.0" layoutX="339.0" layoutY="229.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../images/personal%20info.png" />
+                        <Image url="@../images/personalinfo.png" />
                      </image>
                   </ImageView>
                   <Text layoutX="323.0" layoutY="221.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Click on Edit button and after the changes " wrappingWidth="331.482421875" />

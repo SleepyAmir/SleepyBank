@@ -20,8 +20,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j;
+import javafx.scene.image.ImageView;
 
-import javax.swing.text.html.ImageView;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,8 +61,7 @@ public class MainAppController implements Initializable {
     @FXML private TextField savingBalanceTxt;
     @FXML private TextField interestRateTxt;
     @FXML private Button savingTransferTxt;
-    @FXML private ImageView byChequePng,byCardPng;
-
+    @FXML private ImageView byChequePng, byCardPng;
     @FXML private TextField cardNumberTxt1;
     @FXML private TextField cvvTxt1;
     @FXML private TextField expiryTxt1;
@@ -390,7 +389,7 @@ public class MainAppController implements Initializable {
         transferCvvTxt.setDisable(!enable);
         transferAmountTxt.setDisable(!enable);
         receiverNumberTxt.setDisable(!enable);
-        byCardPng.isVisible();
+        byCardPng.setVisible(enable);
     }
 
     private void enableChequeFields(boolean enable) {
@@ -401,7 +400,7 @@ public class MainAppController implements Initializable {
         chequeDate.setDisable(!enable);
         issueChequeBtn.setDisable(!enable);
         cancelChequeBtn.setDisable(!enable);
-        byChequePng.isVisible();
+        byChequePng.setVisible(enable);
     }
 
     private void populateChequeField() {

@@ -9,9 +9,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserRepository implements Repository<User, Integer>, AutoCloseable { // Explicitly implement AutoCloseable
+public class UserRepository implements Repository<User, Integer>, AutoCloseable {
     private Connection connection;
-    private PreparedStatement statement;
 
     public UserRepository() throws Exception {
         this.connection = ConnectionProvider.getConnectionProvider().getConnection();
@@ -81,48 +80,54 @@ public class UserRepository implements Repository<User, Integer>, AutoCloseable 
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM USERS ORDER BY LASTNAME, FIRSTNAME");
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                User user = User.builder()
-                        .id(resultSet.getInt("USER_ID"))
-                        .firstName(resultSet.getString("FIRSTNAME"))
-                        .lastName(resultSet.getString("LASTNAME"))
-                        .email(resultSet.getString("EMAIL"))
-                        .phone(resultSet.getString("PHONE"))
-                        .address(resultSet.getString("ADDRESS"))
-                        .birthDate(resultSet.getDate("BIRTH_DATE") != null ? resultSet.getDate("BIRTH_DATE").toLocalDate() : null)
-                        .username(resultSet.getString("USERNAME"))
-                        .password(resultSet.getString("PASSWORD"))
-                        .role(Role.valueOf(resultSet.getString("ROLE_NAME")))
-                        .active(resultSet.getInt("IS_ACTIVE") == 1)
-                        .registrationDate(resultSet.getDate("REGISTRATION_DATE") != null ? resultSet.getDate("REGISTRATION_DATE").toLocalDate() : null)
-                        .build();
-                userList.add(user);
+                userList.add(mapResultSetToUser(resultSet));
             }
         }
         return userList;
     }
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        return User.builder()
+                .id(rs.getInt("USER_ID"))
+                .firstName(rs.getString("FIRSTNAME"))
+                .lastName(rs.getString("LASTNAME"))
+                .email(rs.getString("EMAIL"))
+                .phone(rs.getString("PHONE"))
+                .address(rs.getString("ADDRESS"))
+                .birthDate(rs.getDate("BIRTH_DATE") != null ? rs.getDate("BIRTH_DATE").toLocalDate() : null)
+                .username(rs.getString("USERNAME"))
+                .password(rs.getString("PASSWORD"))
+                .role(Role.valueOf(rs.getString("ROLE_NAME")))
+                .active(rs.getInt("IS_ACTIVE") == 1)
+                .registrationDate(rs.getDate("REGISTRATION_DATE") != null ? rs.getDate("REGISTRATION_DATE").toLocalDate() : null)
+                .build();
+    }
+
+    public User findByUsernameAndPassword(String username, String password) throws Exception {
+        String query = "SELECT * FROM USERS WHERE USERNAME=? AND PASSWORD=? AND IS_ACTIVE=1";
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUser(rs); // Assume this method maps ResultSet to User
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new Exception("Database error during authentication: " + e.getMessage(), e);
+        }
+    }
+
 
     @Override
     public User findById(Integer id) throws Exception {
         String query = "SELECT * FROM USERS WHERE USER_ID=?";
-        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return User.builder()
-                            .id(rs.getInt("USER_ID"))
-                            .firstName(rs.getString("FIRSTNAME"))
-                            .lastName(rs.getString("LASTNAME"))
-                            .email(rs.getString("EMAIL"))
-                            .phone(rs.getString("PHONE"))
-                            .address(rs.getString("ADDRESS"))
-                            .birthDate(rs.getDate("BIRTH_DATE") != null ? rs.getDate("BIRTH_DATE").toLocalDate() : null)
-                            .username(rs.getString("USERNAME"))
-                            .password(rs.getString("PASSWORD"))
-                            .role(Role.valueOf(rs.getString("ROLE_NAME")))
-                            .active(rs.getInt("IS_ACTIVE") == 1)
-                            .registrationDate(rs.getDate("REGISTRATION_DATE") != null ? rs.getDate("REGISTRATION_DATE").toLocalDate() : null)
-                            .build();
+                    return mapResultSetToUser(rs);
                 }
                 return null;
             }
@@ -131,7 +136,8 @@ public class UserRepository implements Repository<User, Integer>, AutoCloseable 
 
     @Override
     public void close() throws Exception {
-        if (statement != null && !statement.isClosed()) statement.close();
-        if (connection != null && !connection.isClosed()) connection.close();
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
     }
 }

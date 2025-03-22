@@ -5,26 +5,28 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import lombok.extern.log4j.Log4j;
+import org.apache.log4j.Logger;
 
-@Log4j
 public class Test extends Application {
+    private static final Logger logger = Logger.getLogger(Test.class);
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        log.info("Starting application, loading login.fxml...");
-        Parent root = FXMLLoader.load(getClass().getResource("/templates/login.fxml"));
-        log.info("login.fxml loaded successfully");
-        Scene scene = new Scene(root);
-        primaryStage.setTitle("SleepyBank - Register");
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+        logger.info("Starting application, loading login.fxml...");
+        // Load the FXML file from the resources root
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
+        if (loader.getLocation() == null) {
+            logger.error("FXML file location is null. Check if login.fxml exists in src/main/resources/");
+            throw new IllegalStateException("Unable to find login.fxml in resources");
+        }
+        Parent root = loader.load();
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle("Sleepy Bank Login");
         primaryStage.show();
-        log.info("Login window displayed");
     }
 
     public static void main(String[] args) {
-        log.info("Launching JavaFX application");
+        logger.info("Launching JavaFX application");
         launch(args);
     }
 }

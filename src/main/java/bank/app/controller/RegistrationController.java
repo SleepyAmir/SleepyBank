@@ -1,14 +1,7 @@
 package bank.app.controller;
 
-import bank.app.model.entity.Card;
-import bank.app.model.entity.Cheque;
-import bank.app.model.entity.Transaction;
 import bank.app.model.entity.User;
 import bank.app.model.entity.enums.Role;
-import bank.app.model.service.CardService;
-import bank.app.model.service.ChequeService;
-import bank.app.model.service.TransactionService;
-import bank.app.model.service.UserService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,14 +12,12 @@ import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RegistrationController {
 
@@ -73,27 +64,25 @@ public class RegistrationController {
     @FXML private PieChart pieCHart;
     @FXML private TextField chartPercentCard;
     @FXML private TextField chartPercentCheque;
-    @FXML private WebView webView;
 
-    private UserService userService;
-    private CardService cardService;
-    private TransactionService transactionService;
-    private ChequeService chequeService;
+    private final UserManager userManager;
+    private final DashboardService dashboardService;
     private ObservableList<User> userData;
 
+    // Constructor for dependency injection
+    public RegistrationController(UserManager userManager, DashboardService dashboardService) {
+        this.userManager = userManager;
+        this.dashboardService = dashboardService;
+    }
     @FXML
     private void initialize() {
-        userService = new UserService();
-        cardService = new CardService();
-        transactionService = new TransactionService();
-        chequeService = new ChequeService();
         userData = FXCollections.observableArrayList();
+        setupUsersTable();
 
         // Register Tab
         registerBtn.setOnAction(event -> handleRegister());
 
         // Users Tab
-        setupUsersTable();
         loadUsers();
         saveBtn.setOnAction(event -> handleSaveUser());
         editBtn.setOnAction(event -> handleEditUser());
@@ -102,13 +91,11 @@ public class RegistrationController {
         filterBtn.setOnAction(event -> filterUsers());
         addSearchListeners();
 
-        // Populate text fields when a user is selected in the table
+        // Populate text fields when a user is selected
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null && !userData.isEmpty()) {
-                System.out.println("Selected user: " + newSelection.getUsername());
                 populateTextFields(newSelection);
             } else if (userData.isEmpty()) {
-                System.out.println("No users available to select.");
                 clearSearchFields();
             }
         });
@@ -124,42 +111,44 @@ public class RegistrationController {
     // Register Tab Logic
     private void handleRegister() {
         try {
-            String firstName = firstNameTxt.getText().trim();
-            String lastName = lastNameTxt.getText().trim();
-            String email = emailTxt.getText().trim();
-            String phone = phoneNumberTxt.getText().trim();
-            String address = addressTxt.getText().trim();
-            LocalDate birthDateValue = birthDate.getValue();
-            String username = usernameTxt.getText().trim();
-            String password = passwordTxt.getText().trim();
-
-            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phone.isEmpty() ||
-                    address.isEmpty() || birthDateValue == null || username.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Error", "All fields are required");
-                return;
-            }
-
-            User user = User.builder()
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .email(email)
-                    .phone(phone)
-                    .address(address)
-                    .birthDate(birthDateValue)
-                    .username(username)
-                    .password(password)
-                    .role(Role.Customer)
-                    .active(true)
-                    .build();
-
-            userService.save(user);
+            User user = buildUserFromRegisterFields();
+            if (user == null) return;
+            userManager.saveUser(user);
             showAlert(Alert.AlertType.INFORMATION, "Success", "Registration successful! Please log in.");
             loadView("/templates/login.fxml", "Sleepy Bank Login");
-
         } catch (Exception e) {
-            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Registration failed: " + e.getMessage());
         }
+    }
+
+    private User buildUserFromRegisterFields() {
+        String firstName = firstNameTxt.getText().trim();
+        String lastName = lastNameTxt.getText().trim();
+        String email = emailTxt.getText().trim();
+        String phone = phoneNumberTxt.getText().trim();
+        String address = addressTxt.getText().trim();
+        LocalDate birthDateValue = birthDate.getValue();
+        String username = usernameTxt.getText().trim();
+        String password = passwordTxt.getText().trim();
+
+        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phone.isEmpty() ||
+                address.isEmpty() || birthDateValue == null || username.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Error", "All fields are required");
+            return null;
+        }
+
+        return User.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .phone(phone)
+                .address(address)
+                .birthDate(birthDateValue)
+                .username(username)
+                .password(password)
+                .role(Role.Customer)
+                .active(true)
+                .build();
     }
 
     // Users Tab Logic
@@ -176,10 +165,7 @@ public class RegistrationController {
         Platform.runLater(() -> {
             try {
                 usersTable.getSelectionModel().clearSelection();
-                userData.clear();
-                List<User> users = userService.findAll();
-                System.out.println("Loading users: " + users.size());
-                userData.addAll(users);
+                userData.setAll(userManager.findAllUsers());
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to load users: " + e.getMessage());
             }
@@ -201,7 +187,7 @@ public class RegistrationController {
         try {
             User newUser = buildUserFromSearchFields();
             if (newUser == null) return;
-            userService.save(newUser);
+            userManager.saveUser(newUser);
             loadUsers();
             clearSearchFields();
             showAlert(Alert.AlertType.INFORMATION, "Success", "User saved successfully");
@@ -216,13 +202,12 @@ public class RegistrationController {
             showAlert(Alert.AlertType.WARNING, "Warning", "Please select a user to edit");
             return;
         }
-
         try {
             User updatedUser = buildUserFromSearchFields();
             if (updatedUser == null) return;
             updatedUser.setId(selectedUser.getId());
             updatedUser.setRegistrationDate(selectedUser.getRegistrationDate());
-            userService.edit(updatedUser);
+            userManager.editUser(updatedUser);
             loadUsers();
             clearSearchFields();
             showAlert(Alert.AlertType.INFORMATION, "Success", "User updated successfully");
@@ -237,20 +222,18 @@ public class RegistrationController {
             showAlert(Alert.AlertType.WARNING, "Warning", "Please select a user to remove");
             return;
         }
-
-        // Confirm deletion with user
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirm Deletion");
         confirmation.setHeaderText("Delete User: " + selectedUser.getUsername());
-        confirmation.setContentText("This will also delete all related cards, transactions, and cheques. Proceed?");
+        confirmation.setContentText("This will also delete all related records. Proceed?");
         Optional<ButtonType> result = confirmation.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                userService.remove(selectedUser.getId());
+                userManager.removeUser(selectedUser.getId());
                 loadUsers();
                 clearSearchFields();
-                showAlert(Alert.AlertType.INFORMATION, "Success", "User and related records removed successfully");
+                showAlert(Alert.AlertType.INFORMATION, "Success", "User removed successfully");
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to remove user: " + e.getMessage());
             }
@@ -258,10 +241,29 @@ public class RegistrationController {
     }
 
     private void handleReload() {
-        System.out.println("Reloading users table...");
         loadUsers();
         clearSearchFields();
         showAlert(Alert.AlertType.INFORMATION, "Reload", "Users table reloaded successfully");
+    }
+
+    private void filterUsers() {
+        Platform.runLater(() -> {
+            try {
+                List<User> filtered = userManager.filterUsers(
+                        firstNameSearchTxt.getText(),
+                        lastNameSearchTxt.getText(),
+                        phoneNumberSearchTxt.getText(),
+                        emailSearchTxt.getText(),
+                        dateOfBirthSearchTxt.getValue(),
+                        addressSearchTxt.getText(),
+                        userNameSearchTxt.getText(),
+                        passwordSearchTxt.getText()
+                );
+                userData.setAll(filtered);
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to filter users: " + e.getMessage());
+            }
+        });
     }
 
     private User buildUserFromSearchFields() {
@@ -276,7 +278,7 @@ public class RegistrationController {
 
         if (firstName.isEmpty() || lastName.isEmpty() || phone.isEmpty() || email.isEmpty() ||
                 address.isEmpty() || birthDate == null || username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "All fields are required to save/edit a user");
+            showAlert(Alert.AlertType.ERROR, "Error", "All fields are required");
             return null;
         }
 
@@ -299,40 +301,6 @@ public class RegistrationController {
         firstnameFindTxt.textProperty().addListener((obs, old, newVal) -> filterUsers());
     }
 
-    private void filterUsers() {
-        Platform.runLater(() -> {
-            try {
-                usersTable.getSelectionModel().clearSelection();
-                List<User> allUsers = userService.findAll();
-                List<User> filtered = allUsers.stream()
-                        .filter(u -> matchesField(u.getFirstName(), firstNameSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getLastName(), lastNameSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getPhone(), phoneNumberSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getEmail(), emailSearchTxt.getText()))
-                        .filter(u -> matchesDate(u.getBirthDate(), dateOfBirthSearchTxt.getValue()))
-                        .filter(u -> matchesField(u.getAddress(), addressSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getUsername(), userNameSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getPassword(), passwordSearchTxt.getText()))
-                        .filter(u -> matchesField(u.getUsername(), usernameFindTxt.getText()))
-                        .filter(u -> matchesField(u.getFirstName(), firstnameFindTxt.getText()))
-                        .collect(Collectors.toList());
-                userData.clear();
-                userData.addAll(filtered);
-                System.out.println("Filtered users: " + filtered.size());
-            } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to filter users: " + e.getMessage());
-            }
-        });
-    }
-
-    private boolean matchesField(String value, String filter) {
-        return filter.isEmpty() || (value != null && value.toLowerCase().contains(filter.toLowerCase()));
-    }
-
-    private boolean matchesDate(LocalDate value, LocalDate filter) {
-        return filter == null || (value != null && value.equals(filter));
-    }
-
     private void clearSearchFields() {
         firstNameSearchTxt.clear();
         lastNameSearchTxt.clear();
@@ -346,51 +314,22 @@ public class RegistrationController {
         firstnameFindTxt.clear();
     }
 
+    // Admin Dashboard Logic
     private void populateAdminDashboard() {
-        System.out.println("Populating Admin Dashboard...");
         try {
-            List<User> users = userService.findAll();
-            System.out.println("Total Users: " + users.size());
-            totalUsersTxt.setText(String.valueOf(users.size()));
-
-            List<Card> cards = cardService.findAll();
-            System.out.println("Total Cards: " + cards.size());
-            double totalBalance = cards.stream().mapToDouble(Card::getBalance).sum();
-            totalBalanceTxt.setText(String.format("%.2f", totalBalance));
-
-            LocalDate today = LocalDate.now();
-            long newUsersToday = users.stream()
-                    .filter(u -> u.getRegistrationDate() != null && u.getRegistrationDate().equals(today))
-                    .count();
-            System.out.println("New Users Today: " + newUsersToday);
-            newUsersTodayTxt.setText(String.valueOf(newUsersToday));
-
-            List<Transaction> transactions = transactionService.findAll();
-            System.out.println("Total Transactions: " + transactions.size());
-            long cardTransactions = transactions.size();
-            List<Cheque> cheques = chequeService.findAll();
-            System.out.println("Total Cheques: " + cheques.size());
-            long chequeTransactions = cheques.stream()
-                    .filter(c -> !c.getReceiver().equals("Available"))
-                    .count();
-
-            long totalTransactions = cardTransactions + chequeTransactions;
-            double cardPercent = totalTransactions > 0 ? (cardTransactions * 100.0 / totalTransactions) : 0;
-            double chequePercent = totalTransactions > 0 ? (chequeTransactions * 100.0 / totalTransactions) : 0;
-
-            System.out.println("Card Percent: " + cardPercent + ", Cheque Percent: " + chequePercent);
-            chartPercentCard.setText(String.format("%.1f%%", cardPercent));
-            chartPercentCheque.setText(String.format("%.1f%%", chequePercent));
-
+            totalUsersTxt.setText(String.valueOf(dashboardService.getTotalUsers()));
+            totalBalanceTxt.setText(String.format("%.2f", dashboardService.getTotalBalance()));
+            newUsersTodayTxt.setText(String.valueOf(dashboardService.getNewUsersToday()));
+            double[] distribution = dashboardService.getTransactionDistribution();
+            chartPercentCard.setText(String.format("%.1f%%", distribution[0]));
+            chartPercentCheque.setText(String.format("%.1f%%", distribution[1]));
             ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-                    new PieChart.Data("Card", cardPercent),
-                    new PieChart.Data("Cheque", chequePercent)
+                    new PieChart.Data("Card", distribution[0]),
+                    new PieChart.Data("Cheque", distribution[1])
             );
             pieCHart.setData(pieChartData);
             pieCHart.setTitle("Transaction Distribution");
-
         } catch (Exception e) {
-            System.out.println("Admin Dashboard Error: " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load admin dashboard: " + e.getMessage());
         }
     }

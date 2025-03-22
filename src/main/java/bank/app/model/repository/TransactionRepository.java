@@ -10,59 +10,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionRepository implements Repository<Transaction, Integer>, AutoCloseable {
-    private Connection connection;
-
-    public TransactionRepository() throws Exception {
-        this.connection = ConnectionProvider.getConnectionProvider().getConnection();
-    }
-
     @Override
     public void save(Transaction transaction) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO TRANSACTIONS (ID, SOURCE_ACCOUNT, DESTINATION_ACCOUNT, AMOUNT, TRANSACTION_TYPE, TRANSACTION_TIME, DESCRIPTION) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO TRANSACTIONS (ID, SOURCE_ACCOUNT, DESTINATION_ACCOUNT, AMOUNT, TRANSACTION_TYPE, TRANSACTION_TIME, DESCRIPTION) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
             int newId = ConnectionProvider.getConnectionProvider().nextId("transaction_seq");
-            System.out.println("Generated Transaction ID: " + newId);
-            transaction.setId(newId);
-            statement.setInt(1, newId);
-            statement.setInt(2, transaction.getSourceAccount().getId());
-            statement.setInt(3, transaction.getDestinationAccount().getId());
-            statement.setDouble(4, transaction.getAmount());
-            statement.setString(5, transaction.getTransactionType().name());
-            statement.setTimestamp(6, Timestamp.valueOf(transaction.getTransactionTime() != null ? transaction.getTransactionTime() : LocalDateTime.now()));
-            statement.setString(7, transaction.getDescription());
-            statement.executeUpdate();
+            transaction.setId(newId); // Assumes setter exists; adjust if using immutable builder
+            stmt.setInt(1, newId);
+            stmt.setInt(2, transaction.getSourceAccount().getId());
+            stmt.setInt(3, transaction.getDestinationAccount().getId());
+            stmt.setDouble(4, transaction.getAmount());
+            stmt.setString(5, transaction.getTransactionType().name());
+            stmt.setTimestamp(6, Timestamp.valueOf(transaction.getTransactionTime() != null ? transaction.getTransactionTime() : LocalDateTime.now()));
+            stmt.setString(7, transaction.getDescription());
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public void edit(Transaction transaction) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "UPDATE TRANSACTIONS SET SOURCE_ACCOUNT=?, DESTINATION_ACCOUNT=?, AMOUNT=?, TRANSACTION_TYPE=?, TRANSACTION_TIME=?, DESCRIPTION=? " +
-                        "WHERE ID=?")) {
-            statement.setInt(1, transaction.getSourceAccount().getId());
-            statement.setInt(2, transaction.getDestinationAccount().getId());
-            statement.setDouble(3, transaction.getAmount());
-            statement.setString(4, transaction.getTransactionType().name());
-            statement.setTimestamp(5, Timestamp.valueOf(transaction.getTransactionTime()));
-            statement.setString(6, transaction.getDescription());
-            statement.setInt(7, transaction.getId());
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE TRANSACTIONS SET SOURCE_ACCOUNT=?, DESTINATION_ACCOUNT=?, AMOUNT=?, TRANSACTION_TYPE=?, TRANSACTION_TIME=?, DESCRIPTION=? " +
+                             "WHERE ID=?")) {
+            stmt.setInt(1, transaction.getSourceAccount().getId());
+            stmt.setInt(2, transaction.getDestinationAccount().getId());
+            stmt.setDouble(3, transaction.getAmount());
+            stmt.setString(4, transaction.getTransactionType().name());
+            stmt.setTimestamp(5, Timestamp.valueOf(transaction.getTransactionTime()));
+            stmt.setString(6, transaction.getDescription());
+            stmt.setInt(7, transaction.getId());
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public void remove(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM TRANSACTIONS WHERE ID=?")) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM TRANSACTIONS WHERE ID=?")) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public List<Transaction> findAll() throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM TRANSACTIONS");
-             ResultSet rs = statement.executeQuery()) {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM TRANSACTIONS");
+             ResultSet rs = stmt.executeQuery()) {
             List<Transaction> transactions = new ArrayList<>();
             CardRepository cardRepo = new CardRepository();
             while (rs.next()) {
@@ -83,9 +80,10 @@ public class TransactionRepository implements Repository<Transaction, Integer>, 
 
     @Override
     public Transaction findById(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM TRANSACTIONS WHERE ID=?")) {
-            statement.setInt(1, id);
-            ResultSet rs = statement.executeQuery();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM TRANSACTIONS WHERE ID=?")) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 CardRepository cardRepo = new CardRepository();
                 return Transaction.builder()
@@ -104,8 +102,6 @@ public class TransactionRepository implements Repository<Transaction, Integer>, 
 
     @Override
     public void close() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        // No-op since connections are managed per method
     }
 }

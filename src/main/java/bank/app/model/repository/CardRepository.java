@@ -11,63 +11,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardRepository implements Repository<Card, Integer>, AutoCloseable {
-    private Connection connection;
-
-    public CardRepository() throws Exception {
-        this.connection = ConnectionProvider.getConnectionProvider().getConnection();
-    }
     @Override
     public void save(Card card) throws Exception {
         Card existingCard = findByCardNumber(card.getCardNumber());
         if (existingCard != null) {
-            // Update existing card
-            card.setId(existingCard.getId()); // Preserve original ID
+            card.setId(existingCard.getId());
             edit(card);
         } else {
-            // Insert new card
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO CARD (ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CARD_NUMBER, CVV2, EXPIRY_DATE, U_ID) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+            try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO CARD (ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CARD_NUMBER, CVV2, EXPIRY_DATE, U_ID) " +
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
                 int newId = ConnectionProvider.getConnectionProvider().nextId("card_seq");
                 card.setId(newId);
-                statement.setInt(1, newId);
-                statement.setString(2, card.getAccountType().name());
-                statement.setDouble(3, card.getBalance());
-                statement.setTimestamp(4, Timestamp.valueOf(card.getCreatedAt() != null ? card.getCreatedAt() : LocalDateTime.now()));
-                statement.setString(5, card.getCardNumber());
-                statement.setString(6, card.getCvv2());
-                statement.setDate(7, Date.valueOf(card.getExpiryDate()));
-                statement.setInt(8, card.getUser().getId());
-                statement.executeUpdate();
+                stmt.setInt(1, newId);
+                stmt.setString(2, card.getAccountType().name());
+                stmt.setDouble(3, card.getBalance());
+                stmt.setTimestamp(4, Timestamp.valueOf(card.getCreatedAt() != null ? card.getCreatedAt() : LocalDateTime.now()));
+                stmt.setString(5, card.getCardNumber());
+                stmt.setString(6, card.getCvv2());
+                stmt.setDate(7, Date.valueOf(card.getExpiryDate()));
+                stmt.setInt(8, card.getUser().getId());
+                stmt.executeUpdate();
             }
         }
     }
 
     @Override
     public void edit(Card card) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "UPDATE CARD SET ACCOUNT_TYPE=?, BALANCE=?, CREATED_AT=?, CARD_NUMBER=?, CVV2=?, EXPIRY_DATE=?, U_ID=? " +
-                        "WHERE ID=?")) {
-            statement.setString(1, card.getAccountType().name());
-            statement.setDouble(2, card.getBalance());
-            statement.setTimestamp(3, Timestamp.valueOf(card.getCreatedAt()));
-            statement.setString(4, card.getCardNumber());
-            statement.setString(5, card.getCvv2());
-            statement.setDate(6, Date.valueOf(card.getExpiryDate()));
-            statement.setInt(7, card.getUser().getId());
-            statement.setInt(8, card.getId());
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE CARD SET ACCOUNT_TYPE=?, BALANCE=?, CREATED_AT=?, CARD_NUMBER=?, CVV2=?, EXPIRY_DATE=?, U_ID=? " +
+                             "WHERE ID=?")) {
+            stmt.setString(1, card.getAccountType().name());
+            stmt.setDouble(2, card.getBalance());
+            stmt.setTimestamp(3, Timestamp.valueOf(card.getCreatedAt()));
+            stmt.setString(4, card.getCardNumber());
+            stmt.setString(5, card.getCvv2());
+            stmt.setDate(6, Date.valueOf(card.getExpiryDate()));
+            stmt.setInt(7, card.getUser().getId());
+            stmt.setInt(8, card.getId());
+            stmt.executeUpdate();
         }
     }
 
-    // Add helper method to check if card exists
     public Card findByCardNumber(String cardNumber) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM CARD WHERE CARD_NUMBER=?")) {
-            statement.setString(1, cardNumber);
-            ResultSet rs = statement.executeQuery();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CARD WHERE CARD_NUMBER=?")) {
+            stmt.setString(1, cardNumber);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                UserRepository userRepo = new UserRepository();
+                UserRepository userRepo = new UserRepository(); // Ideally, inject this dependency
                 Card card = new Card();
                 card.setId(rs.getInt("ID"));
                 card.setAccountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")));
@@ -85,18 +79,20 @@ public class CardRepository implements Repository<Card, Integer>, AutoCloseable 
 
     @Override
     public void remove(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM CARD WHERE ID=?")) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM CARD WHERE ID=?")) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public List<Card> findAll() throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM CARD");
-             ResultSet rs = statement.executeQuery()) {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CARD");
+             ResultSet rs = stmt.executeQuery()) {
             List<Card> cards = new ArrayList<>();
-            UserRepository userRepo = new UserRepository();
+            UserRepository userRepo = new UserRepository(); // Inject this in production
             while (rs.next()) {
                 Card card = new Card();
                 card.setId(rs.getInt("ID"));
@@ -115,11 +111,12 @@ public class CardRepository implements Repository<Card, Integer>, AutoCloseable 
 
     @Override
     public Card findById(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM CARD WHERE ID=?")) {
-            statement.setInt(1, id);
-            ResultSet rs = statement.executeQuery();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CARD WHERE ID=?")) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                UserRepository userRepo = new UserRepository();
+                UserRepository userRepo = new UserRepository(); // Inject this
                 Card card = new Card();
                 card.setId(rs.getInt("ID"));
                 card.setAccountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")));
@@ -137,8 +134,6 @@ public class CardRepository implements Repository<Card, Integer>, AutoCloseable 
 
     @Override
     public void close() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        // No-op since connections are managed per method
     }
 }

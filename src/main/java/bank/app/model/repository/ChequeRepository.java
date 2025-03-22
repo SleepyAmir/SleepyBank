@@ -11,63 +11,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChequeRepository implements Repository<Cheque, Integer>, AutoCloseable {
-    private Connection connection;
-
-    public ChequeRepository() throws Exception {
-        this.connection = ConnectionProvider.getConnectionProvider().getConnection();
-    }
-
     @Override
     public void save(Cheque cheque) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO CHEQUES (ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CHEQUE_NUMBER, PASS_DATE, AMOUNT, RECEIVER, DESCRIPTION, U_ID) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-            cheque.setId(ConnectionProvider.getConnectionProvider().nextId("cheque_seq"));
-            statement.setInt(1, cheque.getId());
-            statement.setString(2, cheque.getAccountType().name());
-            statement.setDouble(3, cheque.getBalance());
-            statement.setTimestamp(4, Timestamp.valueOf(cheque.getCreatedAt() != null ? cheque.getCreatedAt() : LocalDateTime.now()));
-            statement.setString(5, cheque.getNumber());
-            statement.setDate(6, Date.valueOf(cheque.getPassDate()));
-            statement.setDouble(7, cheque.getAmount());
-            statement.setString(8, cheque.getReceiver());
-            statement.setString(9, cheque.getDescription());
-            statement.setInt(10, cheque.getUser().getId());
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO CHEQUES (ID, ACCOUNT_TYPE, BALANCE, CREATED_AT, CHEQUE_NUMBER, PASS_DATE, AMOUNT, RECEIVER, DESCRIPTION, U_ID) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            int newId = ConnectionProvider.getConnectionProvider().nextId("cheque_seq");
+            cheque.setId(newId);
+            stmt.setInt(1, newId);
+            stmt.setString(2, cheque.getAccountType().name());
+            stmt.setDouble(3, cheque.getBalance());
+            stmt.setTimestamp(4, Timestamp.valueOf(cheque.getCreatedAt() != null ? cheque.getCreatedAt() : LocalDateTime.now()));
+            stmt.setString(5, cheque.getNumber());
+            stmt.setDate(6, Date.valueOf(cheque.getPassDate()));
+            stmt.setDouble(7, cheque.getAmount());
+            stmt.setString(8, cheque.getReceiver());
+            stmt.setString(9, cheque.getDescription());
+            stmt.setInt(10, cheque.getUser().getId());
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public void edit(Cheque cheque) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "UPDATE CHEQUES SET ACCOUNT_TYPE=?, BALANCE=?, CREATED_AT=?, CHEQUE_NUMBER=?, PASS_DATE=?, AMOUNT=?, RECEIVER=?, DESCRIPTION=?, U_ID=? " +
-                        "WHERE ID=?")) {
-            statement.setString(1, cheque.getAccountType().name());
-            statement.setDouble(2, cheque.getBalance());
-            statement.setTimestamp(3, Timestamp.valueOf(cheque.getCreatedAt()));
-            statement.setString(4, cheque.getNumber());
-            statement.setDate(5, Date.valueOf(cheque.getPassDate()));
-            statement.setDouble(6, cheque.getAmount());
-            statement.setString(7, cheque.getReceiver());
-            statement.setString(8, cheque.getDescription());
-            statement.setInt(9, cheque.getUser().getId());
-            statement.setInt(10, cheque.getId());
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE CHEQUES SET ACCOUNT_TYPE=?, BALANCE=?, CREATED_AT=?, CHEQUE_NUMBER=?, PASS_DATE=?, AMOUNT=?, RECEIVER=?, DESCRIPTION=?, U_ID=? " +
+                             "WHERE ID=?")) {
+            stmt.setString(1, cheque.getAccountType().name());
+            stmt.setDouble(2, cheque.getBalance());
+            stmt.setTimestamp(3, Timestamp.valueOf(cheque.getCreatedAt()));
+            stmt.setString(4, cheque.getNumber());
+            stmt.setDate(5, Date.valueOf(cheque.getPassDate()));
+            stmt.setDouble(6, cheque.getAmount());
+            stmt.setString(7, cheque.getReceiver());
+            stmt.setString(8, cheque.getDescription());
+            stmt.setInt(9, cheque.getUser().getId());
+            stmt.setInt(10, cheque.getId());
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public void remove(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM CHEQUES WHERE ID=?")) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM CHEQUES WHERE ID=?")) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
         }
     }
 
     @Override
     public List<Cheque> findAll() throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHEQUES");
-             ResultSet rs = statement.executeQuery()) {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES");
+             ResultSet rs = stmt.executeQuery()) {
             List<Cheque> cheques = new ArrayList<>();
             UserRepository userRepo = new UserRepository();
             while (rs.next()) {
@@ -90,12 +89,13 @@ public class ChequeRepository implements Repository<Cheque, Integer>, AutoClosea
 
     @Override
     public Cheque findById(Integer id) throws Exception {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHEQUES WHERE ID=?")) {
-            statement.setInt(1, id);
-            ResultSet rs = statement.executeQuery();
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES WHERE ID=?")) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                Cheque cheque = new Cheque();
                 UserRepository userRepo = new UserRepository();
+                Cheque cheque = new Cheque();
                 cheque.setId(rs.getInt("ID"));
                 cheque.setAccountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")));
                 cheque.setBalance(rs.getDouble("BALANCE"));
@@ -114,8 +114,6 @@ public class ChequeRepository implements Repository<Cheque, Integer>, AutoClosea
 
     @Override
     public void close() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        // No-op since connections are managed per method
     }
 }

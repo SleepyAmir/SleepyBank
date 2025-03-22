@@ -2,14 +2,12 @@ package bank.app.model.service;
 
 import bank.app.model.entity.Card;
 import bank.app.model.repository.CardRepository;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.log4j.Logger;
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 public class CardService {
-    // Remove the instance variable cardRepository to avoid sharing across threads
     private static final Logger log = Logger.getLogger(CardService.class);
 
     public void save(Card card) throws Exception {
@@ -38,7 +36,7 @@ public class CardService {
         }
     }
 
-    public Card findByCardNumber(String cardNumber) throws Exception { // Fixed typo from query
+    public Card findByCardNumber(String cardNumber) throws Exception {
         log.info("Requesting connection for findByCardNumber: " + cardNumber);
         try (CardRepository repo = new CardRepository()) {
             log.info("Connection acquired for findByCardNumber: " + cardNumber);

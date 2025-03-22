@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -14,11 +12,6 @@
 <?import javafx.scene.text.Text?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="311.0" prefWidth="500.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.LoginController">
-
-<!--        <stylesheets>-->
-<!--            <URL value="@/Styles/login.css" />-->
-<!--        </stylesheets>-->
-
     <children>
         <GridPane layoutX="39.0" layoutY="78.0" prefHeight="91.0" prefWidth="202.0">
             <columnConstraints>
@@ -29,24 +22,27 @@
                 <RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="45.600006103515625" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="45.399993896484375" vgrow="SOMETIMES" />
             </rowConstraints>
-            <Label prefHeight="17.0" prefWidth="58.0" text="Username" />
-            <Label text="Password" GridPane.rowIndex="1" />
-            <TextField fx:id="userNameTxt" GridPane.columnIndex="1" />
-            <TextField fx:id="passwordTxt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <children>
+                <Label prefHeight="17.0" prefWidth="58.0" text="Username" />
+                <Label text="Password" GridPane.rowIndex="1" />
+                <TextField fx:id="usernameField" GridPane.columnIndex="1" />
+                <TextField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            </children>
         </GridPane>
-        <Button fx:id="loginBtn" layoutX="37.0" layoutY="189.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" style="-fx-background-color: #003366;" text="Login" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="13.0" />
-         </font></Button>
+        <Button fx:id="loginBtn" onAction="#handleLogin" layoutX="37.0" layoutY="189.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" style="-fx-background-color: #003366;" text="Login" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+        </Button>
         <Text layoutX="66.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sleepy Bank" textAlignment="CENTER">
             <font>
                 <Font name="System Bold" size="26.0" />
             </font>
         </Text>
-        <Hyperlink fx:id="forgotPasswordLink" layoutX="37.0" layoutY="229.0" text="Forgot Password" />
-      <ImageView fx:id="image" fitHeight="275.0" fitWidth="271.0" layoutX="229.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/login.png.png" />
-         </image></ImageView>
+        <ImageView fx:id="image" fitHeight="275.0" fitWidth="271.0" layoutX="229.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/login.png.png" />
+            </image>
+        </ImageView>
     </children>
 </Pane>

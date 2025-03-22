@@ -7,16 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TransactionService {
-    private TransactionRepository transactionRepository;
-
-    {
-        try {
-            transactionRepository = new TransactionRepository();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void save(Transaction transaction) throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {
             repo.save(transaction);
@@ -25,7 +15,7 @@ public class TransactionService {
 
     public void delete(Transaction transaction) throws Exception {
         try (TransactionRepository repo = new TransactionRepository()) {
-            repo.remove(transaction.getId()); // Assuming TransactionRepository has a remove method
+            repo.remove(transaction.getId());
         }
     }
 
@@ -36,9 +26,11 @@ public class TransactionService {
     }
 
     public List<Transaction> findByUserId(int userId) throws Exception {
-        return findAll().stream()
-                .filter(t -> t.getSourceAccount().getUser().getId() == userId ||
-                        t.getDestinationAccount().getUser().getId() == userId)
-                .collect(Collectors.toList());
+        try (TransactionRepository repo = new TransactionRepository()) {
+            return repo.findAll().stream()
+                    .filter(t -> t.getSourceAccount().getUser().getId() == userId ||
+                            t.getDestinationAccount().getUser().getId() == userId)
+                    .collect(Collectors.toList());
+        }
     }
 }

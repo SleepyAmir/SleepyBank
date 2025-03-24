@@ -27,9 +27,9 @@
         <Label layoutX="323.0" layoutY="134.0" text="Password" />
         <TextField fx:id="firstNameInfoTxt" editable="false" layoutX="117.0" layoutY="83.0" />
         <TextField fx:id="lastNameInfoTxt" editable="false" layoutX="117.0" layoutY="130.0" />
-        <TextField fx:id="emailAddressInfoTxt" editable="false" layoutX="117.0" layoutY="281.0" prefHeight="25.0" prefWidth="149.0" />
         <TextField fx:id="dateOfBirthInfoTxt" editable="false" layoutX="117.0" layoutY="183.0" />
         <TextField fx:id="phoneNumberInfoTxt" editable="false" layoutX="117.0" layoutY="229.0" />
+        <TextField fx:id="emailAddressInfoTxt" editable="false" layoutX="117.0" layoutY="281.0" prefHeight="25.0" prefWidth="149.0" />
         <TextField fx:id="addressInfoTxt" editable="false" layoutX="35.0" layoutY="340.0" prefHeight="61.0" prefWidth="232.0" />
         <TextField fx:id="userNameInfoTxt" editable="false" layoutX="393.0" layoutY="83.0" />
         <TextField fx:id="passwordInfoTxt" editable="false" layoutX="393.0" layoutY="130.0" />

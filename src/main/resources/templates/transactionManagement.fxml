@@ -5,7 +5,7 @@
 <?import javafx.scene.chart.StackedBarChart?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane fx:id="transactionManagementPane" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.TransactionManagementController">
+<Pane fx:id="transactionManagementPane" prefHeight="506.0" prefWidth="638.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.TransactionManagementController">
     <children>
         <StackedBarChart fx:id="transactionsChart" layoutX="32.0" layoutY="31.0" prefHeight="458.0" prefWidth="566.0">
             <xAxis>

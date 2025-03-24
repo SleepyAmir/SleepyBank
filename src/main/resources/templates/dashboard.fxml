@@ -46,9 +46,9 @@
         <Label layoutX="332.0" layoutY="165.0" text="CVV2" />
         <Label layoutX="486.0" layoutY="165.0" text="Expiry" />
         <Separator layoutX="-4.0" layoutY="232.0" prefHeight="35.0" prefWidth="636.0" />
-        <Label layoutX="386.0" layoutY="294.0" text="CHEQUE MANAGEMENT">
+        <Label layoutX="360.0" layoutY="292.0" text="CHEQUE MANAGEMENT">
             <font>
-                <Font name="System Bold" size="17.0" />
+                <Font name="System Bold" size="22.0" />
             </font>
         </Label>
         <Label layoutX="34.0" layoutY="355.0" text="Total Cheques:" />

@@ -10,33 +10,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionRepository implements Repository<Transaction, Integer>, AutoCloseable {
-    @Override
     public void save(Transaction transaction) throws Exception {
         try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO TRANSACTIONS (ID, SOURCE_ACCOUNT, DESTINATION_ACCOUNT, AMOUNT, TRANSACTION_TYPE, TRANSACTION_TIME, DESCRIPTION) " +
                              "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
             int newId = ConnectionProvider.getConnectionProvider().nextId("transaction_seq");
-            transaction.setId(newId); // Assumes setter exists; adjust if using immutable builder
+            transaction.setId(newId);
             stmt.setInt(1, newId);
-            stmt.setInt(2, transaction.getSourceAccount().getId());
-            stmt.setInt(3, transaction.getDestinationAccount().getId());
+
+            // Handle source account
+            if (transaction.getSourceAccount() != null) {
+                stmt.setInt(2, transaction.getSourceAccount().getId());
+            } else {
+                stmt.setNull(2, Types.INTEGER);
+            }
+
+            // Handle destination account
+            if (transaction.getDestinationAccount() != null) {
+                stmt.setInt(3, transaction.getDestinationAccount().getId());
+            } else {
+                stmt.setNull(3, Types.INTEGER);
+            }
+
             stmt.setDouble(4, transaction.getAmount());
             stmt.setString(5, transaction.getTransactionType().name());
-            stmt.setTimestamp(6, Timestamp.valueOf(transaction.getTransactionTime() != null ? transaction.getTransactionTime() : LocalDateTime.now()));
+            stmt.setTimestamp(6, Timestamp.valueOf(
+                    transaction.getTransactionTime() != null ? transaction.getTransactionTime() : LocalDateTime.now()));
             stmt.setString(7, transaction.getDescription());
             stmt.executeUpdate();
         }
     }
 
-    @Override
     public void edit(Transaction transaction) throws Exception {
         try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE TRANSACTIONS SET SOURCE_ACCOUNT=?, DESTINATION_ACCOUNT=?, AMOUNT=?, TRANSACTION_TYPE=?, TRANSACTION_TIME=?, DESCRIPTION=? " +
                              "WHERE ID=?")) {
-            stmt.setInt(1, transaction.getSourceAccount().getId());
-            stmt.setInt(2, transaction.getDestinationAccount().getId());
+            if (transaction.getSourceAccount() != null) {
+                stmt.setInt(1, transaction.getSourceAccount().getId());
+            } else {
+                stmt.setNull(1, Types.INTEGER);
+            }
+
+            if (transaction.getDestinationAccount() != null) {
+                stmt.setInt(2, transaction.getDestinationAccount().getId());
+            } else {
+                stmt.setNull(2, Types.INTEGER);
+            }
+
             stmt.setDouble(3, transaction.getAmount());
             stmt.setString(4, transaction.getTransactionType().name());
             stmt.setTimestamp(5, Timestamp.valueOf(transaction.getTransactionTime()));

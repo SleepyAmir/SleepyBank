@@ -31,7 +31,7 @@ public class FundTransferController {
     @FXML private TextField transferCvvTxt;
     @FXML private TextField transferAmountTxt;
     @FXML private TextField receiverNumberTxt;
-    @FXML private Button transferConfirmTxt;
+    @FXML private Button transferConfirmBtn;
     @FXML private TextField transferChequeTxt;
     @FXML private TextField transferChequeAmountTxt;
     @FXML private TextField transferChequeAddressTxt;
@@ -39,6 +39,7 @@ public class FundTransferController {
     @FXML private DatePicker chequeDate;
     @FXML private Button issueChequeBtn;
     @FXML private Button cancelChequeBtn;
+    @FXML private Button transferCancelBtn;
     @FXML private ImageView byChequePng;
     @FXML private ImageView byCardPng;
 
@@ -50,21 +51,20 @@ public class FundTransferController {
 
     @FXML
     private void initialize() {
-        // Disable fields and buttons initially
         enableCardFields(false);
         enableChequeFields(false);
-        transferConfirmTxt.setDisable(true);
+        transferConfirmBtn.setDisable(true);
+        transferCancelBtn.setDisable(true);
         issueChequeBtn.setDisable(true);
         cancelChequeBtn.setDisable(true);
 
-        // Card checkbox listener
         byCardCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 byCheckCheckBox.setSelected(false);
                 enableCardFields(true);
                 populateCardField();
                 enableChequeFields(false);
-                transferConfirmTxt.setDisable(false);
+                transferConfirmBtn.setDisable(false);
                 issueChequeBtn.setDisable(true);
                 cancelChequeBtn.setDisable(true);
             } else if (!byCheckCheckBox.isSelected()) {
@@ -72,14 +72,13 @@ public class FundTransferController {
             }
         });
 
-        // Cheque checkbox listener
         byCheckCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 byCardCheckBox.setSelected(false);
                 enableCardFields(false);
                 enableChequeFields(true);
                 populateChequeField();
-                transferConfirmTxt.setDisable(true);
+                transferConfirmBtn.setDisable(true);
                 issueChequeBtn.setDisable(false);
                 cancelChequeBtn.setDisable(false);
             } else if (!byCardCheckBox.isSelected()) {
@@ -87,8 +86,8 @@ public class FundTransferController {
             }
         });
 
-        // Button actions
-        transferConfirmTxt.setOnAction(event -> confirmTransfer());
+
+        transferConfirmBtn.setOnAction(event -> confirmTransfer());
         issueChequeBtn.setOnAction(event -> issueCheque());
         cancelChequeBtn.setOnAction(event -> resetForm());
     }
@@ -113,7 +112,8 @@ public class FundTransferController {
     private void resetFormState() {
         enableCardFields(false);
         enableChequeFields(false);
-        transferConfirmTxt.setDisable(true);
+        transferConfirmBtn.setDisable(true);
+        transferCancelBtn.setDisable(true);
         issueChequeBtn.setDisable(true);
         cancelChequeBtn.setDisable(true);
     }

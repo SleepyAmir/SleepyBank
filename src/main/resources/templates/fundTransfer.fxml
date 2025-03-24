@@ -36,8 +36,8 @@
         <Label layoutX="21.0" layoutY="183.0" text="Receiver number:" />
         <TextField fx:id="receiverNumberTxt" layoutX="119.0" layoutY="179.0" prefHeight="25.0" prefWidth="166.0" />
         <Separator layoutX="4.0" layoutY="283.0" prefHeight="18.0" prefWidth="629.0" />
-        <Button fx:id="transferConfirmTxt" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
-        <Button fx:id="transferCancelTxt" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
+        <Button fx:id="transferConfirmBtn" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
+        <Button fx:id="transferCancelBtn" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
         <Label layoutX="21.0" layoutY="360.0" text="Cheque Number :" />
         <TextField fx:id="transferChequeTxt" editable="false" layoutX="117.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
         <Label layoutX="250.0" layoutY="360.0" text="Cheque Amount :" />

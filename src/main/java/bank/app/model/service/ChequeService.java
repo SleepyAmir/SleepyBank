@@ -4,7 +4,6 @@ import bank.app.model.entity.Cheque;
 import bank.app.model.repository.ChequeRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChequeService {
     public void save(Cheque cheque) throws Exception {
@@ -31,26 +30,13 @@ public class ChequeService {
 
     public List<Cheque> findByUserId(int userId) throws Exception {
         try (ChequeRepository repo = new ChequeRepository()) {
-            return repo.findAll().stream()
-                    .filter(cheque -> cheque.getUser().getId() == userId)
-                    .collect(Collectors.toList());
+            return repo.findByUserId(userId);
         }
     }
 
-    public Cheque findByChequeNumber(String chequeNumber) throws Exception {
+    public Cheque findByNumber(String chequeNumber) throws Exception {
         try (ChequeRepository repo = new ChequeRepository()) {
-            return repo.findAll().stream()
-                    .filter(cheque -> cheque.getNumber().equals(chequeNumber))
-                    .findFirst()
-                    .orElse(null);
-        }
-    }
-    public Cheque saveOrUpdate(Cheque cheque) throws Exception {
-        try (ChequeRepository repo = new ChequeRepository()) {
-            if (cheque.getId() == 0) {
-                repo.save(cheque);
-            }
-            return repo.findById(cheque.getId());
+            return repo.findByNumber(chequeNumber);
         }
     }
 }

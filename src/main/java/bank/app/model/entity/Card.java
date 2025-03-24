@@ -11,9 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @SuperBuilder
-
-public class Card extends Account{
-    private int id;
+public class Card extends Account {
     private String cardNumber;
     private String cvv2;
     private LocalDate expiryDate;

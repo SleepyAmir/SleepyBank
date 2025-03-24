@@ -112,6 +112,57 @@ public class ChequeRepository implements Repository<Cheque, Integer>, AutoClosea
         }
     }
 
+    // New method to find cheques by user ID
+    public List<Cheque> findByUserId(int userId) throws Exception {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES WHERE U_ID=?")) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            List<Cheque> cheques = new ArrayList<>();
+            UserRepository userRepo = new UserRepository();
+            while (rs.next()) {
+                Cheque cheque = new Cheque();
+                cheque.setId(rs.getInt("ID"));
+                cheque.setAccountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")));
+                cheque.setBalance(rs.getDouble("BALANCE"));
+                cheque.setCreatedAt(rs.getTimestamp("CREATED_AT").toLocalDateTime());
+                cheque.setNumber(rs.getString("CHEQUE_NUMBER"));
+                cheque.setPassDate(rs.getDate("PASS_DATE").toLocalDate());
+                cheque.setAmount(rs.getDouble("AMOUNT"));
+                cheque.setReceiver(rs.getString("RECEIVER"));
+                cheque.setDescription(rs.getString("DESCRIPTION"));
+                cheque.setUser(userRepo.findById(rs.getInt("U_ID")));
+                cheques.add(cheque);
+            }
+            return cheques;
+        }
+    }
+
+    // New method to find cheque by cheque number
+    public Cheque findByNumber(String chequeNumber) throws Exception {
+        try (Connection conn = ConnectionProvider.getConnectionProvider().getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM CHEQUES WHERE CHEQUE_NUMBER=?")) {
+            stmt.setString(1, chequeNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                UserRepository userRepo = new UserRepository();
+                Cheque cheque = new Cheque();
+                cheque.setId(rs.getInt("ID"));
+                cheque.setAccountType(AccountType.valueOf(rs.getString("ACCOUNT_TYPE")));
+                cheque.setBalance(rs.getDouble("BALANCE"));
+                cheque.setCreatedAt(rs.getTimestamp("CREATED_AT").toLocalDateTime());
+                cheque.setNumber(rs.getString("CHEQUE_NUMBER"));
+                cheque.setPassDate(rs.getDate("PASS_DATE").toLocalDate());
+                cheque.setAmount(rs.getDouble("AMOUNT"));
+                cheque.setReceiver(rs.getString("RECEIVER"));
+                cheque.setDescription(rs.getString("DESCRIPTION"));
+                cheque.setUser(userRepo.findById(rs.getInt("U_ID")));
+                return cheque;
+            }
+            return null;
+        }
+    }
+
     @Override
     public void close() throws Exception {
         // No-op since connections are managed per method

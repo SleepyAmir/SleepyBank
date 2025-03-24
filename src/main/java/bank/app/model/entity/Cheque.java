@@ -13,9 +13,7 @@ import java.time.LocalDate;
 @Setter
 @SuperBuilder
 @ToString
-
 public class Cheque extends Account {
-    private int id;
     private String number;
     private LocalDate passDate;
     private double amount;

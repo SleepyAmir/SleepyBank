@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UserService implements Service<User, Integer> {
+public class UserService implements Service<User, Integer> { // Properly implements Service<User, Integer>
     @Override
     public void save(User user) throws Exception {
         try (UserRepository repo = new UserRepository()) {

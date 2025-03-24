@@ -4,4 +4,5 @@ public enum TransactionType {
     Withdraw,
     Deposit,
     Transfer,
+    Cheque
 }

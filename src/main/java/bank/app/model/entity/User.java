@@ -27,11 +27,6 @@ public class User {
     private boolean active = true;
     private LocalDate registrationDate;
 
-    // Ensure registrationDate defaults to today in the builder
-    public static UserBuilder<?, ?> builder() {
-        return new UserBuilderImpl().registrationDate(LocalDate.now());
-    }
-
     @Override
     public String toString() {
         return new Gson().toJson(this);

@@ -71,7 +71,6 @@ public class RegistrationController {
     private final DashboardService dashboardService;
     private ObservableList<User> userData;
 
-    // Constructor for dependency injection
     public RegistrationController(UserManager userManager, DashboardService dashboardService) {
         this.userManager = userManager;
         this.dashboardService = dashboardService;
@@ -93,7 +92,6 @@ public class RegistrationController {
         filterBtn.setOnAction(event -> filterUsers());
         addSearchListeners();
 
-        // Populate text fields when a user is selected
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null && !userData.isEmpty()) {
                 populateTextFields(newSelection);
@@ -102,7 +100,6 @@ public class RegistrationController {
             }
         });
 
-        // Admin Dashboard Tab
         adminDashboardTab.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if (isSelected) {
                 populateAdminDashboard();
@@ -110,7 +107,6 @@ public class RegistrationController {
         });
     }
 
-    // Register Tab Logic
     private void handleRegister() {
         try {
             User user = buildUserFromRegisterFields();
@@ -153,7 +149,6 @@ public class RegistrationController {
                 .build();
     }
 
-    // Users Tab Logic
     private void setupUsersTable() {
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         firstnameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
@@ -316,7 +311,6 @@ public class RegistrationController {
         firstnameFindTxt.clear();
     }
 
-    // Admin Dashboard Logic
     private void populateAdminDashboard() {
         try {
             totalUsersTxt.setText(String.valueOf(dashboardService.getTotalUsers()));
@@ -336,7 +330,6 @@ public class RegistrationController {
         }
     }
 
-    // Utility Methods
     private void loadView(String fxmlPath, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();

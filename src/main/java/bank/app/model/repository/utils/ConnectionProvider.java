@@ -57,8 +57,8 @@ public class ConnectionProvider {
         dataSource.setPassword("java123");
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(10);
-        dataSource.setMaxTotal(20); // Optional: limit total connections
-        dataSource.setInitialSize(5); // Optional: start with 5 connections
+        dataSource.setMaxTotal(20);
+        dataSource.setInitialSize(5);
     }
 
     public static ConnectionProvider getConnectionProvider() {

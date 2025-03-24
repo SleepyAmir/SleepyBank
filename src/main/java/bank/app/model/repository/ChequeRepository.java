@@ -165,6 +165,5 @@ public class ChequeRepository implements Repository<Cheque, Integer>, AutoClosea
 
     @Override
     public void close() throws Exception {
-        // No-op since connections are managed per method
     }
 }

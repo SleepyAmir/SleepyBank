@@ -37,7 +37,7 @@ public class DashboardController {
     @FXML private TextField chequeAddressTxt;
     @FXML private TextField pendingChequeTxt;
     @FXML private TextField cashedChequeTxt;
-    @FXML private TextField bouncedChequetxt; // Matches fx:id in dashboard.fxml
+    @FXML private TextField bouncedChequetxt;
     @FXML private Button viewTransactionBtn;
     @FXML private Button transferFundsBtn;
     @FXML private TextField savingBalanceTxt;
@@ -45,9 +45,9 @@ public class DashboardController {
     @FXML private TextField cardNumberTxt1;
     @FXML private TextField cvvTxt1;
     @FXML private TextField expiryTxt1;
-    @FXML private Button chequeBtn; // Added from dashboard.fxml
-    @FXML private TextField interestRateTxt; // Added from dashboard.fxml
-    @FXML private Button savingTransferTxt; // Added from dashboard.fxml
+    @FXML private Button chequeBtn;
+    @FXML private TextField interestRateTxt;
+    @FXML private Button savingTransferTxt;
 
     @Setter
     private Runnable onViewTransactions;
@@ -69,7 +69,6 @@ public class DashboardController {
     @FXML
     private void initialize() {
         System.out.println("Initializing DashboardController");
-        // Null checks for debugging
         if (viewTransactionBtn == null) {
             System.out.println("Error: viewTransactionBtn is null");
         } else {
@@ -104,7 +103,6 @@ public class DashboardController {
             savingTransferTxt.setOnAction(event -> transferToChecking());
         }
 
-        // Set fields to non-editable
         if (accountBalanceTxt != null) accountBalanceTxt.setEditable(false);
         if (cardNumberTxt != null) cardNumberTxt.setEditable(false);
         if (cvvTxt != null) cvvTxt.setEditable(false);
@@ -129,7 +127,6 @@ public class DashboardController {
         }
         try {
             populateDashboard();
-            // Enable buttons after data is loaded
             viewTransactionBtn.setDisable(false);
             viewTransactionBtn.setVisible(true);
             transferFundsBtn.setDisable(false);

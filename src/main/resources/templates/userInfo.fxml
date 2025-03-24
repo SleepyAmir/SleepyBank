@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane fx:id="userInfoPane" prefHeight="493.0" prefWidth="636.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.UserInfoController">
+    <children>
+        <Label layoutX="213.0" layoutY="14.0" text="Personal Info">
+            <font>
+                <Font name="System Bold" size="29.0" />
+            </font>
+        </Label>
+        <Label layoutX="41.0" layoutY="87.0" text="First Name" />
+        <Label layoutX="41.0" layoutY="134.0" text="Last Name" />
+        <Label layoutX="36.0" layoutY="285.0" text="Email Address" />
+        <Label layoutX="39.0" layoutY="187.0" text="Date Of Birth" />
+        <Label layoutX="33.0" layoutY="233.0" text="Phone Number" />
+        <Label layoutX="39.0" layoutY="321.0" text="Address" />
+        <Label layoutX="320.0" layoutY="87.0" text="UserName" />
+        <Label layoutX="323.0" layoutY="134.0" text="Password" />
+        <TextField fx:id="firstNameInfoTxt" editable="false" layoutX="117.0" layoutY="83.0" />
+        <TextField fx:id="lastNameInfoTxt" editable="false" layoutX="117.0" layoutY="130.0" />
+        <TextField fx:id="emailAddressInfoTxt" editable="false" layoutX="117.0" layoutY="281.0" prefHeight="25.0" prefWidth="149.0" />
+        <TextField fx:id="dateOfBirthInfoTxt" editable="false" layoutX="117.0" layoutY="183.0" />
+        <TextField fx:id="phoneNumberInfoTxt" editable="false" layoutX="117.0" layoutY="229.0" />
+        <TextField fx:id="addressInfoTxt" editable="false" layoutX="35.0" layoutY="340.0" prefHeight="61.0" prefWidth="232.0" />
+        <TextField fx:id="userNameInfoTxt" editable="false" layoutX="393.0" layoutY="83.0" />
+        <TextField fx:id="passwordInfoTxt" editable="false" layoutX="393.0" layoutY="130.0" />
+        <Line endX="-110.39999389648438" endY="-402.3999938964844" layoutX="413.0" layoutY="468.0" startX="-110.39996337890625" startY="10.79998779296875" />
+        <Button fx:id="editBtn" layoutX="397.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Edit" />
+        <ImageView fitHeight="256.0" fitWidth="295.0" layoutX="339.0" layoutY="229.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/personalinfo.png" />
+            </image>
+        </ImageView>
+        <Text layoutX="323.0" layoutY="221.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Click on Edit button and after the changes " wrappingWidth="331.482421875" />
+        <Text layoutX="322.0" layoutY="238.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Click on Save button" />
+    </children>
+</Pane>

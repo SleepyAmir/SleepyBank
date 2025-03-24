@@ -1,251 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.net.URL?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.StackedBarChart?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import java.net.URL?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="562.0" prefWidth="636.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.MainAppController">
-       <stylesheets>
-           <URL value="@/Styles/mainApp.css" />
-       </stylesheets>
+<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="562.0" prefWidth="636.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.MainAppController">
+   <stylesheets>
+      <URL value="@/Styles/mainApp.css" />
+   </stylesheets>
    <tabs>
       <Tab fx:id="dashboardTab" text="Dashboard">
          <content>
-            <Pane fx:id="dashboardPane" prefHeight="518.0" prefWidth="636.0">
-               <children>
-                  <Label fx:id="welcomeLabel" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="236.0">
-                     <font>
-                        <Font name="System Bold" size="23.0" />
-                     </font>
-                  </Label>
-                  <GridPane layoutX="22.0" layoutY="60.0" prefHeight="92.0" prefWidth="250.0">
-                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.5999755859375" minWidth="10.0" prefWidth="102.19998168945312" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.20001220703125" minWidth="10.0" prefWidth="147.80001831054688" />
-                     </columnConstraints>
-                     <rowConstraints>
-                        <RowConstraints maxHeight="57.600006103515625" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="72.60000610351562" minHeight="10.0" prefHeight="54.0" vgrow="SOMETIMES" />
-                     </rowConstraints>
-                     <children>
-                        <Label text="Account Balance :" />
-                        <Label text="Card Number :" GridPane.rowIndex="1" />
-                        <TextField fx:id="accountBalanceTxt" editable="false" GridPane.columnIndex="1" />
-                        <TextField fx:id="cardNumberTxt" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                     </children>
-                  </GridPane>
-                  <Label layoutX="23.0" layoutY="175.0" text="CVV2" />
-                  <Label layoutX="154.0" layoutY="175.0" text="Expiry" />
-                  <TextField fx:id="cvvTxt" editable="false" layoutX="57.0" layoutY="171.0" prefHeight="25.0" prefWidth="79.0" />
-                  <TextField fx:id="expiryTxt" editable="false" layoutX="192.0" layoutY="171.0" prefHeight="25.0" prefWidth="79.0" />
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#6699cc" height="151.0" layoutX="312.0" layoutY="53.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
-                  <TextField fx:id="cardNumberTxt1" editable="false" layoutX="332.0" layoutY="118.0" prefHeight="25.0" prefWidth="268.0" />
-                  <TextField fx:id="cvvTxt1" editable="false" layoutX="365.0" layoutY="161.0" prefHeight="25.0" prefWidth="54.0" />
-                  <TextField fx:id="expiryTxt1" editable="false" layoutX="520.0" layoutY="161.0" prefHeight="25.0" prefWidth="80.0" />
-                  <Label layoutX="332.0" layoutY="165.0" text="CVV2" />
-                  <Label layoutX="486.0" layoutY="165.0" text="Expiry" />
-                  <Separator layoutX="-4.0" layoutY="232.0" prefHeight="35.0" prefWidth="668.0" />
-                  <Button fx:id="viewTransactionBtn" layoutX="25.0" layoutY="203.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="114.0" text="View Transactions" visible="false" />
-                  <Button fx:id="transferFundsBtn" layoutX="159.0" layoutY="203.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="114.0" text=" Transfer Funds" visible="false" />
-                  <Label layoutX="386.0" layoutY="294.0" text="CHEQUE MANAGEMENT">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="34.0" layoutY="355.0" text="Total Cheques:" />
-                  <TextField fx:id="totalChequeBtn" layoutX="110.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
-                  <Label layoutX="26.0" layoutY="299.0" text="Current Cheque:" />
-                  <TextField fx:id="chequeAddressTxt" layoutX="119.0" layoutY="295.0" prefHeight="25.0" prefWidth="197.0" />
-                  <Label layoutX="201.0" layoutY="355.0" text="Pending:" />
-                  <TextField fx:id="pendingChequeBtn" layoutX="255.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
-                  <Label layoutX="360.0" layoutY="355.0" text="Cashed" />
-                  <TextField fx:id="cashedChequeBtn" layoutX="405.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
-                  <Label layoutX="493.0" layoutY="355.0" text="Bounced" />
-                  <TextField fx:id="bouncedChequeBtn" layoutX="549.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
-                  <Button fx:id="chequeBtn" layoutX="335.0" layoutY="295.0" mnemonicParsing="false" text="Use Cheque for Purchase" visible="false" />
-                  <Button fx:id="manageChequeBtn" layoutX="499.0" layoutY="295.0" mnemonicParsing="false" text="Manage Cheques" visible="false" />
-                  <Separator layoutX="-16.0" layoutY="389.0" prefHeight="35.0" prefWidth="668.0" />
-                  <Label layoutX="232.0" layoutY="411.0" text="SAVINGS ACCOUNT">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="30.0" layoutY="453.0" text="Balance :" />
-                  <TextField fx:id="savingBalanceTxt" layoutX="81.0" layoutY="449.0" prefHeight="25.0" prefWidth="167.0" />
-                  <Label layoutX="283.0" layoutY="453.0" text="Interest Rate:" />
-                  <TextField fx:id="interestRateTxt" layoutX="365.0" layoutY="449.0" prefHeight="25.0" prefWidth="68.0" />
-                  <Button fx:id="savingTransferTxt" layoutX="473.0" layoutY="449.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Coming Soon" />
-                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="367.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sleepy Bank">
-                     <font>
-                        <Font name="Felix Titling" size="31.0" />
-                     </font>
-                  </Text>
-               </children>
-            </Pane>
+            <fx:include fx:id="dashboard" source="dashboard.fxml"/>
          </content>
       </Tab>
       <Tab fx:id="fundTab" text="Fund Transfer">
          <content>
-            <Pane fx:id="fundTransferPane" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Label layoutX="24.0" layoutY="22.0" text="Transfer Method:">
-                     <font>
-                        <Font name="System Bold" size="22.0" />
-                     </font>
-                  </Label>
-                  <CheckBox fx:id="byCardCheckBox" layoutX="258.0" layoutY="22.0" mnemonicParsing="false" text="By Card" underline="true">
-                     <font>
-                        <Font size="21.0" />
-                     </font>
-                  </CheckBox>
-                  <CheckBox fx:id="byCheckCheckBox" layoutX="426.0" layoutY="22.0" mnemonicParsing="false" text="By Cheque" underline="true">
-                     <font>
-                        <Font size="21.0" />
-                     </font>
-                  </CheckBox>
-                  <Label layoutX="24.0" layoutY="133.0" text="Card number :" />
-                  <Label layoutX="308.0" layoutY="133.0" text="CVV2 :" />
-                  <TextField fx:id="transferCvvTxt" layoutX="351.0" layoutY="129.0" prefHeight="25.0" prefWidth="66.0" />
-                  <Label layoutX="309.0" layoutY="183.0" text="Amount :" />
-                  <TextField fx:id="transferAmountTxt" layoutX="363.0" layoutY="179.0" prefHeight="25.0" prefWidth="118.0" />
-                  <Label layoutX="21.0" layoutY="183.0" text="Receiver number:" />
-                  <TextField fx:id="receiverNumberTxt" layoutX="119.0" layoutY="179.0" prefHeight="25.0" prefWidth="166.0" />
-                  <Separator layoutX="4.0" layoutY="283.0" prefHeight="18.0" prefWidth="629.0" />
-                  <Button fx:id="transferConfirmTxt" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
-                  <Button fx:id="transferCancelTxt" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
-                  <Label layoutX="21.0" layoutY="360.0" text="Cheque Number :" />
-                  <TextField fx:id="transferChequeTxt" editable="false" layoutX="117.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
-                  <Label layoutX="250.0" layoutY="360.0" text="Cheque Amount :" />
-                  <TextField fx:id="transferChequeAmountTxt" layoutX="347.0" layoutY="356.0" prefHeight="25.0" prefWidth="76.0" />
-                  <Label layoutX="236.0" layoutY="310.0" text="TRANSFER BY CHEQUE">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="236.0" layoutY="85.0" text="TRANSFER BY CARD">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Button fx:id="issueChequeBtn" layoutX="172.0" layoutY="487.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Issue Cheque" />
-                  <Button fx:id="cancelChequeBtn" layoutX="333.0" layoutY="487.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel" />
-                  <Label layoutX="20.0" layoutY="408.0" text="Receiver Number:" />
-                  <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
-                  <TextField fx:id="transferCardNumberTxt" layoutX="106.0" layoutY="129.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Label layoutX="21.0" layoutY="450.0" text="Description :" />
-                  <TextField fx:id="chequeDescriptionTxt" layoutX="89.0" layoutY="446.0" prefHeight="25.0" prefWidth="393.0" />
-                  <Label layoutX="292.0" layoutY="408.0" text="Pass Date:" />
-                  <DatePicker fx:id="chequeDate" layoutX="350.0" layoutY="404.0" prefHeight="25.0" prefWidth="132.0" />
-                  <ImageView fx:id="byCardPng" fitHeight="150.0" fitWidth="200.0" layoutX="460.0" layoutY="85.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/creditcard.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="byChequePng" fitHeight="180.0" fitWidth="206.0" layoutX="445.0" layoutY="291.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/cheque.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Pane>
+            <fx:include fx:id="fundTransfer" source="fundTransfer.fxml"/>
          </content>
       </Tab>
       <Tab fx:id="transactionHistoryTab" text="Transaction History">
          <content>
-            <Pane fx:id="transactionHistoryPane" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <TableView fx:id="transactionTable" layoutX="15.0" layoutY="67.0" prefHeight="403.0" prefWidth="615.0">
-                     <columns>
-                        <TableColumn fx:id="accountCol" prefWidth="113.39999389648438" text="Account" />
-                        <TableColumn fx:id="typeCol" prefWidth="86.5999755859375" text="Type" />
-                        <TableColumn fx:id="amountCol" prefWidth="89.4000244140625" text="Amount" />
-                        <TableColumn fx:id="statusCol" prefWidth="67.79998779296875" text="Status" />
-                        <TableColumn fx:id="descriptionCol" prefWidth="256.20001220703125" text="Description" />
-                     </columns>
-                  </TableView>
-                  <Label layoutX="189.0" layoutY="20.0" text="Transaction History">
-                     <font>
-                        <Font name="System Bold" size="29.0" />
-                     </font>
-                  </Label>
-                  <Button fx:id="printTableBtn" layoutX="217.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" text="Print" />
-               </children>
-            </Pane>
+            <fx:include fx:id="transactionHistory" source="transactionHistory.fxml"/>
          </content>
       </Tab>
       <Tab fx:id="userInfoTab" text="User Info">
          <content>
-            <Pane fx:id="userInfoPane" prefHeight="493.0" prefWidth="636.0">
-               <children>
-                  <Label layoutX="213.0" layoutY="14.0" text="Personal Info">
-                     <font>
-                        <Font name="System Bold" size="29.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="41.0" layoutY="87.0" text="First Name" />
-                  <Label layoutX="41.0" layoutY="134.0" text="Last Name" />
-                  <Label layoutX="36.0" layoutY="285.0" text="Email Address" />
-                  <Label layoutX="39.0" layoutY="187.0" text="Date Of Birth" />
-                  <Label layoutX="33.0" layoutY="233.0" text="Phone Number" />
-                  <Label layoutX="39.0" layoutY="321.0" text="Address" />
-                  <Label layoutX="320.0" layoutY="87.0" text="UserName" />
-                  <Label layoutX="323.0" layoutY="134.0" text="Password" />
-                  <TextField fx:id="firstNameInfoTxt" editable="false" layoutX="117.0" layoutY="83.0" />
-                  <TextField fx:id="lastNameInfoTxt" editable="false" layoutX="117.0" layoutY="130.0" />
-                  <TextField fx:id="emailAddressInfoTxt" editable="false" layoutX="117.0" layoutY="281.0" prefHeight="25.0" prefWidth="149.0" />
-                  <TextField fx:id="dateOfBirthInfoTxt" editable="false" layoutX="117.0" layoutY="183.0" />
-                  <TextField fx:id="phoneNumberInfoTxt" editable="false" layoutX="117.0" layoutY="229.0" />
-                  <TextField fx:id="addressInfoTxt" editable="false" layoutX="35.0" layoutY="340.0" prefHeight="61.0" prefWidth="232.0" />
-                  <TextField fx:id="userNameInfoTxt" editable="false" layoutX="393.0" layoutY="83.0" />
-                  <TextField fx:id="passwordInfoTxt" editable="false" layoutX="393.0" layoutY="130.0" />
-                  <Line endX="-110.39999389648438" endY="-402.3999938964844" layoutX="413.0" layoutY="468.0" startX="-110.39996337890625" startY="10.79998779296875" />
-                  <Button fx:id="editBtn" layoutX="397.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Edit" />
-                  <ImageView fitHeight="256.0" fitWidth="295.0" layoutX="339.0" layoutY="229.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/personalinfo.png" />
-                     </image>
-                  </ImageView>
-                  <Text layoutX="323.0" layoutY="221.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Click on Edit button and after the changes " wrappingWidth="331.482421875" />
-                  <Text layoutX="322.0" layoutY="238.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Click on Save button" />
-               </children>
-            </Pane>
+            <fx:include fx:id="userInfo" source="userInfo.fxml"/>
          </content>
       </Tab>
       <Tab fx:id="transactionManagementTab" text="Transaction management">
          <content>
-            <Pane fx:id="transactionManagementPane" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <StackedBarChart fx:id="transactionsChart" layoutX="32.0" layoutY="31.0" prefHeight="458.0" prefWidth="566.0">
-                     <xAxis>
-                        <CategoryAxis fx:id="categoryAxis" side="BOTTOM" />
-                     </xAxis>
-                     <yAxis>
-                        <NumberAxis fx:id="numberAxis" side="LEFT" />
-                     </yAxis>
-                  </StackedBarChart>
-               </children>
-            </Pane>
+            <fx:include fx:id="transactionManagement" source="transactionManagement.fxml"/>
          </content>
       </Tab>
    </tabs>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="fundTransferPane" prefHeight="522.0" prefWidth="636.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.FundTransferController">
+    <children>
+        <Label layoutX="24.0" layoutY="22.0" text="Transfer Method:">
+            <font>
+                <Font name="System Bold" size="22.0" />
+            </font>
+        </Label>
+        <CheckBox fx:id="byCardCheckBox" layoutX="258.0" layoutY="22.0" mnemonicParsing="false" text="By Card" underline="true">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </CheckBox>
+        <CheckBox fx:id="byCheckCheckBox" layoutX="426.0" layoutY="22.0" mnemonicParsing="false" text="By Cheque" underline="true">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </CheckBox>
+        <Label layoutX="24.0" layoutY="133.0" text="Card number :" />
+        <Label layoutX="308.0" layoutY="133.0" text="CVV2 :" />
+        <TextField fx:id="transferCvvTxt" layoutX="351.0" layoutY="129.0" prefHeight="25.0" prefWidth="66.0" />
+        <Label layoutX="309.0" layoutY="183.0" text="Amount :" />
+        <TextField fx:id="transferAmountTxt" layoutX="363.0" layoutY="179.0" prefHeight="25.0" prefWidth="118.0" />
+        <Label layoutX="21.0" layoutY="183.0" text="Receiver number:" />
+        <TextField fx:id="receiverNumberTxt" layoutX="119.0" layoutY="179.0" prefHeight="25.0" prefWidth="166.0" />
+        <Separator layoutX="4.0" layoutY="283.0" prefHeight="18.0" prefWidth="629.0" />
+        <Button fx:id="transferConfirmTxt" layoutX="172.0" layoutY="234.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Confirm" />
+        <Button fx:id="transferCancelTxt" layoutX="327.0" layoutY="234.0" mnemonicParsing="false" prefWidth="138.0" text="Cancel" />
+        <Label layoutX="21.0" layoutY="360.0" text="Cheque Number :" />
+        <TextField fx:id="transferChequeTxt" editable="false" layoutX="117.0" layoutY="356.0" prefHeight="25.0" prefWidth="113.0" />
+        <Label layoutX="250.0" layoutY="360.0" text="Cheque Amount :" />
+        <TextField fx:id="transferChequeAmountTxt" layoutX="347.0" layoutY="356.0" prefHeight="25.0" prefWidth="76.0" />
+        <Label layoutX="236.0" layoutY="310.0" text="TRANSFER BY CHEQUE">
+            <font>
+                <Font name="System Bold" size="17.0" />
+            </font>
+        </Label>
+        <Label layoutX="236.0" layoutY="85.0" text="TRANSFER BY CARD">
+            <font>
+                <Font name="System Bold" size="17.0" />
+            </font>
+        </Label>
+        <Button fx:id="issueChequeBtn" layoutX="172.0" layoutY="487.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Issue Cheque" />
+        <Button fx:id="cancelChequeBtn" layoutX="333.0" layoutY="487.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel" />
+        <TextField fx:id="transferCardNumberTxt" layoutX="106.0" layoutY="129.0" prefHeight="25.0" prefWidth="160.0" />
+        <Label layoutX="20.0" layoutY="408.0" text="Receiver Number:" />
+        <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
+        <Label layoutX="21.0" layoutY="450.0" text="Description :" />
+        <TextField fx:id="chequeDescriptionTxt" layoutX="89.0" layoutY="446.0" prefHeight="25.0" prefWidth="393.0" />
+        <Label layoutX="292.0" layoutY="408.0" text="Pass Date:" />
+        <ImageView fx:id="byCardPng" fitHeight="150.0" fitWidth="200.0" layoutX="460.0" layoutY="85.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/creditcard.png" />
+            </image>
+        </ImageView>
+        <ImageView fx:id="byChequePng" fitHeight="180.0" fitWidth="206.0" layoutX="445.0" layoutY="291.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/cheque.png" />
+            </image>
+        </ImageView>
+        <DatePicker fx:id="chequeDate" layoutX="350.0" layoutY="404.0" prefHeight="25.0" prefWidth="132.0" />
+    </children>
+</Pane>

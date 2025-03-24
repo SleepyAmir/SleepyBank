@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane fx:id="dashboardPane" prefHeight="518.0" prefWidth="636.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.DashboardController">
+    <children>
+        <Label fx:id="welcomeLabel" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="236.0">
+            <font>
+                <Font name="System Bold" size="23.0" />
+            </font>
+        </Label>
+        <GridPane layoutX="22.0" layoutY="60.0" prefHeight="92.0" prefWidth="250.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.5999755859375" minWidth="10.0" prefWidth="102.19998168945312" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.20001220703125" minWidth="10.0" prefWidth="147.80001831054688" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="57.600006103515625" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="72.60000610351562" minHeight="10.0" prefHeight="54.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Account Balance :" />
+                <Label text="Card Number :" GridPane.rowIndex="1" />
+                <TextField fx:id="accountBalanceTxt" editable="false" GridPane.columnIndex="1" />
+                <TextField fx:id="cardNumberTxt" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            </children>
+        </GridPane>
+        <Label layoutX="23.0" layoutY="175.0" text="CVV2" />
+        <Label layoutX="154.0" layoutY="175.0" text="Expiry" />
+        <TextField fx:id="cvvTxt" editable="false" layoutX="57.0" layoutY="171.0" prefHeight="25.0" prefWidth="79.0" />
+        <TextField fx:id="expiryTxt" editable="false" layoutX="192.0" layoutY="171.0" prefHeight="25.0" prefWidth="79.0" />
+        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#6699cc" height="151.0" layoutX="312.0" layoutY="53.0" stroke="BLACK" strokeType="INSIDE" width="305.0" />
+        <TextField fx:id="cardNumberTxt1" editable="false" layoutX="332.0" layoutY="118.0" prefHeight="25.0" prefWidth="268.0" />
+        <TextField fx:id="cvvTxt1" editable="false" layoutX="365.0" layoutY="161.0" prefHeight="25.0" prefWidth="54.0" />
+        <TextField fx:id="expiryTxt1" editable="false" layoutX="520.0" layoutY="161.0" prefHeight="25.0" prefWidth="80.0" />
+        <Label layoutX="332.0" layoutY="165.0" text="CVV2" />
+        <Label layoutX="486.0" layoutY="165.0" text="Expiry" />
+        <Separator layoutX="-4.0" layoutY="232.0" prefHeight="35.0" prefWidth="636.0" />
+        <Label layoutX="386.0" layoutY="294.0" text="CHEQUE MANAGEMENT">
+            <font>
+                <Font name="System Bold" size="17.0" />
+            </font>
+        </Label>
+        <Label layoutX="34.0" layoutY="355.0" text="Total Cheques:" />
+        <TextField fx:id="totalChequeTxt" editable="false" layoutX="110.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
+        <Label layoutX="26.0" layoutY="299.0" text="Current Cheque:" />
+        <TextField fx:id="chequeAddressTxt" editable="false" layoutX="119.0" layoutY="295.0" prefHeight="25.0" prefWidth="197.0" />
+        <Label layoutX="201.0" layoutY="355.0" text="Pending:" />
+        <TextField fx:id="pendingChequeTxt" editable="false" layoutX="255.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
+        <Label layoutX="360.0" layoutY="355.0" text="Cashed" />
+        <TextField fx:id="cashedChequeTxt" editable="false" layoutX="405.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
+        <Label layoutX="493.0" layoutY="355.0" text="Bounced" />
+        <TextField fx:id="bouncedChequetxt" editable="false" layoutX="549.0" layoutY="351.0" prefHeight="25.0" prefWidth="57.0" />
+        <Separator layoutX="-16.0" layoutY="389.0" prefHeight="35.0" prefWidth="650.0" />
+        <Label layoutX="232.0" layoutY="411.0" text="SAVINGS ACCOUNT">
+            <font>
+                <Font name="System Bold" size="17.0" />
+            </font>
+        </Label>
+        <Label layoutX="30.0" layoutY="453.0" text="Balance :" />
+        <TextField fx:id="savingBalanceTxt" editable="false" layoutX="81.0" layoutY="449.0" prefHeight="25.0" prefWidth="167.0" />
+        <Label layoutX="283.0" layoutY="453.0" text="Interest Rate:" />
+        <TextField fx:id="interestRateTxt" editable="false" layoutX="365.0" layoutY="449.0" prefHeight="25.0" prefWidth="68.0" />
+        <Button fx:id="savingTransferTxt" layoutX="473.0" layoutY="449.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Coming Soon" />
+        <Text fill="WHITE" fontSmoothingType="LCD" layoutX="367.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sleepy Bank">
+            <font>
+                <Font name="Felix Titling" size="31.0" />
+            </font>
+        </Text>
+    </children>
+</Pane>

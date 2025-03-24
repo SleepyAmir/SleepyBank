@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="transactionHistoryPane" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bank.app.controller.TransactionHistoryController">
+    <children>
+        <TableView fx:id="transactionTable" layoutX="15.0" layoutY="67.0" prefHeight="403.0" prefWidth="615.0">
+            <columns>
+                <TableColumn fx:id="accountCol" prefWidth="113.39999389648438" text="Account" />
+                <TableColumn fx:id="typeCol" prefWidth="86.5999755859375" text="Type" />
+                <TableColumn fx:id="amountCol" prefWidth="89.4000244140625" text="Amount" />
+                <TableColumn fx:id="statusCol" prefWidth="67.79998779296875" text="Status" />
+                <TableColumn fx:id="descriptionCol" prefWidth="256.20001220703125" text="Description" />
+            </columns>
+        </TableView>
+        <Label layoutX="189.0" layoutY="20.0" text="Transaction History">
+            <font>
+                <Font name="System Bold" size="29.0" />
+            </font>
+        </Label>
+        <Button fx:id="printTableBtn" layoutX="217.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="202.0" text="Print" />
+    </children>
+</Pane>

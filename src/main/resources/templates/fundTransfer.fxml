@@ -56,7 +56,7 @@
         <Button fx:id="cancelChequeBtn" layoutX="333.0" layoutY="487.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Cancel" />
         <TextField fx:id="transferCardNumberTxt" layoutX="106.0" layoutY="129.0" prefHeight="25.0" prefWidth="160.0" />
         <Label layoutX="20.0" layoutY="408.0" text="Receiver Number:" />
-        <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" />
+        <TextField fx:id="transferChequeAddressTxt" layoutX="120.0" layoutY="404.0" prefHeight="25.0" prefWidth="166.0" promptText="enter the cardNumber of receiver" />
         <Label layoutX="21.0" layoutY="450.0" text="Description :" />
         <TextField fx:id="chequeDescriptionTxt" layoutX="89.0" layoutY="446.0" prefHeight="25.0" prefWidth="393.0" />
         <Label layoutX="292.0" layoutY="408.0" text="Pass Date:" />

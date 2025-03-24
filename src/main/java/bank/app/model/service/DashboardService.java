@@ -1,10 +1,7 @@
-package bank.app.controller;
+package bank.app.model.service;
 
 import bank.app.model.entity.Card;
-import bank.app.model.service.CardService;
-import bank.app.model.service.ChequeService;
-import bank.app.model.service.TransactionService;
-import bank.app.model.service.UserService;
+
 import java.time.LocalDate;
 
 public class DashboardService {

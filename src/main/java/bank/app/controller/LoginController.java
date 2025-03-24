@@ -1,6 +1,7 @@
 package bank.app.controller;
 
 import bank.app.model.entity.User;
+import bank.app.model.entity.UserManager;
 import bank.app.model.service.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

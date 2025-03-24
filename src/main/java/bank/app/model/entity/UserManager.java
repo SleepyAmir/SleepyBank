@@ -1,6 +1,5 @@
-package bank.app.controller;
+package bank.app.model.entity;
 
-import bank.app.model.entity.User;
 import bank.app.model.service.UserService;
 import java.time.LocalDate;
 import java.util.List;
